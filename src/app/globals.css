@@ -1,36 +1,361 @@
 @import "tailwindcss";
 
+/* ===========================================
+   Halo Collective — Court Cream
+   Design tokens (consumed by Tailwind v4 via @theme)
+   =========================================== */
+
 @theme inline {
-  --color-background: 0 0% 100%;
-  --color-foreground: 0 0% 3.9%;
-  --color-card: 0 0% 100%;
-  --color-card-foreground: 0 0% 3.9%;
-  --color-popover: 0 0% 100%;
-  --color-popover-foreground: 0 0% 3.9%;
-  --color-primary: 0 0% 9%;
-  --color-primary-foreground: 0 0% 98%;
-  --color-secondary: 0 0% 96.1%;
-  --color-secondary-foreground: 0 0% 9%;
-  --color-muted: 0 0% 96.1%;
-  --color-muted-foreground: 0 0% 45.1%;
-  --color-accent: 0 0% 96.1%;
-  --color-accent-foreground: 0 0% 9%;
-  --color-destructive: 0 84.2% 60.2%;
-  --color-destructive-foreground: 0 0% 98%;
-  --color-border: 0 0% 89.8%;
-  --color-input: 0 0% 89.8%;
-  --color-ring: 0 0% 3.9%;
+  /* ---------- Brand palette (Court Cream) ---------- */
+  --color-cream: #f1ebde;       /* page background */
+  --color-cream-2: #fbf6e9;     /* surface / card */
+  --color-cream-3: #e9e0cb;     /* sunken surface */
+  --color-ink: #1a1612;         /* primary text — warm near-black */
+  --color-ink-2: #3d3528;       /* secondary text */
+  --color-ink-3: #75674e;       /* tertiary / meta text */
+  --color-line: #d8cfb6;        /* hairline border */
+  --color-line-2: #beb295;      /* stronger border */
+
+  --color-accent-gold: #c8932e; /* eyebrows, top-stripe, gold accents */
+  --color-accent-warm: #d4a04a;
+  --color-action: #5ba9d8;      /* the only CTA / play / vote / link blue */
+  --color-banner: #1e2d4a;      /* navy module-header banner */
+  --color-win: #2e7d32;
+  --color-loss: #7a1f1f;
+  --color-ok: #5b7a3f;
+
+  /* Flag chroma (only place flag color enters the system) */
+  --color-flag-ita-green: #009246;
+  --color-flag-ita-red: #ce2b37;
+  --color-flag-fra-blue: #002395;
+  --color-flag-fra-red: #ed2939;
+  --color-flag-pol-red: #b8001f;
+  --color-flag-kaz-blue: #009dbf;
+  --color-flag-kaz-yellow: #f5c500;
+  --color-flag-bel-yellow: #ffd100;
+  --color-flag-bel-red: #ef3340;
+
+  /* ---------- shadcn semantic tokens (re-routed to Court Cream) ---------- */
+  --color-background: #f1ebde;
+  --color-foreground: #1a1612;
+  --color-card: #fbf6e9;
+  --color-card-foreground: #1a1612;
+  --color-popover: #fbf6e9;
+  --color-popover-foreground: #1a1612;
+  --color-primary: #1a1612;
+  --color-primary-foreground: #f1ebde;
+  --color-secondary: #e9e0cb;
+  --color-secondary-foreground: #1a1612;
+  --color-muted: #e9e0cb;
+  --color-muted-foreground: #75674e;
+  --color-accent: #c8932e;
+  --color-accent-foreground: #ffffff;
+  --color-destructive: #7a1f1f;
+  --color-destructive-foreground: #ffffff;
+  --color-border: #d8cfb6;
+  --color-input: #d8cfb6;
+  --color-ring: #1a1612;
+
+  /* ---------- Type families ---------- */
+  --font-serif: var(--font-serif), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-sans), "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: var(--font-mono), "SF Mono", ui-monospace, monospace;
+
+  /* ---------- Radii ---------- */
   --radius: 0.5rem;
-  --font-sans: var(--font-montserrat);
-  --font-mono: var(--font-poppins);
+  --radius-xs: 4px;     /* mono buttons (Watch Highlights / Submit Vote) */
+  --radius-sm: 8px;     /* small inputs, video frame */
+  --radius-md: 10px;    /* primary cta */
+  --radius-lg: 12px;    /* video widgets, voice player, match cards */
+  --radius-xl: 14px;    /* voice player outer */
+  --radius-2xl: 16px;   /* athlete roster card */
+  --radius-pill: 999px;
+
+  /* ---------- Shadows (3 discrete, no scale) ---------- */
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.10);     /* roster hover lift */
+  --shadow-portrait: 0 6px 20px rgba(0, 0, 0, 0.22); /* circular avatar */
+  --shadow-pill: 0 6px 20px rgba(0, 0, 0, 0.45);    /* play button over media */
+
+  /* ---------- Spacing (8pt-ish) ---------- */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 14px;
+  --spacing-5: 16px;
+  --spacing-6: 20px;
+  --spacing-7: 24px;
+  --spacing-8: 32px;
+  --spacing-9: 44px;
+  --spacing-10: 64px;
+
+  /* ---------- Layout ---------- */
+  --content-max: 480px;   /* newsletter column width */
+  --hero-h: 220px;
 }
 
+/* =========================
+   Base element styles
+   ========================= */
+
 * {
-  border-color: hsl(var(--color-border));
+  border-color: var(--color-border);
 }
 
 body {
-  background-color: hsl(var(--color-background));
-  color: hsl(var(--color-foreground));
+  background-color: var(--color-background);
+  color: var(--color-foreground);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* =========================
+   Editorial typography utilities
+   ========================= */
+
+/* Display serif uppercase — landing hero "THE INSIDE STORY..." */
+.h-display {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 32px;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+
+/* H1 — athlete name on story page */
+.h1 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 26px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+
+/* H2 — section/module title (sits on navy banner) */
+.h2 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: var(--color-cream);
+}
+
+/* H3 — card heading */
+.h3 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
+}
+
+/* Italic serif — pull quote / hero subtitle (journal voice) */
+.quote {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+  color: var(--color-ink-2);
+}
+
+.quote-sm {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--color-ink);
+}
+
+/* Body paragraph */
+.p-body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--color-ink-2);
+}
+
+.p-body-sm {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-ink-2);
+}
+
+/* Mono labels — the visual signature: wide-tracked uppercase */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-accent-gold);
+}
+
+.meta {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+
+.tiny {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+
+/* Wordmark composite: italic Fraunces "HALO" + mono small-caps "COLLECTIVE" */
+.wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+}
+.wordmark .halo {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+.wordmark .collective {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+
+/* =========================
+   Buttons (brand variants)
+   ========================= */
+
+/* Dark CTA — ink/cream, uppercase mono */
+.btn-primary-cta {
+  background: var(--color-ink);
+  color: var(--color-cream);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 14px 20px;
+  border-radius: var(--radius-md);
+  border: 0;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+.btn-primary-cta:hover {
+  filter: brightness(0.92);
+}
+
+/* Action-color CTA — the ONLY blue in the system (play, submit, vote) */
+.btn-action {
+  background: var(--color-action);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  border-radius: var(--radius-xs);
+  border: 0;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+.btn-action:hover {
+  filter: brightness(1.1);
+}
+
+/* =========================
+   Brand chrome
+   ========================= */
+
+/* Navy module header w/ 3px gold top stripe */
+.section-banner {
+  background: var(--color-banner);
+  color: var(--color-cream);
+  padding: 16px 20px 14px;
+  position: relative;
+  overflow: hidden;
+}
+.section-banner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-accent-gold);
+}
+
+/* Frosted capsule — sits over hero photography (★ MEMBER, #03 · 22 APR) */
+.frost-capsule {
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Frosted top nav */
+.frost-nav {
+  background: color-mix(in srgb, var(--color-cream) 90%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Hero protection gradient (badge legibility over photography) */
+.hero-protection::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.28) 0%,
+    rgba(0, 0, 0, 0) 40%,
+    rgba(0, 0, 0, 0.18) 100%
+  );
+  pointer-events: none;
+}
+
+/* =========================
+   Animation (restrained — one keyframe)
+   ========================= */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out;
 }

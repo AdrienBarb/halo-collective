@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Montserrat, Poppins } from "next/font/google";
+import { Fraunces, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import GlobalErrorHandler from "@/components/GlobalErrorHandler";
 import { QueryProviders } from "@/components/providers/QueryProviders";
@@ -10,16 +10,27 @@ import "./globals.css";
 import { genPageMetadata } from "@/lib/seo/genPageMetadata";
 import { siteMetadata } from "@/data/siteMetadata";
 
-const montserrat = Montserrat({
-  variable: "--font-montserrat",
+// Editorial display + headlines + italic pull-quotes + the wordmark "HALO"
+// Variable font so we can use opsz (optical size) — see colors_and_type.css
+const fraunces = Fraunces({
+  variable: "--font-serif",
   subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  style: ["normal", "italic"],
+  axes: ["opsz"],
 });
 
-const poppins = Poppins({
-  variable: "--font-poppins",
+// Body copy (paragraphs, athlete names on cards)
+const interTight = Inter_Tight({
+  variable: "--font-sans",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+});
+
+// Eyebrows, meta, dates, ranks, button text — wide-tracked uppercase
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = genPageMetadata({
@@ -36,7 +47,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${montserrat.variable} ${poppins.variable} antialiased`}
+        className={`${fraunces.variable} ${interTight.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <QueryProviders>
           <PostHogProvider>
