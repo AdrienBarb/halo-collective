@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { genPageMetadata } from "@/lib/seo/genPageMetadata";
-import { siteMetadata } from "@/data/siteMetadata";
 
 export const metadata: Metadata = genPageMetadata({
   title: "Privacy Policy",

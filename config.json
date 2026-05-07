@@ -27,7 +27,11 @@
     "supportEmail": "support@yourproject.com"
   },
   "social": {
-    "twitter": "https://x.com/yourhandle"
+    "twitter": "https://x.com/yourhandle",
+    "github": "",
+    "linkedin": "",
+    "instagram": "",
+    "tiktok": ""
   },
   "pricing": {
     "plans": [
@@ -38,6 +42,7 @@
         "period": "/month",
         "description": "Perfect for individuals and small projects",
         "stripePriceId": "",
+        "checkoutUrl": "",
         "features": [
           "Up to 5 projects",
           "Basic analytics",
@@ -53,6 +58,7 @@
         "period": "/month",
         "description": "Ideal for growing businesses",
         "stripePriceId": "",
+        "checkoutUrl": "",
         "popular": true,
         "features": [
           "Unlimited projects",
@@ -70,6 +76,7 @@
         "period": "",
         "description": "For large organizations",
         "stripePriceId": "",
+        "checkoutUrl": "",
         "features": [
           "Everything in Professional",
           "Dedicated account manager",

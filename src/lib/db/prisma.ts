@@ -1,24 +1,25 @@
-import { isProduction } from '@/utils/environments';
-import { PrismaClient } from '@prisma/client';
+import { isProduction } from "@/utils/environments";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = global as unknown as {
   prisma: PrismaClient;
 };
 
-// Prevent Prisma from running in browser environments
 const createPrismaClient = () => {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     throw new Error(
-      'PrismaClient is unable to run in this browser environment',
+      "PrismaClient is unable to run in this browser environment",
     );
   }
 
-  return new PrismaClient();
+  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+  return new PrismaClient({ adapter });
 };
 
 const prisma = globalForPrisma.prisma || createPrismaClient();
 
-if (!isProduction && typeof window === 'undefined') {
+if (!isProduction && typeof window === "undefined") {
   globalForPrisma.prisma = prisma;
 }
 
