@@ -17,9 +17,76 @@ model User {
   updatedAt     DateTime  @default(now()) @updatedAt
   sessions      Session[]
   accounts      Account[]
+  subscriptions NewsletterSubscription[]
 
   @@unique([email])
   @@map("user")
+}
+
+enum Sport {
+  TENNIS
+}
+
+enum NewsletterStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model Athlete {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  firstName    String
+  lastName     String
+  sport        Sport    @default(TENNIS)
+  countryCode  String
+  bio          String?
+  avatarUrl    String?
+  heroImageUrl String?
+  worldRank    Int?
+  countryRank  Int?
+  titlesCount  Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  newsletters   Newsletter[]
+  subscriptions NewsletterSubscription[]
+
+  @@map("athlete")
+}
+
+model Newsletter {
+  id           String           @id @default(cuid())
+  athleteId    String
+  title        String
+  slug         String
+  heroImageUrl String?
+  body         String           @default("")
+  status       NewsletterStatus @default(DRAFT)
+  publishedAt  DateTime?
+  renderedHtml String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  athlete Athlete @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+
+  @@unique([athleteId, slug])
+  @@map("newsletter")
+}
+
+model NewsletterSubscription {
+  id             String    @id @default(cuid())
+  userId         String
+  athleteId      String
+  source         String?
+  brevoContactId String?
+  subscribedAt   DateTime  @default(now())
+  unsubscribedAt DateTime?
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  athlete Athlete @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, athleteId])
+  @@map("newsletter_subscription")
 }
 
 model Session {
