@@ -1,0 +1,31 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Color · Ink scale</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  html,body{margin:0;background:var(--bg);}
+  .wrap{padding:18px 20px;font-family:var(--font-sans);}
+  .row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .swatch{display:flex;flex-direction:column;gap:8px;}
+  .chip{height:80px;border-radius:8px;display:flex;align-items:flex-end;padding:10px;color:#fff;font-family:var(--font-serif);font-weight:500;font-size:18px;letter-spacing:-.01em;}
+  .name{font-family:var(--font-mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);font-weight:600;}
+  .hex{font-family:var(--font-mono);font-size:10px;color:var(--ink-3);}
+  .sample{font-family:var(--font-sans);font-size:13px;line-height:1.5;}
+</style></head><body><div class="wrap">
+<div class="row">
+  <div class="swatch">
+    <div class="chip" style="background:#1a1612">Aa</div>
+    <div class="name">ink</div><div class="hex">#1a1612</div>
+    <div class="sample" style="color:#1a1612">Primary text — headlines &amp; body</div>
+  </div>
+  <div class="swatch">
+    <div class="chip" style="background:#3d3528">Aa</div>
+    <div class="name">ink‑2</div><div class="hex">#3d3528</div>
+    <div class="sample" style="color:#3d3528">Secondary text — paragraphs</div>
+  </div>
+  <div class="swatch">
+    <div class="chip" style="background:#75674e">Aa</div>
+    <div class="name">ink‑3</div><div class="hex">#75674e</div>
+    <div class="sample" style="color:#75674e">Tertiary &amp; meta — labels, dates</div>
+  </div>
+</div>
+</div></body></html>

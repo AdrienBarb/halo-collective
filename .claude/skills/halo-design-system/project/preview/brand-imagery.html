@@ -1,0 +1,16 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Brand · Imagery</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>html,body{margin:0;background:var(--bg);}.wrap{padding:14px 20px;}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.tile{position:relative;aspect-ratio:4/3;border-radius:12px;overflow:hidden;}
+.tile img{width:100%;height:100%;object-fit:cover;display:block;}
+.tile::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05) 0%,rgba(0,0,0,.35) 100%);}
+.tag{position:absolute;left:10px;bottom:10px;font-family:var(--font-mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#fff;font-weight:600;z-index:2;}</style></head>
+<body><div class="wrap">
+<div class="row">
+  <div class="tile"><img src="../assets/heroes/flavio-cobolli.jpg" style="object-position:center 15%;"><div class="tag">Cobolli · 🇮🇹</div></div>
+  <div class="tile"><img src="../assets/heroes/iga-swiatek.jpg" style="object-position:center 25%;"><div class="tag">Świątek · 🇵🇱</div></div>
+  <div class="tile"><img src="../assets/heroes/elise-mertens.jpg" style="object-position:center 20%;"><div class="tag">Mertens · 🇧🇪</div></div>
+</div>
+</div></body></html>
