@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Reference-only design-system bundle (skill-loadable, not production code)
+    ".claude/**",
   ]),
 ]);
 

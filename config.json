@@ -3,20 +3,21 @@
     "name": "Halo Collective",
     "shortName": "halocollective",
     "brandName": "Halo Collective",
-    "description": "A modern SaaS application that helps you [describe your value proposition]",
-    "tagline": "Your compelling tagline here",
+    "description": "Honest match debriefs. The gear, the schedule, the wins and the losses — unfiltered, member-only, delivered between matches.",
+    "tagline": "The inside story, direct from the athlete.",
     "url": "https://www.yourproject.com",
     "logo": "/logo.png",
     "favicon": "/favicon.ico"
   },
   "seo": {
-    "title": "YourProject - Your Main Value Proposition",
-    "description": "A modern SaaS application that helps you [describe your value proposition]. Start free today.",
+    "title": "Halo Collective — The inside story, direct from the athlete.",
+    "description": "A private, members-only newsletter from elite athletes. Match debriefs, the gear, the schedule — unfiltered, between matches.",
     "keywords": [
-      "saas",
-      "your-keyword-1",
-      "your-keyword-2",
-      "your-keyword-3"
+      "athlete newsletter",
+      "tennis",
+      "fan club",
+      "members only",
+      "halo collective"
     ],
     "author": "Your Name",
     "ogImage": "/og-image.png",
