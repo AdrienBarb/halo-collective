@@ -38,10 +38,13 @@ model Athlete {
   firstName    String
   lastName     String
   sport        Sport    @default(TENNIS)
+  tour         String?
   countryCode  String
+  countryName  String
   bio          String?
   avatarUrl    String?
   heroImageUrl String?
+  heroFocus    String?
   worldRank    Int?
   countryRank  Int?
   titlesCount  Int      @default(0)
@@ -55,21 +58,23 @@ model Athlete {
 }
 
 model Newsletter {
-  id           String           @id @default(cuid())
-  athleteId    String
-  title        String
-  slug         String
-  heroImageUrl String?
-  body         String           @default("")
-  status       NewsletterStatus @default(DRAFT)
-  publishedAt  DateTime?
-  renderedHtml String?
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
+  id            String           @id @default(cuid())
+  athleteId     String
+  editionNumber Int
+  title         String
+  slug          String
+  heroImageUrl  String?
+  body          String           @default("")
+  status        NewsletterStatus @default(DRAFT)
+  publishedAt   DateTime?
+  renderedHtml  String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
 
   athlete Athlete @relation(fields: [athleteId], references: [id], onDelete: Cascade)
 
   @@unique([athleteId, slug])
+  @@unique([athleteId, editionNumber])
   @@map("newsletter")
 }
 

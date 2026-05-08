@@ -1,7 +1,8 @@
 import RosterCard from "@/components/RosterCard";
-import { athletes } from "@/data/athletes";
+import { listAllAthletes } from "@/lib/services/athlete";
 
-export default function Home() {
+export default async function Home() {
+  const athletes = await listAllAthletes();
   const count = athletes.length.toString().padStart(2, "0");
 
   return (
