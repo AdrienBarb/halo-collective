@@ -1,17 +1,7 @@
-import {
-  Body,
-  Container,
-  Head,
-  Heading,
-  Hr,
-  Html,
-  Img,
-  Link,
-  Preview,
-  Section,
-  Text,
-} from "@react-email/components";
-import { Tailwind } from "@react-email/tailwind";
+import { Img, Link, Section, Text } from "@react-email/components";
+import { EmailLayout } from "@/lib/emails/_brand/EmailLayout";
+import { EmailHeading } from "@/lib/emails/_brand/atoms";
+import { palette, fonts } from "@/lib/emails/_brand/theme";
 
 interface NewsletterEmailProps {
   title: string;
@@ -39,67 +29,58 @@ export const NewsletterEmail = ({
     .filter(Boolean);
 
   return (
-    <Html>
-      <Head />
-      <Preview>{previewText ?? title}</Preview>
-      <Tailwind>
-        <Body className="bg-[#f5f1ea] font-sans">
-          <Container className="mx-auto max-w-[640px] bg-white px-8 py-10">
-            <Text className="m-0 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#9a8f7e]">
-              {athleteName} · {editionLabel}
-            </Text>
+    <EmailLayout
+      preview={previewText ?? title}
+      eyebrow={`${athleteName} · ${editionLabel}`}
+      footerNote={
+        <>
+          You&apos;re receiving this because you subscribed to{" "}
+          {athleteName}&apos;s edition on Halo Collective.{" "}
+          <Link
+            href={unsubscribeUrl}
+            style={{ color: palette.ink3, textDecoration: "underline" }}
+          >
+            Unsubscribe
+          </Link>
+        </>
+      }
+    >
+      <EmailHeading>{title}</EmailHeading>
 
-            <Heading className="mt-4 mb-0 text-[34px] font-semibold leading-[1.1] tracking-[-0.015em] text-[#1a1815]">
-              {title}
-            </Heading>
+      {heroImageUrl ? (
+        <Section style={{ marginTop: 24 }}>
+          <Img
+            src={heroImageUrl}
+            alt={title}
+            width="536"
+            style={{
+              display: "block",
+              width: "100%",
+              borderRadius: 8,
+              objectFit: "cover",
+            }}
+          />
+        </Section>
+      ) : null}
 
-            {heroImageUrl ? (
-              <Section className="mt-8">
-                <Img
-                  src={heroImageUrl}
-                  alt={title}
-                  width="576"
-                  className="block w-full rounded-md object-cover"
-                />
-              </Section>
-            ) : null}
-
-            <Section className="mt-8">
-              {paragraphs.length === 0 ? (
-                <Text className="m-0 whitespace-pre-wrap text-[16px] leading-[1.65] text-[#3a342e]">
-                  {body}
-                </Text>
-              ) : (
-                paragraphs.map((p, i) => (
-                  <Text
-                    key={i}
-                    className={
-                      i === 0
-                        ? "m-0 whitespace-pre-wrap text-[16px] leading-[1.65] text-[#3a342e]"
-                        : "m-0 mt-4 whitespace-pre-wrap text-[16px] leading-[1.65] text-[#3a342e]"
-                    }
-                  >
-                    {p}
-                  </Text>
-                ))
-              )}
-            </Section>
-
-            <Hr className="mt-10 mb-6 border-[#e8e1d4]" />
-
-            <Text className="m-0 text-[12px] leading-[1.6] text-[#7a7164]">
-              You&apos;re receiving this because you subscribed to{" "}
-              {athleteName}&apos;s edition on Halo Collective.
-            </Text>
-            <Text className="mt-2 mb-0 text-[12px] leading-[1.6] text-[#7a7164]">
-              <Link href={unsubscribeUrl} className="text-[#7a7164] underline">
-                Unsubscribe
-              </Link>
-            </Text>
-          </Container>
-        </Body>
-      </Tailwind>
-    </Html>
+      <Section style={{ marginTop: 24 }}>
+        {(paragraphs.length === 0 ? [body] : paragraphs).map((p, i) => (
+          <Text
+            key={i}
+            style={{
+              margin: i === 0 ? 0 : "16px 0 0",
+              color: palette.ink2,
+              fontFamily: fonts.sans,
+              fontSize: 16,
+              lineHeight: 1.65,
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            {p}
+          </Text>
+        ))}
+      </Section>
+    </EmailLayout>
   );
 };
 

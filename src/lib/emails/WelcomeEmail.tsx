@@ -1,44 +1,58 @@
+import { EmailLayout } from "@/lib/emails/_brand/EmailLayout";
 import {
-  Body,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Preview,
-  Section,
-  Text,
-  Tailwind,
-} from "@react-email/components";
+  EmailBody,
+  EmailButton,
+  EmailHeading,
+  EmailLead,
+} from "@/lib/emails/_brand/atoms";
 
 interface WelcomeEmailProps {
-  name?: string;
+  firstName?: string;
+  athleteFirstName: string;
+  athleteName: string;
+  profileUrl: string;
 }
 
-export const WelcomeEmail = ({ name = "User" }: WelcomeEmailProps) => {
+export const WelcomeEmail = ({
+  firstName,
+  athleteFirstName,
+  athleteName,
+  profileUrl,
+}: WelcomeEmailProps) => {
+  const greeting = firstName ? `${firstName}, ` : "";
+
   return (
-    <Html>
-      <Head />
-      <Preview>Welcome to our platform!</Preview>
-      <Tailwind>
-        <Body className="bg-gray-50 font-sans">
-          <Container className="mx-auto py-8 px-4">
-            <Section className="bg-white rounded-lg shadow-sm p-8">
-              <Heading className="text-2xl font-bold text-gray-900 mb-4">
-                Welcome {name}!
-              </Heading>
-              <Text className="text-gray-700 text-base leading-6 mb-4">
-                Thank you for signing up. We&apos;re excited to have you on board!
-              </Text>
-              <Text className="text-gray-600 text-sm">
-                If you have any questions, feel free to reach out to our support team.
-              </Text>
-            </Section>
-          </Container>
-        </Body>
-      </Tailwind>
-    </Html>
+    <EmailLayout
+      preview={`You're in. Welcome to ${athleteFirstName}'s circle.`}
+      eyebrow="You're in"
+      footerNote={
+        <>
+          You&apos;re receiving this because you subscribed to{" "}
+          {athleteName}&apos;s newsletter on Halo Collective. You can
+          unsubscribe at any time from the footer of any edition.
+        </>
+      }
+    >
+      <EmailHeading>Welcome to {athleteFirstName}&apos;s circle.</EmailHeading>
+      <EmailLead>
+        {greeting}thanks for stepping inside. Every week, {athleteFirstName}
+        &apos;s next edition will land here — results, behind the scenes, gear,
+        and the things only the inner circle gets.
+      </EmailLead>
+      <EmailBody>
+        The first edition you&apos;ll receive is the next one published. Until
+        then, the back catalog is on the profile.
+      </EmailBody>
+      <EmailButton href={profileUrl}>Visit {athleteFirstName}&apos;s page</EmailButton>
+    </EmailLayout>
   );
 };
 
-export default WelcomeEmail;
+WelcomeEmail.PreviewProps = {
+  firstName: "Adrien",
+  athleteFirstName: "Flavio",
+  athleteName: "Flavio Cobolli",
+  profileUrl: "https://halocollective.com/flavio-cobolli",
+} satisfies WelcomeEmailProps;
 
+export default WelcomeEmail;

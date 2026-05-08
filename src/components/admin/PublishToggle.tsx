@@ -50,7 +50,7 @@ export default function PublishToggle({
         type="button"
         onClick={() => publish.mutate({})}
         disabled={publish.isPending}
-        className="group inline-flex items-center gap-2 rounded-md bg-ink px-5 py-2.5 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-cream transition-[background-color,transform] duration-200 ease-out hover:bg-banner disabled:cursor-not-allowed disabled:opacity-60"
+        className="group inline-flex cursor-pointer items-center gap-2 rounded-md bg-ink px-5 py-2.5 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-cream transition-[background-color,transform] duration-200 ease-out hover:bg-banner disabled:cursor-not-allowed disabled:opacity-60"
       >
         {publish.isPending ? "Publishing…" : "Publish edition"}
         <svg
@@ -82,7 +82,7 @@ export default function PublishToggle({
         if (confirmed) unpublish.mutate({});
       }}
       disabled={unpublish.isPending}
-      className="inline-flex items-center gap-2 rounded-md border border-line bg-cream-2 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-2 transition-colors duration-200 ease-out hover:border-ink hover:text-ink disabled:cursor-not-allowed disabled:opacity-60"
+      className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-line bg-cream-2 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-2 transition-colors duration-200 ease-out hover:border-ink hover:text-ink disabled:cursor-not-allowed disabled:opacity-60"
     >
       {unpublish.isPending ? "Unpublishing…" : "Unpublish"}
     </button>

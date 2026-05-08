@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { getAthleteBySlug } from "@/lib/services/athlete";
 import { listPublishedByAthleteId } from "@/lib/services/newsletter";
 import EditionsSlider from "@/components/athlete/EditionsSlider";
+import SubscribeForm from "@/components/athlete/SubscribeForm";
 
 export default async function AthleteHomePage({
   params,
@@ -16,7 +17,8 @@ export default async function AthleteHomePage({
   const editions = await listPublishedByAthleteId(athlete.id);
 
   return (
-    <section className="mx-auto max-w-[1100px] px-6 py-12 md:py-16">
+    <>
+    <section className="px-6 py-12 md:py-16">
       {editions.length === 0 ? (
         <>
           <div className="mb-6 flex items-baseline gap-3">
@@ -79,5 +81,10 @@ export default async function AthleteHomePage({
         </EditionsSlider>
       )}
     </section>
+    <SubscribeForm
+      athleteSlug={athlete.slug}
+      athleteFirstName={athlete.firstName}
+    />
+    </>
   );
 }

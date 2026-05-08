@@ -13,9 +13,8 @@ import {
   NotFoundError,
 } from "@/lib/errors/AppError";
 import { NewsletterEmail } from "@/lib/emails/NewsletterEmail";
-import { upsertContact } from "@/lib/brevo/contacts";
 import { createCampaign, sendCampaignNow } from "@/lib/brevo/campaigns";
-import { getRequiredEnv, getRequiredEnvInt } from "@/lib/utils/env";
+import { getRequiredEnv } from "@/lib/utils/env";
 
 const MAX_CREATE_ATTEMPTS = 50;
 
@@ -140,8 +139,6 @@ type NewsletterWithAthlete = Newsletter & { athlete: Athlete };
 
 interface BrevoConfig {
   senderEmail: string;
-  testEmail: string;
-  testListId: number;
 }
 
 function logBrevo(event: string, data: Record<string, unknown>) {
@@ -151,8 +148,6 @@ function logBrevo(event: string, data: Record<string, unknown>) {
 function loadBrevoConfig(): BrevoConfig {
   return {
     senderEmail: getRequiredEnv("BREVO_SENDER_EMAIL"),
-    testEmail: getRequiredEnv("BREVO_TEST_EMAIL"),
-    testListId: getRequiredEnvInt("BREVO_TEST_LIST_ID"),
   };
 }
 
@@ -268,6 +263,12 @@ export async function publishNewsletter(id: string) {
     return republishWithoutResending(id, newsletter.publishedAt);
   }
 
+  if (newsletter.athlete.brevoListId === null) {
+    throw new BadRequestError(
+      "Athlete has no Brevo list — recreate athlete or set brevoListId manually.",
+    );
+  }
+
   const config = loadBrevoConfig();
   const athleteName = `${newsletter.athlete.firstName} ${newsletter.athlete.lastName}`;
   const renderedHtml = await renderNewsletterEmail(newsletter);
@@ -275,18 +276,12 @@ export async function publishNewsletter(id: string) {
   await claimForSending(id, renderedHtml);
   logBrevo("claimed", { newsletterId: id });
 
-  // Fire-and-forget — the contact id isn't on the publish critical path.
-  upsertContact({ email: config.testEmail, listIds: [config.testListId] }).catch(
-    (error: unknown) =>
-      logBrevo("upsert_contact_failed", { newsletterId: id, error: String(error) }),
-  );
-
   const campaignId = await createCampaign({
     name: `${athleteName} — Edition #${newsletter.editionNumber} (${newsletter.slug})`,
     subject: newsletter.title,
     htmlContent: renderedHtml,
     sender: { name: athleteName, email: config.senderEmail },
-    listIds: [config.testListId],
+    listIds: [newsletter.athlete.brevoListId],
     replyTo: config.senderEmail,
   });
   logBrevo("campaign_created", { newsletterId: id, campaignId });

@@ -71,7 +71,7 @@ function ArrowButton({
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-cream-2 text-ink-2 transition-colors hover:border-line-2 hover:text-ink"
+      className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-line bg-cream-2 text-ink-2 transition-colors hover:border-line-2 hover:text-ink"
     >
       <Icon className="h-4 w-4" strokeWidth={1.6} />
     </button>

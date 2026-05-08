@@ -73,7 +73,7 @@ export default function AvatarUploader({
         disabled={isUploading}
         aria-label={value ? "Replace avatar" : "Upload avatar"}
         className={[
-          "group relative h-[160px] w-[160px] overflow-hidden rounded-full",
+          "group relative h-[160px] w-[160px] cursor-pointer overflow-hidden rounded-full",
           "border-[4px] border-cream-2",
           "shadow-[0_10px_28px_rgba(0,0,0,0.22)]",
           "transition-[transform,box-shadow] duration-200 ease-out",

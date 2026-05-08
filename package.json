@@ -12,7 +12,7 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "db:seed": "tsx src/lib/db/seed.ts",
-    "email:dev": "email dev",
+    "email:dev": "email dev --dir src/lib/emails --port 3030",
     "storage:test": "tsx scripts/test-upload-media.ts"
   },
   "dependencies": {
@@ -35,8 +35,6 @@
     "@supabase/supabase-js": "^2.105.3",
     "@tailwindcss/typography": "^0.5.19",
     "@tanstack/react-query": "^5.90.20",
-    "@upstash/ratelimit": "^2.0.8",
-    "@upstash/redis": "^1.36.1",
     "axios": "^1.13.4",
     "better-auth": "^1.4.18",
     "class-variance-authority": "^0.7.1",
@@ -61,6 +59,7 @@
     "zustand": "^5.0.10"
   },
   "devDependencies": {
+    "@react-email/ui": "^6.1.1",
     "@tailwindcss/postcss": "^4",
     "@tanstack/react-query-devtools": "^5.90.20",
     "@types/node": "^22",

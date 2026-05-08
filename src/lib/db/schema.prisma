@@ -13,6 +13,10 @@ model User {
   email         String
   emailVerified Boolean   @default(false)
   image         String?
+  firstName     String?
+  lastName      String?
+  countryCode   String?
+  phone         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @default(now()) @updatedAt
   sessions      Session[]
@@ -47,6 +51,7 @@ model Athlete {
   worldRank    Int?
   countryRank  Int?
   titlesCount  Int      @default(0)
+  brevoListId  Int?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -80,13 +85,14 @@ model Newsletter {
 }
 
 model NewsletterSubscription {
-  id             String    @id @default(cuid())
-  userId         String
-  athleteId      String
-  source         String?
-  brevoContactId String?
-  subscribedAt   DateTime  @default(now())
-  unsubscribedAt DateTime?
+  id                   String    @id @default(cuid())
+  userId               String
+  athleteId            String
+  source               String?
+  brevoContactId       String?
+  partnerOffersConsent Boolean   @default(false)
+  subscribedAt         DateTime  @default(now())
+  unsubscribedAt       DateTime?
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   athlete Athlete @relation(fields: [athleteId], references: [id], onDelete: Cascade)

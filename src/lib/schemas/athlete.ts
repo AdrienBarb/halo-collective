@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { COUNTRIES } from "@/lib/data/countries";
+import { countryCodeSchema } from "@/lib/schemas/country";
 
 const slugSchema = z
   .string()
@@ -22,15 +22,6 @@ const optionalInt = z
   .optional()
   .transform((v) =>
     v === "" || v === undefined ? undefined : v,
-  );
-
-const countryCodeSchema = z
-  .string()
-  .trim()
-  .toUpperCase()
-  .refine(
-    (code) => COUNTRIES.some((c) => c.code === code),
-    "Unknown country code",
   );
 
 export const createAthleteSchema = z.object({

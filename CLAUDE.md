@@ -32,7 +32,6 @@ When building features, ask: *does this help an agent close a sponsorship, or he
 - **Better Auth** for authentication (email/password + magic links)
 - **Stripe** (v22, API `2026-04-22.dahlia`) for payments
 - **Resend** + React Email for transactional emails
-- **Upstash Redis** for rate limiting
 - **React Query** (via `useApi` hook) for client-side data fetching
 - **Zustand** for client-side global state
 - **react-hook-form** + Zod for form handling and validation
@@ -76,7 +75,6 @@ src/
 │   ├── emails/           # React Email templates
 │   ├── errors/           # errorHandler
 │   ├── hooks/            # useApi, etc.
-│   ├── ratelimit/        # Upstash limiters
 │   ├── resend/           # Resend client
 │   ├── schemas/          # Zod schemas
 │   ├── seo/              # SEO utilities
@@ -99,8 +97,6 @@ src/
 | `src/lib/constants/errorMessage.ts`   | Centralized error messages            |
 | `src/lib/errors/errorHandler.ts`      | API route error handler               |
 | `src/lib/better-auth/auth.ts`         | Auth configuration                    |
-| `src/lib/ratelimit/client.ts`         | Upstash limiters                      |
-| `src/lib/ratelimit/checkRateLimit.ts` | Rate limit check utility              |
 | `src/lib/db/prisma.ts`                | PrismaClient with pg driver adapter   |
 
 ## Coding Standards
@@ -151,17 +147,11 @@ export async function POST(req: NextRequest) {
 }
 ```
 
-### API Routes — Public (always rate-limit)
+### API Routes — Public
 
 ```typescript
-import { checkRateLimit } from "@/lib/ratelimit/checkRateLimit";
-import { publicLimiter } from "@/lib/ratelimit/client";
-
 export async function POST(req: NextRequest) {
   try {
-    const rateLimit = await checkRateLimit(req, publicLimiter);
-    if (!rateLimit.success) return rateLimit.response;
-
     const body = await req.json();
     const validatedData = someSchema.parse(body);
     const result = await someService({ data: validatedData });
@@ -246,9 +236,6 @@ NEXT_PUBLIC_APP_ENV=
 STRIPE_SECRET_KEY=
 STRIPE_WEBHOOK_SECRET=
 
-# Rate limiting (Upstash Redis)
-UPSTASH_REDIS_REST_URL=
-UPSTASH_REDIS_REST_TOKEN=
 ```
 
 ## Prisma 7 Notes

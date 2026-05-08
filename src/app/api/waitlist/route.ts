@@ -5,16 +5,10 @@ import { WaitlistConfirmationEmail } from "@/lib/emails/WaitlistConfirmationEmai
 import { resendClient } from "@/lib/resend/resendClient";
 import { errorHandler } from "@/lib/errors/errorHandler";
 import { waitlistSchema } from "@/lib/schemas/common";
-import { checkRateLimit } from "@/lib/ratelimit/checkRateLimit";
-import { emailLimiter } from "@/lib/ratelimit/client";
 import config from "@/lib/config";
 
 export async function POST(request: NextRequest) {
   try {
-    // Rate limit check
-    const rateLimit = await checkRateLimit(request, emailLimiter);
-    if (!rateLimit.success) return rateLimit.response;
-
     const body = await request.json();
     const { email, name } = waitlistSchema.parse(body);
 

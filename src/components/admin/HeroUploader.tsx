@@ -66,7 +66,7 @@ export default function HeroUploader({ value, onChange }: HeroUploaderProps) {
         disabled={isUploading}
         aria-label={value ? "Replace cover" : "Upload cover"}
         className={[
-          "group relative aspect-[16/9] w-full overflow-hidden rounded-2xl",
+          "group relative aspect-[16/9] w-full cursor-pointer overflow-hidden rounded-2xl",
           "border border-line",
           "transition-[transform,box-shadow] duration-200 ease-out",
           "hover:[box-shadow:0_10px_28px_rgba(0,0,0,0.10)]",

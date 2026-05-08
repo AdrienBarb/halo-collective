@@ -6,6 +6,7 @@ import type {
   UpdateAthleteOutput,
 } from "@/lib/schemas/athlete";
 import { COUNTRIES } from "@/lib/data/countries";
+import { ensureAthleteList } from "@/lib/brevo/lists";
 import {
   BadRequestError,
   ConflictError,
@@ -72,7 +73,7 @@ export async function createAthlete(input: CreateAthleteOutput) {
   for (let attempt = 0; attempt < MAX_SLUG_ATTEMPTS; attempt++) {
     const slug = attempt === 0 ? baseSlug : `${baseSlug}-${attempt + 1}`;
     try {
-      return await prisma.athlete.create({
+      const athlete = await prisma.athlete.create({
         data: {
           slug,
           firstName,
@@ -88,6 +89,9 @@ export async function createAthlete(input: CreateAthleteOutput) {
           titlesCount,
         },
       });
+
+      const brevoListId = await ensureAthleteList(athlete);
+      return { ...athlete, brevoListId };
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
