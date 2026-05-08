@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { format } from "date-fns";
 import { genPageMetadata } from "@/lib/seo/genPageMetadata";
 import { getPublishedNewsletterBySlugs } from "@/lib/services/newsletter";
+import Debrief from "@/components/newsletter/blocks/Debrief";
 
 type EditionRoute = "/[athleteSlug]/[editionSlug]";
 
@@ -15,10 +16,11 @@ export async function generateMetadata({
   const newsletter = await getPublishedNewsletterBySlugs(athleteSlug, editionSlug);
   if (!newsletter) return {};
 
+  const debriefBody = newsletter.debriefSection?.body;
   return genPageMetadata({
     title: newsletter.title,
-    description: newsletter.body
-      ? newsletter.body.slice(0, 160)
+    description: debriefBody
+      ? debriefBody.slice(0, 160)
       : `${newsletter.athlete.firstName} ${newsletter.athlete.lastName} — ${newsletter.title}`,
     url: `/${athleteSlug}/${editionSlug}`,
     image: newsletter.heroImageUrl ?? undefined,
@@ -69,11 +71,7 @@ export default async function EditionPage({
         </div>
       ) : null}
 
-      {newsletter.body ? (
-        <div className="prose prose-lg mt-10 max-w-none whitespace-pre-wrap text-[17px] leading-[1.7] text-ink-2">
-          {newsletter.body}
-        </div>
-      ) : null}
+      <Debrief section={newsletter.debriefSection} />
     </article>
   );
 }

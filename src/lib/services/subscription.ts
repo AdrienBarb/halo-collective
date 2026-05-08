@@ -16,20 +16,6 @@ interface SubscribeResult {
   userId: string;
 }
 
-function composePhone(
-  dialCode: string | undefined,
-  number: string | undefined,
-): string | null {
-  if (!dialCode || !number) return null;
-  let digits = number.replace(/\s+/g, "");
-  // National trunk prefix "0" is dropped when going international (e.g. BE
-  // "0470…" → "+32470…"). Don't strip "00" — that's an old intl prefix.
-  if (digits.startsWith("0") && !digits.startsWith("00")) {
-    digits = digits.slice(1);
-  }
-  return `${dialCode}${digits}`;
-}
-
 export async function subscribeToAthlete(
   args: SubscribeArgs,
 ): Promise<SubscribeResult> {
@@ -39,8 +25,7 @@ export async function subscribeToAthlete(
     lastName,
     email,
     countryCode,
-    phoneCountryCode,
-    phoneNumber,
+    phone,
     partnerOffersConsent,
     source,
   } = args;
@@ -51,7 +36,6 @@ export async function subscribeToAthlete(
   }
 
   const brevoListId = await ensureAthleteList(athlete);
-  const phone = composePhone(phoneCountryCode, phoneNumber);
   const fullName = `${firstName} ${lastName}`;
 
   // DB writes first, in a single transaction. If Brevo later fails, our
@@ -66,7 +50,7 @@ export async function subscribeToAthlete(
         firstName,
         lastName,
         countryCode,
-        phone,
+        phone: phone ?? null,
         emailVerified: false,
       },
       update: {
@@ -74,7 +58,9 @@ export async function subscribeToAthlete(
         firstName,
         lastName,
         countryCode,
-        phone,
+        // Only overwrite phone when the user actually provided one.
+        // Preserves any number captured in a prior subscribe.
+        ...(phone !== undefined && { phone }),
       },
       select: { id: true },
     });

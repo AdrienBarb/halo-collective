@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { PhoneInput } from "@/components/ui/phone-input";
 import {
   Select,
   SelectContent,
@@ -46,8 +47,7 @@ export default function SubscribeForm({
       lastName: "",
       email: "",
       countryCode: undefined,
-      phoneCountryCode: undefined,
-      phoneNumber: "",
+      phone: "",
       partnerOffersConsent: false,
       athleteNewsletterConsent: true,
     },
@@ -190,52 +190,28 @@ export default function SubscribeForm({
                     </FormItem>
                   )}
                 />
-                <div className="md:col-span-5">
-                  <div className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
-                    Phone <span className="text-ink-3">(optional)</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <FormField
-                      control={form.control}
-                      name="phoneCountryCode"
-                      render={({ field }) => (
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value ?? ""}
-                        >
-                          <SelectTrigger className="w-[110px]">
-                            <SelectValue placeholder="+--" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {COUNTRIES.map((c) => (
-                              <SelectItem key={c.code} value={c.dialCode}>
-                                {c.dialCode} {c.code}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="phoneNumber"
-                      render={({ field }) => (
-                        <Input
-                          placeholder="470 00 00 00"
-                          {...field}
-                          value={field.value ?? ""}
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-5">
+                      <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
+                        Phone <span className="text-ink-3">(optional)</span>
+                      </FormLabel>
+                      <FormControl>
+                        <PhoneInput
+                          defaultCountry="FR"
+                          placeholder="6 12 34 56 78"
+                          value={field.value || undefined}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                          name={field.name}
                         />
-                      )}
-                    />
-                  </div>
-                  {(form.formState.errors.phoneCountryCode?.message ||
-                    form.formState.errors.phoneNumber?.message) && (
-                    <p className="mt-1.5 text-[13px] text-loss">
-                      {form.formState.errors.phoneCountryCode?.message ??
-                        form.formState.errors.phoneNumber?.message}
-                    </p>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </div>
+                />
               </div>
 
               <div className="pt-4">

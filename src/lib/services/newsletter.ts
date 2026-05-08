@@ -1,10 +1,11 @@
 import { cache } from "react";
 import { NewsletterStatus, Prisma } from "@prisma/client";
-import type { Athlete, Newsletter } from "@prisma/client";
+import type { Athlete, DebriefSection, Newsletter } from "@prisma/client";
 import { render } from "@react-email/render";
 import { prisma } from "@/lib/db/prisma";
 import type {
   CreateNewsletterOutput,
+  DebriefOutput,
   UpdateNewsletterOutput,
 } from "@/lib/schemas/newsletter";
 import {
@@ -15,8 +16,23 @@ import {
 import { NewsletterEmail } from "@/lib/emails/NewsletterEmail";
 import { createCampaign, sendCampaignNow } from "@/lib/brevo/campaigns";
 import { getRequiredEnv } from "@/lib/utils/env";
+import config from "@/lib/config";
 
 const MAX_CREATE_ATTEMPTS = 50;
+
+function debriefCreateData(
+  input: DebriefOutput,
+): Prisma.DebriefSectionCreateWithoutNewsletterInput {
+  return {
+    body: input.body,
+    pullQuote: input.pullQuote,
+    pullQuoteContext: input.pullQuoteContext,
+    voiceNoteUrl: input.voiceNoteUrl,
+    voiceNoteDurationSec: input.voiceNoteDurationSec,
+    voiceNoteLabel: input.voiceNoteLabel,
+    voiceNoteLocation: input.voiceNoteLocation,
+  };
+}
 
 export const listPublishedByAthleteId = cache(async (athleteId: string) => {
   return prisma.newsletter.findMany({
@@ -26,6 +42,7 @@ export const listPublishedByAthleteId = cache(async (athleteId: string) => {
       publishedAt: { not: null },
     },
     orderBy: { publishedAt: { sort: "desc", nulls: "last" } },
+    include: { debriefSection: true },
   });
 });
 
@@ -37,7 +54,7 @@ export const getPublishedNewsletterBySlugs = cache(
         status: NewsletterStatus.PUBLISHED,
         athlete: { slug: athleteSlug },
       },
-      include: { athlete: true },
+      include: { athlete: true, debriefSection: true },
     });
   },
 );
@@ -46,18 +63,22 @@ export async function listAllByAthleteId(athleteId: string) {
   return prisma.newsletter.findMany({
     where: { athleteId },
     orderBy: [{ editionNumber: "desc" }],
+    include: { debriefSection: true },
   });
 }
 
 export async function getNewsletterById(id: string) {
   return prisma.newsletter.findUnique({
     where: { id },
-    include: { athlete: { select: { slug: true } } },
+    include: {
+      athlete: { select: { slug: true } },
+      debriefSection: true,
+    },
   });
 }
 
 export async function createNewsletter(input: CreateNewsletterOutput) {
-  const { athleteId, title, slug: baseSlug, body, heroImageUrl } = input;
+  const { athleteId, title, slug: baseSlug, debrief, heroImageUrl } = input;
 
   const athlete = await prisma.athlete.findUnique({
     where: { id: athleteId },
@@ -83,9 +104,9 @@ export async function createNewsletter(input: CreateNewsletterOutput) {
             athleteId,
             title,
             slug,
-            body,
             heroImageUrl,
             editionNumber,
+            debriefSection: { create: debriefCreateData(debrief) },
           },
         });
       });
@@ -116,7 +137,14 @@ export async function updateNewsletter(
         title: input.title,
         slug: input.slug,
         heroImageUrl: input.heroImageUrl,
-        body: input.body,
+        debriefSection: input.debrief
+          ? {
+              upsert: {
+                create: debriefCreateData(input.debrief),
+                update: debriefCreateData(input.debrief),
+              },
+            }
+          : undefined,
       },
       include: { athlete: { select: { slug: true } } },
     });
@@ -135,7 +163,10 @@ export async function updateNewsletter(
   }
 }
 
-type NewsletterWithAthlete = Newsletter & { athlete: Athlete };
+type NewsletterWithAthlete = Newsletter & {
+  athlete: Athlete;
+  debriefSection: DebriefSection | null;
+};
 
 interface BrevoConfig {
   senderEmail: string;
@@ -156,7 +187,7 @@ async function loadNewsletterWithAthlete(
 ): Promise<NewsletterWithAthlete> {
   const newsletter = await prisma.newsletter.findUnique({
     where: { id },
-    include: { athlete: true },
+    include: { athlete: true, debriefSection: true },
   });
   if (!newsletter) {
     throw new NotFoundError("Newsletter not found");
@@ -164,17 +195,36 @@ async function loadNewsletterWithAthlete(
   return newsletter;
 }
 
+const SLUG_PATTERN = /^[a-z0-9-]+$/;
+
+function buildEditionUrl(athleteSlug: string, editionSlug: string): string {
+  if (!SLUG_PATTERN.test(athleteSlug) || !SLUG_PATTERN.test(editionSlug)) {
+    throw new BadRequestError("Invalid athlete or edition slug");
+  }
+  const base =
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    process.env.BETTER_AUTH_URL ||
+    config.project.url;
+  return `${base.replace(/\/$/, "")}/${athleteSlug}/${editionSlug}`;
+}
+
 async function renderNewsletterEmail(
   newsletter: NewsletterWithAthlete,
 ): Promise<string> {
+  if (!newsletter.debriefSection) {
+    throw new BadRequestError(
+      "Newsletter has no debrief section — add one before publishing",
+    );
+  }
   try {
     return await render(
       NewsletterEmail({
         title: newsletter.title,
-        body: newsletter.body,
+        debrief: newsletter.debriefSection,
         heroImageUrl: newsletter.heroImageUrl,
         editionNumber: newsletter.editionNumber,
         athleteName: `${newsletter.athlete.firstName} ${newsletter.athlete.lastName}`,
+        editionUrl: buildEditionUrl(newsletter.athlete.slug, newsletter.slug),
       }),
     );
   } catch (error) {
@@ -228,7 +278,7 @@ async function markPublished(
       brevoSentAt: now,
       brevoCampaignId: String(campaignId),
     },
-    include: { athlete: true },
+    include: { athlete: true, debriefSection: true },
   });
 }
 
@@ -255,6 +305,11 @@ export async function publishNewsletter(id: string) {
   if (newsletter.status === NewsletterStatus.SENDING) {
     throw new ConflictError(
       "Publish in progress or stuck — check Brevo and reset the row manually",
+    );
+  }
+  if (!newsletter.debriefSection) {
+    throw new BadRequestError(
+      "Newsletter has no debrief section — add one before publishing",
     );
   }
 

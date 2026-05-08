@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { Sport } from "@prisma/client";
 import { prisma } from "./prisma";
+import { ensureAthleteList } from "@/lib/brevo/lists";
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is not set — refusing to seed");
@@ -73,7 +74,9 @@ async function main() {
       update: a,
       create: a,
     });
-    console.log(`✓ ${result.slug}`);
+
+    const brevoListId = await ensureAthleteList(result);
+    console.log(`✓ ${result.slug} (brevoListId: ${brevoListId})`);
   }
 }
 

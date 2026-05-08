@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { countryCodeSchema, dialCodeSchema } from "@/lib/schemas/country";
+import { isValidPhoneNumber } from "libphonenumber-js";
+import { countryCodeSchema } from "@/lib/schemas/country";
 
 const SUBSCRIBE_SOURCES = [
   "athlete-page",
@@ -10,39 +11,26 @@ const SUBSCRIBE_SOURCES = [
   "share",
 ] as const;
 
-const phoneNumberSchema = z
+const phoneSchema = z
   .string()
   .trim()
-  .refine(
-    (v) => /^\d{6,15}$/.test(v.replace(/\s+/g, "")),
-    "Phone number must contain 6–15 digits",
-  );
+  .max(32, "Invalid phone number")
+  .refine((v) => v === "" || isValidPhoneNumber(v), "Invalid phone number")
+  .transform((v) => (v === "" ? undefined : v))
+  .optional();
 
-export const subscribeSchema = z
-  .object({
-    firstName: z.string().trim().min(1, "First name is required"),
-    lastName: z.string().trim().min(1, "Last name is required"),
-    email: z.string().trim().toLowerCase().email("Invalid email"),
-    countryCode: countryCodeSchema,
-    phoneCountryCode: dialCodeSchema.optional(),
-    phoneNumber: phoneNumberSchema.optional(),
-    partnerOffersConsent: z.boolean().default(false),
-    athleteNewsletterConsent: z.literal(true, {
-      message: "You must agree to receive the newsletter",
-    }),
-    source: z.enum(SUBSCRIBE_SOURCES).optional(),
-  })
-  .superRefine((value, ctx) => {
-    const hasCode = !!value.phoneCountryCode;
-    const hasNumber = !!value.phoneNumber;
-    if (hasCode !== hasNumber) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Provide both dial code and phone number, or leave both empty",
-        path: hasNumber ? ["phoneCountryCode"] : ["phoneNumber"],
-      });
-    }
-  });
+export const subscribeSchema = z.object({
+  firstName: z.string().trim().min(1, "First name is required").max(80),
+  lastName: z.string().trim().min(1, "Last name is required").max(80),
+  email: z.string().trim().toLowerCase().email("Invalid email").max(254),
+  countryCode: countryCodeSchema,
+  phone: phoneSchema,
+  partnerOffersConsent: z.boolean().default(false),
+  athleteNewsletterConsent: z.literal(true, {
+    message: "You must agree to receive the newsletter",
+  }),
+  source: z.enum(SUBSCRIBE_SOURCES).optional(),
+});
 
 export type SubscribeInput = z.input<typeof subscribeSchema>;
 export type SubscribeOutput = z.output<typeof subscribeSchema>;

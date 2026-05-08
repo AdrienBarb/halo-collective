@@ -62,13 +62,12 @@ model Athlete {
 }
 
 model Newsletter {
-  id            String           @id @default(cuid())
-  athleteId     String
-  editionNumber Int
-  title         String
-  slug          String
-  heroImageUrl  String?
-  body          String           @default("")
+  id              String           @id @default(cuid())
+  athleteId       String
+  editionNumber   Int
+  title           String
+  slug            String
+  heroImageUrl    String?
   status          NewsletterStatus @default(DRAFT)
   publishedAt     DateTime?
   renderedHtml    String?
@@ -77,11 +76,30 @@ model Newsletter {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
-  athlete Athlete @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  athlete        Athlete         @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  debriefSection DebriefSection?
 
   @@unique([athleteId, slug])
   @@unique([athleteId, editionNumber])
   @@map("newsletter")
+}
+
+model DebriefSection {
+  id                   String   @id @default(cuid())
+  newsletterId         String   @unique
+  body                 String
+  pullQuote            String?
+  pullQuoteContext     String?
+  voiceNoteUrl         String?
+  voiceNoteDurationSec Int?
+  voiceNoteLabel       String?
+  voiceNoteLocation    String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  newsletter Newsletter @relation(fields: [newsletterId], references: [id], onDelete: Cascade)
+
+  @@map("debrief_section")
 }
 
 model NewsletterSubscription {

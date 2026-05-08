@@ -32,21 +32,45 @@ const optionalMediaUrl = z
   .optional()
   .transform((v) => (v === "" || v === undefined ? undefined : v));
 
+const optionalTrimmedString = z
+  .union([z.string(), z.undefined()])
+  .optional()
+  .transform((v) => {
+    if (v === undefined) return undefined;
+    const trimmed = v.trim();
+    return trimmed === "" ? undefined : trimmed;
+  });
+
+export const debriefSchema = z.object({
+  body: z.string().trim().min(1, "Debrief body is required"),
+  pullQuote: optionalTrimmedString,
+  pullQuoteContext: optionalTrimmedString,
+  voiceNoteUrl: optionalMediaUrl,
+  voiceNoteDurationSec: z
+    .union([z.number().int().nonnegative(), z.null(), z.undefined()])
+    .optional()
+    .transform((v) => (v === null ? undefined : v)),
+  voiceNoteLabel: optionalTrimmedString,
+  voiceNoteLocation: optionalTrimmedString,
+});
+
 export const createNewsletterSchema = z.object({
   athleteId: z.string().min(1, "Athlete is required"),
   title: z.string().trim().min(1, "Title is required"),
   slug: slugSchema,
   heroImageUrl: optionalMediaUrl,
-  body: z.string(),
+  debrief: debriefSchema,
 });
 
 export const updateNewsletterSchema = z.object({
   title: z.string().trim().min(1, "Title is required").optional(),
   slug: slugSchema.optional(),
   heroImageUrl: optionalMediaUrl,
-  body: z.string().optional(),
+  debrief: debriefSchema.optional(),
 });
 
+export type DebriefInput = z.input<typeof debriefSchema>;
+export type DebriefOutput = z.output<typeof debriefSchema>;
 export type CreateNewsletterInput = z.input<typeof createNewsletterSchema>;
 export type CreateNewsletterOutput = z.output<typeof createNewsletterSchema>;
 export type UpdateNewsletterInput = z.input<typeof updateNewsletterSchema>;

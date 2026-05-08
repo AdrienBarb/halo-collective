@@ -1,32 +1,32 @@
-import { Img, Link, Section, Text } from "@react-email/components";
+import { Img, Link, Section } from "@react-email/components";
+import type { DebriefSection } from "@prisma/client";
 import { EmailLayout } from "@/lib/emails/_brand/EmailLayout";
 import { EmailHeading } from "@/lib/emails/_brand/atoms";
-import { palette, fonts } from "@/lib/emails/_brand/theme";
+import { EmailDebrief } from "@/lib/emails/blocks/Debrief";
+import { palette } from "@/lib/emails/_brand/theme";
 
 interface NewsletterEmailProps {
   title: string;
-  body: string;
+  debrief: DebriefSection;
   heroImageUrl?: string | null;
   editionNumber: number;
   athleteName: string;
+  editionUrl: string;
   previewText?: string;
   unsubscribeUrl?: string;
 }
 
 export const NewsletterEmail = ({
   title,
-  body,
+  debrief,
   heroImageUrl,
   editionNumber,
   athleteName,
+  editionUrl,
   previewText,
   unsubscribeUrl = "{{ unsubscribe }}",
 }: NewsletterEmailProps) => {
   const editionLabel = `Edition #${editionNumber.toString().padStart(2, "0")}`;
-  const paragraphs = body
-    .split(/\n{2,}/)
-    .map((p) => p.trim())
-    .filter(Boolean);
 
   return (
     <EmailLayout
@@ -63,33 +63,31 @@ export const NewsletterEmail = ({
         </Section>
       ) : null}
 
-      <Section style={{ marginTop: 24 }}>
-        {(paragraphs.length === 0 ? [body] : paragraphs).map((p, i) => (
-          <Text
-            key={i}
-            style={{
-              margin: i === 0 ? 0 : "16px 0 0",
-              color: palette.ink2,
-              fontFamily: fonts.sans,
-              fontSize: 16,
-              lineHeight: 1.65,
-              whiteSpace: "pre-wrap",
-            }}
-          >
-            {p}
-          </Text>
-        ))}
-      </Section>
+      <EmailDebrief section={debrief} editionUrl={editionUrl} />
     </EmailLayout>
   );
 };
 
 NewsletterEmail.PreviewProps = {
   title: "Monte Carlo: the comeback nobody saw",
-  body: "Down a set and a break. Crowd dead. I told myself one point at a time — and somehow we found a way back.\n\nThis one's for everyone who stayed up watching.",
+  debrief: {
+    id: "preview",
+    newsletterId: "preview",
+    body:
+      "Down a set and a break. Crowd dead. I told myself one point at a time — and somehow we found a way back.\n\nThis one's for everyone who stayed up watching.",
+    pullQuote: "One point at a time.",
+    pullQuoteContext: "Between sets — Monte Carlo, R3",
+    voiceNoteUrl: null,
+    voiceNoteDurationSec: 92,
+    voiceNoteLabel: "Voice note",
+    voiceNoteLocation: "Locker room · Monte Carlo",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  } satisfies DebriefSection,
   heroImageUrl: null,
   editionNumber: 1,
   athleteName: "Flavio Cobolli",
+  editionUrl: "https://halocollective.co/flavio-cobolli/monte-carlo-comeback",
   previewText: "The comeback nobody saw",
 } satisfies NewsletterEmailProps;
 
