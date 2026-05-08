@@ -205,7 +205,9 @@ function buildEditionUrl(athleteSlug: string, editionSlug: string): string {
     process.env.NEXT_PUBLIC_BASE_URL ||
     process.env.BETTER_AUTH_URL ||
     config.project.url;
-  return `${base.replace(/\/$/, "")}/${athleteSlug}/${editionSlug}`;
+  const url = new URL(`/${athleteSlug}`, base);
+  url.searchParams.set("edition", editionSlug);
+  return url.toString();
 }
 
 async function renderNewsletterEmail(

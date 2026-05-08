@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { NewsletterStatus, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db/prisma";
 import type {
   CreateAthleteOutput,
@@ -30,17 +30,6 @@ export const getAthleteBySlug = cache(async (slug: string) => {
 export const listAllAthletes = cache(async () => {
   return prisma.athlete.findMany({
     orderBy: [{ worldRank: "asc" }, { createdAt: "asc" }],
-  });
-});
-
-export const getLatestPublishedNewsletter = cache(async (athleteId: string) => {
-  return prisma.newsletter.findFirst({
-    where: {
-      athleteId,
-      status: NewsletterStatus.PUBLISHED,
-      publishedAt: { not: null },
-    },
-    orderBy: { publishedAt: "desc" },
   });
 });
 

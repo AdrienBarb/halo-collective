@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import GlobalErrorHandler from "@/components/GlobalErrorHandler";
 import { QueryProviders } from "@/components/providers/QueryProviders";
 import { PostHogProvider } from "@/components/tracking/PostHogProvider";
@@ -49,17 +50,19 @@ export default function RootLayout({
       <body
         className={`${fraunces.variable} ${interTight.variable} ${jetbrainsMono.variable} antialiased`}
       >
-        <QueryProviders>
-          <PostHogProvider>
-            <div className="flex min-h-screen flex-col">
-              <Navbar />
-              <main className="flex-1">{children}</main>
-              <Footer />
-            </div>
-            <Toaster position="bottom-center" />
-            <GlobalErrorHandler />
-          </PostHogProvider>
-        </QueryProviders>
+        <NuqsAdapter>
+          <QueryProviders>
+            <PostHogProvider>
+              <div className="flex min-h-screen flex-col">
+                <Navbar />
+                <main className="flex-1">{children}</main>
+                <Footer />
+              </div>
+              <Toaster position="bottom-center" />
+              <GlobalErrorHandler />
+            </PostHogProvider>
+          </QueryProviders>
+        </NuqsAdapter>
       </body>
     </html>
   );
