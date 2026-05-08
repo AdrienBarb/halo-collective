@@ -58,6 +58,7 @@ export default async function AthleteHomePage({
                     fill
                     sizes="(max-width: 640px) 78vw, (max-width: 1024px) 40vw, 32vw"
                     className="object-cover"
+                    unoptimized
                   />
                 ) : null}
                 <div

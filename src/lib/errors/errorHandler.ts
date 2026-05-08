@@ -1,21 +1,26 @@
 import { errorMessages } from "@/lib/constants/errorMessage";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
+import { AppError } from "@/lib/errors/AppError";
 
 export function errorHandler(error: unknown) {
-  console.error(error);
-
   if (error instanceof ZodError) {
     return NextResponse.json(
       { message: "Invalid input", errors: error.issues },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
-  const errorMessage =
-    error instanceof Error && error.message
-      ? error.message
-      : errorMessages.SERVER_ERROR;
+  if (error instanceof AppError) {
+    return NextResponse.json(
+      { error: error.message },
+      { status: error.statusCode },
+    );
+  }
 
-  return NextResponse.json({ error: errorMessage }, { status: 500 });
+  console.error(error);
+  return NextResponse.json(
+    { error: errorMessages.SERVER_ERROR },
+    { status: 500 },
+  );
 }

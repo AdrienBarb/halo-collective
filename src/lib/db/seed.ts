@@ -18,7 +18,6 @@ type AthleteSeed = {
   countryRank: number;
   titlesCount: number;
   bio: string;
-  heroFocus: string;
   avatarUrl: string | null;
 };
 
@@ -35,8 +34,7 @@ const athletes: AthleteSeed[] = [
     countryRank: 1,
     titlesCount: 22,
     bio: "Polish tennis player and former world No. 1, multi-Slam champion.",
-    heroFocus: "center 20%",
-    avatarUrl: null,
+    avatarUrl: "/brand/heroes/iga-swiatek.jpg",
   },
   {
     slug: "alexander-bublik",
@@ -50,8 +48,7 @@ const athletes: AthleteSeed[] = [
     countryRank: 1,
     titlesCount: 9,
     bio: "Kazakh tennis player known for his creative, unpredictable game.",
-    heroFocus: "center 12%",
-    avatarUrl: null,
+    avatarUrl: "/brand/heroes/alexander-bublik.jpg",
   },
   {
     slug: "flavio-cobolli",
@@ -65,18 +62,16 @@ const athletes: AthleteSeed[] = [
     countryRank: 4,
     titlesCount: 1,
     bio: "Italian tennis player on the ATP tour, breakthrough season in 2025.",
-    heroFocus: "center 18%",
     avatarUrl: "/brand/portraits/flavio-cobolli.jpg",
   },
 ];
 
 async function main() {
   for (const a of athletes) {
-    const data = { ...a, heroImageUrl: `/brand/heroes/${a.slug}.jpg` };
     const result = await prisma.athlete.upsert({
       where: { slug: a.slug },
-      update: data,
-      create: data,
+      update: a,
+      create: a,
     });
     console.log(`✓ ${result.slug}`);
   }

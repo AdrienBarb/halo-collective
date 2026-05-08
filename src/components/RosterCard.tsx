@@ -23,15 +23,15 @@ export default function RosterCard({ athlete }: RosterCardProps) {
       className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-cream-2 transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-[3px] hover:[box-shadow:0_10px_28px_rgba(0,0,0,0.10)]"
     >
       <div className="relative aspect-square w-full overflow-hidden bg-[linear-gradient(135deg,#5a6478_0%,#2c3340_100%)]">
-        {athlete.heroImageUrl ? (
+        {athlete.avatarUrl ? (
           <Image
-            src={athlete.heroImageUrl}
+            src={athlete.avatarUrl}
             alt={fullName}
             fill
             sizes="(max-width: 620px) 100vw, (max-width: 980px) 50vw, 33vw"
             className="object-cover"
-            style={{ objectPosition: athlete.heroFocus ?? "center" }}
             priority
+            unoptimized
           />
         ) : null}
       </div>

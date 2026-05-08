@@ -64,6 +64,7 @@ export default async function EditionPage({
             sizes="(max-width: 760px) 100vw, 760px"
             className="object-cover"
             priority
+            unoptimized
           />
         </div>
       ) : null}

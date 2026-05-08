@@ -43,7 +43,7 @@ export default async function AthleteLayout({
       ? `#${latest.editionNumber.toString().padStart(2, "0")} · ${format(latest.publishedAt, "d MMM").toUpperCase()}`
       : null;
 
-  const portraitSrc = athlete.heroImageUrl ?? athlete.avatarUrl;
+  const portraitSrc = athlete.avatarUrl;
 
   return (
     <div className="bg-cream">
@@ -81,8 +81,8 @@ export default async function AthleteLayout({
                 fill
                 sizes="200px"
                 className="object-cover"
-                style={{ objectPosition: athlete.heroFocus ?? "center 20%" }}
                 priority
+                unoptimized
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center font-serif text-[56px] font-semibold tracking-[-0.02em] text-cream md:text-[72px]">

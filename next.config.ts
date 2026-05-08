@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const isDev = process.env.NODE_ENV !== "production";
+
 const nextConfig: NextConfig = {
   // Image optimization for external sources
   images: {
@@ -20,6 +22,25 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "lh3.googleusercontent.com",
       },
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+      ...(isDev
+        ? ([
+            {
+              protocol: "http",
+              hostname: "127.0.0.1",
+              pathname: "/storage/v1/object/public/**",
+            },
+            {
+              protocol: "http",
+              hostname: "localhost",
+              pathname: "/storage/v1/object/public/**",
+            },
+          ] as const)
+        : []),
     ],
   },
 };
