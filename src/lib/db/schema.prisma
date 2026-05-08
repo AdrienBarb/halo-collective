@@ -29,6 +29,7 @@ enum Sport {
 
 enum NewsletterStatus {
   DRAFT
+  SENDING
   PUBLISHED
 }
 
@@ -63,11 +64,13 @@ model Newsletter {
   slug          String
   heroImageUrl  String?
   body          String           @default("")
-  status        NewsletterStatus @default(DRAFT)
-  publishedAt   DateTime?
-  renderedHtml  String?
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
+  status          NewsletterStatus @default(DRAFT)
+  publishedAt     DateTime?
+  renderedHtml    String?
+  brevoCampaignId String?
+  brevoSentAt     DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
   athlete Athlete @relation(fields: [athleteId], references: [id], onDelete: Cascade)
 

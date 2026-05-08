@@ -6,7 +6,7 @@ import useApi from "@/lib/hooks/useApi";
 
 interface PublishToggleProps {
   newsletterId: string;
-  status: "DRAFT" | "PUBLISHED";
+  status: "DRAFT" | "SENDING" | "PUBLISHED";
 }
 
 export default function PublishToggle({
@@ -35,6 +35,14 @@ export default function PublishToggle({
       toast.error(error.response?.data?.error ?? "Failed to unpublish");
     },
   });
+
+  if (status === "SENDING") {
+    return (
+      <span className="inline-flex items-center gap-2 rounded-md border border-line bg-cream-2 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-3">
+        Send in progress
+      </span>
+    );
+  }
 
   if (status === "DRAFT") {
     return (

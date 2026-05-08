@@ -57,6 +57,14 @@ export default async function EditNewsletterPage({
                 View live ↗
               </Link>
             ) : null}
+            <Link
+              href={`/api/admin/newsletters/${newsletter.id}/preview`}
+              target="_blank"
+              rel="noreferrer"
+              className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-ink-2 transition-colors hover:text-ink"
+            >
+              Preview email ↗
+            </Link>
             <PublishToggle
               newsletterId={newsletter.id}
               status={newsletter.status}
@@ -78,27 +86,43 @@ export default async function EditNewsletterPage({
   );
 }
 
-function StatusPill({ status }: { status: "DRAFT" | "PUBLISHED" }) {
-  const isPublished = status === "PUBLISHED";
+function StatusPill({
+  status,
+}: {
+  status: "DRAFT" | "SENDING" | "PUBLISHED";
+}) {
+  const tone =
+    status === "PUBLISHED"
+      ? "border-ok/30 bg-ok/10 text-ok"
+      : status === "SENDING"
+        ? "border-accent-gold/30 bg-accent-gold/10 text-accent-gold"
+        : "border-line bg-cream-3 text-ink-2";
+  const dot =
+    status === "PUBLISHED"
+      ? "bg-ok"
+      : status === "SENDING"
+        ? "bg-accent-gold"
+        : "bg-ink-3";
+  const label =
+    status === "PUBLISHED"
+      ? "Published"
+      : status === "SENDING"
+        ? "Sending"
+        : "Draft";
 
   return (
     <span
       className={[
         "inline-flex items-center gap-2 rounded-pill border px-3 py-1.5",
         "font-mono text-[10px] font-semibold uppercase tracking-[0.22em]",
-        isPublished
-          ? "border-ok/30 bg-ok/10 text-ok"
-          : "border-line bg-cream-3 text-ink-2",
+        tone,
       ].join(" ")}
     >
       <span
         aria-hidden
-        className={[
-          "h-1.5 w-1.5 rounded-full",
-          isPublished ? "bg-ok" : "bg-ink-3",
-        ].join(" ")}
+        className={["h-1.5 w-1.5 rounded-full", dot].join(" ")}
       />
-      {isPublished ? "Published" : "Draft"}
+      {label}
     </span>
   );
 }
