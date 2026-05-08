@@ -22,7 +22,6 @@ export async function generateMetadata({
     description:
       athlete.bio ?? `${fullName} — newsletter and updates on Halo Collective.`,
     url: `/${athleteSlug}`,
-    image: athlete.heroImageUrl ?? undefined,
   });
 }
 
@@ -44,62 +43,49 @@ export default async function AthleteLayout({
       ? `#${latest.editionNumber.toString().padStart(2, "0")} · ${format(latest.publishedAt, "d MMM").toUpperCase()}`
       : null;
 
+  const portraitSrc = athlete.heroImageUrl ?? athlete.avatarUrl;
+
   return (
     <div className="bg-cream">
-      <section className="relative w-full overflow-hidden bg-[linear-gradient(135deg,#5a6478_0%,#2c3340_100%)]">
-        <div className="relative aspect-[16/10] w-full md:aspect-[21/9]">
-          {athlete.heroImageUrl ? (
-            <Image
-              src={athlete.heroImageUrl}
-              alt={fullName}
-              fill
-              sizes="100vw"
-              className="object-cover"
-              style={{ objectPosition: athlete.heroFocus ?? "center" }}
-              priority
-            />
-          ) : null}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.32)_0%,rgba(0,0,0,0)_35%,rgba(0,0,0,0.18)_100%)]"
-          />
-
-          <div className="absolute left-5 top-5 md:left-8 md:top-8">
-            <FrostedBadge>★ MEMBER</FrostedBadge>
-          </div>
-          {issueMeta ? (
-            <div className="absolute right-5 top-5 md:right-8 md:top-8">
-              <FrostedBadge>{issueMeta}</FrostedBadge>
+      <div className="mx-auto max-w-[820px] border-x border-line bg-cream-2">
+        <section className="relative w-full overflow-hidden bg-cream-3">
+          <div className="relative aspect-[16/10] w-full md:aspect-[21/9]">
+            <div className="absolute left-5 top-5 md:left-8 md:top-8">
+              <FrostedBadge>★ MEMBER</FrostedBadge>
             </div>
-          ) : null}
-        </div>
+            {issueMeta ? (
+              <div className="absolute right-5 top-5 md:right-8 md:top-8">
+                <FrostedBadge>{issueMeta}</FrostedBadge>
+              </div>
+            ) : null}
+          </div>
 
-        <div className="flex h-1 w-full">
-          {flag.stripe.map((color, i) => (
-            <span
-              key={i}
-              className="flex-1"
-              style={{ background: color }}
-              aria-hidden
-            />
-          ))}
-        </div>
-      </section>
+          <div className="flex h-1 w-full">
+            {flag.stripe.map((color, i) => (
+              <span
+                key={i}
+                className="flex-1"
+                style={{ background: color }}
+                aria-hidden
+              />
+            ))}
+          </div>
+        </section>
 
-      <div className="mx-auto max-w-[1100px] px-6">
-        <div className="-mt-[56px] flex flex-col items-center md:-mt-[72px]">
-          <div className="relative h-[112px] w-[112px] overflow-hidden rounded-full border-[3px] border-cream bg-[linear-gradient(135deg,#5a6478_0%,#2c3340_100%)] shadow-[0_8px_24px_rgba(0,0,0,0.22)] md:h-[140px] md:w-[140px]">
-            {athlete.avatarUrl ? (
+        <div className="flex flex-col items-center px-6 pb-2">
+          <div className="relative -mt-[80px] h-[160px] w-[160px] overflow-hidden rounded-full border-[4px] border-cream-2 bg-[linear-gradient(135deg,#5a6478_0%,#2c3340_100%)] shadow-[0_10px_28px_rgba(0,0,0,0.22)] md:-mt-[110px] md:h-[200px] md:w-[200px]">
+            {portraitSrc ? (
               <Image
-                src={athlete.avatarUrl}
+                src={portraitSrc}
                 alt={fullName}
                 fill
-                sizes="140px"
+                sizes="200px"
                 className="object-cover"
-                style={{ objectPosition: "center 20%" }}
+                style={{ objectPosition: athlete.heroFocus ?? "center 20%" }}
+                priority
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center font-serif text-[44px] font-semibold tracking-[-0.02em] text-cream md:text-[54px]">
+              <div className="flex h-full w-full items-center justify-center font-serif text-[56px] font-semibold tracking-[-0.02em] text-cream md:text-[72px]">
                 {initials}
               </div>
             )}
@@ -117,7 +103,7 @@ export default async function AthleteLayout({
           </div>
         </div>
 
-        <dl className="mt-8 grid grid-cols-3 border-y border-line">
+        <dl className="mt-6 grid grid-cols-3 border-y border-line">
           <Stat
             value={athlete.worldRank !== null ? `#${athlete.worldRank}` : "—"}
             label={athlete.tour ? `${athlete.tour} World` : "World"}
@@ -129,16 +115,16 @@ export default async function AthleteLayout({
           />
           <Stat value={athlete.titlesCount.toString()} label="Titles" />
         </dl>
-      </div>
 
-      {children}
+        {children}
+      </div>
     </div>
   );
 }
 
 function FrostedBadge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center rounded-full border border-white/20 bg-white/[0.16] px-2.5 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-white backdrop-blur-md">
+    <span className="inline-flex items-center rounded-full border border-ink/15 bg-cream-2/70 px-2.5 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-ink-2 backdrop-blur-md">
       {children}
     </span>
   );
