@@ -6,6 +6,9 @@ const globalForPrisma = global as unknown as {
   prisma: PrismaClient;
 };
 
+const stripSslMode = (url: string | undefined) =>
+  url?.replace(/([?&])sslmode=[^&]*&?/gi, "$1").replace(/[?&]$/, "");
+
 const createPrismaClient = () => {
   if (typeof window !== "undefined") {
     throw new Error(
@@ -14,7 +17,7 @@ const createPrismaClient = () => {
   }
 
   const adapter = new PrismaPg({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: stripSslMode(process.env.DATABASE_URL),
     ...(isProduction && { ssl: { rejectUnauthorized: false } }),
   });
   return new PrismaClient({ adapter });
