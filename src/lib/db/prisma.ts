@@ -13,7 +13,12 @@ const createPrismaClient = () => {
     );
   }
 
-  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+  const url = process.env.DATABASE_URL ?? "";
+  const needsRelaxedTls = /[?&]sslmode=(require|no-verify)/i.test(url);
+  const adapter = new PrismaPg({
+    connectionString: url,
+    ...(needsRelaxedTls ? { ssl: { rejectUnauthorized: false } } : {}),
+  });
   return new PrismaClient({ adapter });
 };
 

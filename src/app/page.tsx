@@ -1,6 +1,8 @@
 import RosterCard from "@/components/RosterCard";
 import { listAllAthletes } from "@/lib/services/athlete";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const athletes = await listAllAthletes();
   const count = athletes.length.toString().padStart(2, "0");
