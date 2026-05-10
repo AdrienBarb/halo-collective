@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "vercel-build": "prisma generate && if [ \"$VERCEL_ENV\" = \"production\" ]; then prisma migrate deploy; fi && next build",
+    "postinstall": "prisma generate",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "prisma generate",
@@ -58,7 +60,6 @@
     "react-phone-number-input": "^3.4.16",
     "resend": "^6.9.1",
     "slugify": "^1.6.9",
-    "stripe": "^22.1.1",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.4.3",
     "zustand": "^5.0.10"

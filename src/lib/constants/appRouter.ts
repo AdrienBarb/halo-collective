@@ -20,8 +20,5 @@ export const appRouter = {
   // API routes
   api: {
     auth: "/api/auth",
-    webhooks: {
-      stripe: "/api/webhooks/stripe",
-    },
   },
 };
