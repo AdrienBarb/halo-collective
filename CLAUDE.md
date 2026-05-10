@@ -222,8 +222,15 @@ BETTER_AUTH_SECRET=
 BETTER_AUTH_URL=
 NEXT_PUBLIC_BASE_URL=
 
-# Email (Resend)
+# Email (Resend — transactional)
 RESEND_API_KEY=
+RESEND_FROM_EMAIL=           # e.g. login@halocollective.co (used for magic-link login)
+
+# Newsletter (Brevo — campaigns)
+BREVO_API_KEY=
+BREVO_SENDER_EMAIL=          # e.g. news@halocollective.co (must be a verified sender in Brevo)
+BREVO_REPLY_TO_EMAIL=        # e.g. fans@halocollective.co (where fan replies land)
+BREVO_DEFAULT_FOLDER_ID=     # Brevo folder id for athlete contact lists
 
 # Analytics (PostHog)
 NEXT_PUBLIC_POSTHOG_KEY=

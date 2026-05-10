@@ -122,16 +122,15 @@ BETTER_AUTH_SECRET="your-secret-min-32-chars"
 BETTER_AUTH_URL="http://localhost:3000"
 NEXT_PUBLIC_BASE_URL="http://localhost:3000"
 
-# Email
+# Email (Resend — transactional, magic-link login)
 RESEND_API_KEY="re_your_api_key"
+RESEND_FROM_EMAIL="login@halocollective.co"
 
-# Payments
-STRIPE_SECRET_KEY="sk_test_..."
-STRIPE_WEBHOOK_SECRET="whsec_..."
-
-# Rate Limiting
-UPSTASH_REDIS_REST_URL="https://..."
-UPSTASH_REDIS_REST_TOKEN="..."
+# Newsletter (Brevo — campaigns)
+BREVO_API_KEY="xkeysib-..."
+BREVO_SENDER_EMAIL="news@halocollective.co"
+BREVO_REPLY_TO_EMAIL="fans@halocollective.co"
+BREVO_DEFAULT_FOLDER_ID="6"
 ```
 
 ### Optional

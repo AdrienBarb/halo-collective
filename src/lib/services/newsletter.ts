@@ -170,6 +170,7 @@ type NewsletterWithAthlete = Newsletter & {
 
 interface BrevoConfig {
   senderEmail: string;
+  replyToEmail: string;
 }
 
 function logBrevo(event: string, data: Record<string, unknown>) {
@@ -179,6 +180,7 @@ function logBrevo(event: string, data: Record<string, unknown>) {
 function loadBrevoConfig(): BrevoConfig {
   return {
     senderEmail: getRequiredEnv("BREVO_SENDER_EMAIL"),
+    replyToEmail: getRequiredEnv("BREVO_REPLY_TO_EMAIL"),
   };
 }
 
@@ -339,7 +341,7 @@ export async function publishNewsletter(id: string) {
     htmlContent: renderedHtml,
     sender: { name: athleteName, email: config.senderEmail },
     listIds: [newsletter.athlete.brevoListId],
-    replyTo: config.senderEmail,
+    replyTo: config.replyToEmail,
   });
   logBrevo("campaign_created", { newsletterId: id, campaignId });
 

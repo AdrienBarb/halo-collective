@@ -5,7 +5,7 @@
     "brandName": "Halo Collective",
     "description": "Honest match debriefs. The gear, the schedule, the wins and the losses — unfiltered, member-only, delivered between matches.",
     "tagline": "The inside story, direct from the athlete.",
-    "url": "https://www.yourproject.com",
+    "url": "https://halocollective.co",
     "logo": "/logo.png",
     "favicon": "/favicon.ico"
   },
@@ -19,13 +19,13 @@
       "members only",
       "halo collective"
     ],
-    "author": "Your Name",
+    "author": "Halo Collective",
     "ogImage": "/og-image.png",
     "twitterHandle": "@yourhandle"
   },
   "contact": {
-    "email": "hello@yourproject.com",
-    "supportEmail": "support@yourproject.com"
+    "email": "hello@halocollective.co",
+    "supportEmail": "support@halocollective.co"
   },
   "social": {
     "twitter": "https://x.com/yourhandle",
