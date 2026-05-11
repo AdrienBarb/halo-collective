@@ -256,7 +256,7 @@ export default function SubscribeForm({
                             <SelectValue placeholder="– Country –" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="max-h-[min(300px,60vh)]">
                           {COUNTRIES.map((c) => (
                             <SelectItem key={c.code} value={c.code}>
                               {c.name}
