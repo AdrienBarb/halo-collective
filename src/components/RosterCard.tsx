@@ -3,8 +3,13 @@ import Link from "next/link";
 import type { Athlete } from "@prisma/client";
 import { flagFor } from "@/lib/athlete/flag";
 
+export type RosterAthlete = Pick<
+  Athlete,
+  "slug" | "firstName" | "lastName" | "tour" | "worldRank" | "countryCode" | "avatarUrl"
+>;
+
 type RosterCardProps = {
-  athlete: Athlete;
+  athlete: RosterAthlete;
 };
 
 export default function RosterCard({ athlete }: RosterCardProps) {

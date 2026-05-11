@@ -139,3 +139,56 @@ export async function isSubscribedToAthlete(
   });
   return Boolean(sub && sub.unsubscribedAt === null);
 }
+
+export interface UserSubscriptionListItem {
+  id: string;
+  subscribedAt: Date;
+  athlete: {
+    slug: string;
+    firstName: string;
+    lastName: string;
+    tour: string | null;
+    worldRank: number | null;
+    countryCode: string;
+    avatarUrl: string | null;
+  };
+}
+
+const SUBSCRIPTION_LIST_LIMIT = 100;
+
+export async function listSubscriptionsByUser(
+  userId: string,
+): Promise<UserSubscriptionListItem[]> {
+  const startedAt = Date.now();
+  const subscriptions = await prisma.newsletterSubscription.findMany({
+    where: { userId, unsubscribedAt: null },
+    select: {
+      id: true,
+      subscribedAt: true,
+      athlete: {
+        select: {
+          slug: true,
+          firstName: true,
+          lastName: true,
+          tour: true,
+          worldRank: true,
+          countryCode: true,
+          avatarUrl: true,
+        },
+      },
+    },
+    orderBy: { subscribedAt: "desc" },
+    take: SUBSCRIPTION_LIST_LIMIT,
+  });
+
+  console.info(
+    JSON.stringify({
+      scope: "subscription.list",
+      userId,
+      count: subscriptions.length,
+      durationMs: Date.now() - startedAt,
+    }),
+  );
+
+  return subscriptions;
+}

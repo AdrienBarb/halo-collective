@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut, Shield } from "lucide-react";
+import { LogOut, Newspaper, Shield } from "lucide-react";
 import { UserRole } from "@prisma/client";
 import { authClient } from "@/lib/better-auth/auth-client";
 import {
@@ -29,6 +29,16 @@ function initials(firstName: string | null, lastName: string | null, email: stri
   return email[0]?.toUpperCase() ?? "?";
 }
 
+function formatDisplayName(
+  firstName: string | null,
+  lastName: string | null,
+  email: string,
+) {
+  if (firstName && lastName) return `${firstName} ${lastName}`;
+  if (firstName) return firstName;
+  return email;
+}
+
 export default function AccountMenu({
   email,
   firstName,
@@ -42,11 +52,7 @@ export default function AccountMenu({
     router.refresh();
   }
 
-  const display = firstName
-    ? lastName
-      ? `${firstName} ${lastName}`
-      : firstName
-    : email;
+  const display = formatDisplayName(firstName, lastName, email);
 
   return (
     <DropdownMenu>
@@ -58,6 +64,7 @@ export default function AccountMenu({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
+        lang="fr"
         className="min-w-[220px] border-line bg-cream-2"
       >
         <DropdownMenuLabel>
@@ -78,6 +85,13 @@ export default function AccountMenu({
             <DropdownMenuSeparator />
           </>
         ) : null}
+        <DropdownMenuItem asChild className="cursor-pointer">
+          <Link href="/subscriptions">
+            <Newspaper className="mr-2 h-4 w-4" />
+            Mes abonnements
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           onSelect={() => void onSignOut()}
           className="cursor-pointer"
