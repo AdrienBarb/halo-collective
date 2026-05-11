@@ -1,119 +1,141 @@
-import { randomUUID } from "node:crypto";
 import { prisma } from "@/lib/db/prisma";
 import { ensureAthleteList } from "@/lib/brevo/lists";
 import { upsertContact } from "@/lib/brevo/contacts";
 import { getAthleteBySlug } from "@/lib/services/athlete";
 import { sendWelcomeEmail } from "@/lib/resend/sendWelcomeEmail";
 import { NotFoundError } from "@/lib/errors/AppError";
-import type { SubscribeOutput } from "@/lib/schemas/subscription";
 
-interface SubscribeArgs extends SubscribeOutput {
-  athleteSlug: string;
+interface ProfilePatch {
+  firstName?: string;
+  lastName?: string;
+  countryCode?: string;
+  phone?: string;
 }
 
-interface SubscribeResult {
+interface CreateSubscriptionArgs {
+  userId: string;
+  athleteSlug: string;
+  partnerOffersConsent: boolean;
+  source?: string;
+  profilePatch?: ProfilePatch;
+}
+
+interface CreateSubscriptionResult {
   subscriptionId: string;
   userId: string;
 }
 
-export async function subscribeToAthlete(
-  args: SubscribeArgs,
-): Promise<SubscribeResult> {
-  const {
-    athleteSlug,
-    firstName,
-    lastName,
-    email,
-    countryCode,
-    phone,
-    partnerOffersConsent,
-    source,
-  } = args;
+export async function createSubscription(
+  args: CreateSubscriptionArgs,
+): Promise<CreateSubscriptionResult> {
+  const { userId, athleteSlug, partnerOffersConsent, source, profilePatch } =
+    args;
 
   const athlete = await getAthleteBySlug(athleteSlug);
   if (!athlete) {
     throw new NotFoundError("Athlete not found");
   }
 
-  const brevoListId = await ensureAthleteList(athlete);
-  const fullName = `${firstName} ${lastName}`;
-
-  // DB writes first, in a single transaction. If Brevo later fails, our
-  // consent record is still durable — we reconcile contact ids on retry.
-  const { userId, subscriptionId } = await prisma.$transaction(async (tx) => {
-    const user = await tx.user.upsert({
-      where: { email },
-      create: {
-        id: randomUUID(),
-        email,
-        name: fullName,
-        firstName,
-        lastName,
-        countryCode,
-        phone: phone ?? null,
-        emailVerified: false,
-      },
-      update: {
-        name: fullName,
-        firstName,
-        lastName,
-        countryCode,
-        // Only overwrite phone when the user actually provided one.
-        // Preserves any number captured in a prior subscribe.
-        ...(phone !== undefined && { phone }),
-      },
-      select: { id: true },
-    });
-
-    const subscription = await tx.newsletterSubscription.upsert({
-      where: { userId_athleteId: { userId: user.id, athleteId: athlete.id } },
-      create: {
-        userId: user.id,
-        athleteId: athlete.id,
-        source,
-        partnerOffersConsent,
-      },
-      update: {
-        partnerOffersConsent,
-        unsubscribedAt: null,
-      },
-      select: { id: true },
-    });
-
-    return { userId: user.id, subscriptionId: subscription.id };
-  });
-
-  const brevoContactId = await upsertContact({
-    email,
-    listIds: [brevoListId],
-    attributes: {
-      FIRSTNAME: firstName,
-      LASTNAME: lastName,
-      COUNTRY: countryCode,
+  // Patch profile fields if provided (used after OTP-based sign-in to backfill
+  // form values onto a previously-created user).
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: profilePatch
+      ? {
+          ...(profilePatch.firstName ? { firstName: profilePatch.firstName } : {}),
+          ...(profilePatch.lastName ? { lastName: profilePatch.lastName } : {}),
+          ...(profilePatch.countryCode
+            ? { countryCode: profilePatch.countryCode }
+            : {}),
+          ...(profilePatch.phone ? { phone: profilePatch.phone } : {}),
+          ...(profilePatch.firstName && profilePatch.lastName
+            ? { name: `${profilePatch.firstName} ${profilePatch.lastName}` }
+            : {}),
+        }
+      : {},
+    select: {
+      email: true,
+      firstName: true,
+      lastName: true,
+      countryCode: true,
     },
   });
 
-  await prisma.newsletterSubscription.update({
-    where: { id: subscriptionId },
-    data: { brevoContactId: String(brevoContactId) },
+  const brevoListId = await ensureAthleteList(athlete);
+  const brevoContactId = await upsertContact({
+    email: user.email,
+    listIds: [brevoListId],
+    attributes: {
+      FIRSTNAME: user.firstName ?? "",
+      LASTNAME: user.lastName ?? "",
+      COUNTRY: user.countryCode ?? "",
+    },
   });
 
-  // Fire-and-forget: a Resend hiccup must not 502 the subscribe.
-  sendWelcomeEmail({
-    email,
-    firstName,
-    athleteFirstName: athlete.firstName,
-    athleteLastName: athlete.lastName,
-    athleteSlug: athlete.slug,
-  }).catch((error: unknown) => {
-    console.error(
-      JSON.stringify({
-        scope: "subscribe.welcome_email_failed",
-        email,
-        error: String(error),
-      }),
-    );
+  // findUnique → create or update — so we can detect new vs returning and
+  // only send the welcome email on first subscribe.
+  const existing = await prisma.newsletterSubscription.findUnique({
+    where: { userId_athleteId: { userId, athleteId: athlete.id } },
+    select: { id: true, unsubscribedAt: true },
   });
+
+  let subscriptionId: string;
+  let isNewSubscriber: boolean;
+
+  if (existing) {
+    await prisma.newsletterSubscription.update({
+      where: { id: existing.id },
+      data: {
+        partnerOffersConsent,
+        unsubscribedAt: null,
+        brevoContactId: String(brevoContactId),
+      },
+    });
+    subscriptionId = existing.id;
+    isNewSubscriber = existing.unsubscribedAt !== null;
+  } else {
+    const created = await prisma.newsletterSubscription.create({
+      data: {
+        userId,
+        athleteId: athlete.id,
+        source,
+        partnerOffersConsent,
+        brevoContactId: String(brevoContactId),
+      },
+      select: { id: true },
+    });
+    subscriptionId = created.id;
+    isNewSubscriber = true;
+  }
+
+  if (isNewSubscriber) {
+    // Fire-and-forget: a Resend hiccup must not 502 the subscribe.
+    sendWelcomeEmail({
+      email: user.email,
+      firstName: user.firstName ?? "",
+      athleteFirstName: athlete.firstName,
+      athleteLastName: athlete.lastName,
+      athleteSlug: athlete.slug,
+    }).catch((error: unknown) => {
+      console.error(
+        JSON.stringify({
+          scope: "subscribe.welcome_email_failed",
+          error: String(error),
+        }),
+      );
+    });
+  }
 
   return { subscriptionId, userId };
+}
+
+export async function isSubscribedToAthlete(
+  userId: string,
+  athleteId: string,
+): Promise<boolean> {
+  const sub = await prisma.newsletterSubscription.findUnique({
+    where: { userId_athleteId: { userId, athleteId } },
+    select: { unsubscribedAt: true },
+  });
+  return Boolean(sub && sub.unsubscribedAt === null);
 }

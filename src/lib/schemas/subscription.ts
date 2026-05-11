@@ -34,3 +34,17 @@ export const subscribeSchema = z.object({
 
 export type SubscribeInput = z.input<typeof subscribeSchema>;
 export type SubscribeOutput = z.output<typeof subscribeSchema>;
+
+export const subscribeAuthSchema = z.object({
+  partnerOffersConsent: z.boolean().default(false),
+  source: z.enum(SUBSCRIBE_SOURCES).optional(),
+  // Optional profile patch — used after OTP sign-in to backfill user
+  // values from the form the visitor just filled out anonymously.
+  firstName: z.string().trim().min(1).max(80).optional(),
+  lastName: z.string().trim().min(1).max(80).optional(),
+  countryCode: countryCodeSchema.optional(),
+  phone: phoneSchema,
+});
+
+export type SubscribeAuthInput = z.input<typeof subscribeAuthSchema>;
+export type SubscribeAuthOutput = z.output<typeof subscribeAuthSchema>;

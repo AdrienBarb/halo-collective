@@ -29,12 +29,18 @@ axiosInstance.interceptors.response.use(
   },
   (error: AxiosError) => {
     const errorStatus = error?.response?.status;
+    const errorData = error?.response?.data as
+      | { error?: string; code?: string }
+      | undefined;
     const errorMessage =
-      (error?.response?.data as { error?: string })?.error ||
-      error?.message ||
-      "Something went wrong";
+      errorData?.error || error?.message || "Something went wrong";
 
-    if (!isServer && errorStatus) {
+    // Errors with a `code` are handled by the local mutation's onError so
+    // the UI can react in a domain-specific way (e.g. EMAIL_EXISTS opens the
+    // OTP modal). Skip the global toast in that case.
+    const hasLocalHandler = Boolean(errorData?.code);
+
+    if (!isServer && errorStatus && !hasLocalHandler) {
       const { setError } = useErrorStore.getState();
 
       switch (errorStatus) {

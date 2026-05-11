@@ -5,7 +5,11 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { format } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useQueryState } from "nuqs";
-import type { Athlete, DebriefSection, Newsletter } from "@prisma/client";
+import type {
+  Athlete,
+  DebriefSection,
+  Newsletter,
+} from "@prisma/client";
 import { flagFor } from "@/lib/athlete/flag";
 import Debrief from "@/components/newsletter/blocks/Debrief";
 import SubscribeForm from "@/components/athlete/SubscribeForm";
@@ -17,6 +21,8 @@ type EditionWithDebrief = Newsletter & {
 interface AthleteProfileProps {
   athlete: Athlete;
   editions: EditionWithDebrief[];
+  isSignedIn: boolean;
+  isSubscribed: boolean;
 }
 
 function subscribeReducedMotion(onChange: () => void) {
@@ -40,6 +46,8 @@ function usePrefersReducedMotion() {
 export default function AthleteProfile({
   athlete,
   editions,
+  isSignedIn,
+  isSubscribed,
 }: AthleteProfileProps) {
   const fullName = `${athlete.firstName} ${athlete.lastName}`;
   const flag = flagFor(athlete.countryCode);
@@ -82,7 +90,7 @@ export default function AthleteProfile({
 
         <StatsRow athlete={athlete} />
 
-        {selected ? (
+        {isSignedIn && selected ? (
           <>
             <EditionTabs
               editions={editions}
@@ -108,7 +116,9 @@ export default function AthleteProfile({
               <Debrief section={selected.debriefSection} />
             </article>
           </>
-        ) : (
+        ) : null}
+
+        {isSignedIn && !selected ? (
           <section className="px-6 py-12 md:py-16">
             <div className="rounded-2xl border border-dashed border-line bg-cream-2 px-6 py-14 text-center">
               <p className="font-serif text-[22px] leading-tight text-ink">
@@ -119,11 +129,13 @@ export default function AthleteProfile({
               </p>
             </div>
           </section>
-        )}
+        ) : null}
 
         <SubscribeForm
           athleteSlug={athlete.slug}
           athleteFirstName={athlete.firstName}
+          isSignedIn={isSignedIn}
+          isSubscribed={isSubscribed}
         />
       </div>
     </div>

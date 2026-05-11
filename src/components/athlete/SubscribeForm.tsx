@@ -1,15 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import {
   subscribeSchema,
   type SubscribeInput,
+  type SubscribeAuthInput,
 } from "@/lib/schemas/subscription";
 import useApi from "@/lib/hooks/useApi";
 import { COUNTRIES } from "@/lib/data/countries";
+import { authClient } from "@/lib/better-auth/auth-client";
 import {
   Form,
   FormControl,
@@ -28,17 +32,38 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+// OtpModal only renders on email-collision; avoid shipping its bundle
+// (Dialog + better-auth client OTP plugin) to every athlete-page visitor.
+const OtpModal = dynamic(() => import("@/components/auth/OtpModal"), {
+  ssr: false,
+});
+
+type SubscribeError = Error & {
+  response?: { data?: { error?: string; code?: string } };
+};
+
 interface SubscribeFormProps {
   athleteSlug: string;
   athleteFirstName: string;
+  isSignedIn: boolean;
+  isSubscribed: boolean;
 }
 
 export default function SubscribeForm({
   athleteSlug,
   athleteFirstName,
+  isSignedIn,
+  isSubscribed,
 }: SubscribeFormProps) {
-  const [submitted, setSubmitted] = useState(false);
+  const router = useRouter();
+  const [justSubscribed, setJustSubscribed] = useState(false);
+  const [otpEmail, setOtpEmail] = useState<string | null>(null);
+  const [signInOpen, setSignInOpen] = useState(false);
   const { usePost } = useApi();
+
+  // Confirmation card whenever the server says we're subscribed OR we just
+  // succeeded locally (server hasn't rerendered yet).
+  const submitted = isSubscribed || justSubscribed;
 
   const form = useForm<SubscribeInput>({
     resolver: zodResolver(subscribeSchema),
@@ -53,22 +78,77 @@ export default function SubscribeForm({
     },
   });
 
-  const subscribe = usePost(`/athletes/${athleteSlug}/subscribe`, {
-    onSuccess: () => setSubmitted(true),
-    onError: (
-      error: Error & { response?: { data?: { error?: string } } },
-    ) => {
+  const subscribeAnon = usePost(`/athletes/${athleteSlug}/subscribe`, {
+    onSuccess: () => {
+      setJustSubscribed(true);
+      router.refresh();
+    },
+    onError: (error: SubscribeError) => {
+      if (error.response?.data?.code === "EMAIL_EXISTS") {
+        const email = form.getValues("email");
+        // Fire-and-forget: open the modal immediately; the user can use the
+        // "Renvoyer le code" button inside if delivery fails.
+        authClient.emailOtp
+          .sendVerificationOtp({ email, type: "sign-in" })
+          .catch((e: unknown) => {
+            console.error("Failed to send OTP:", e);
+          });
+        setOtpEmail(email);
+        return;
+      }
       toast.error(error.response?.data?.error ?? "Could not subscribe");
     },
   });
 
-  function onSubmit(values: SubscribeInput) {
-    subscribe.mutate(values);
+  const subscribeAuth = usePost(`/athletes/${athleteSlug}/subscribe`, {
+    onSuccess: () => {
+      setJustSubscribed(true);
+      router.refresh();
+    },
+    onError: (error: SubscribeError) => {
+      toast.error(error.response?.data?.error ?? "Could not subscribe");
+    },
+  });
+
+  const anyPending = subscribeAnon.isPending || subscribeAuth.isPending;
+
+  function onAnonSubmit(values: SubscribeInput) {
+    if (anyPending) return;
+    subscribeAnon.mutate(values);
   }
 
+  function onOtpSuccess() {
+    if (anyPending) return;
+    const v = form.getValues();
+    setOtpEmail(null);
+    const payload: SubscribeAuthInput = {
+      partnerOffersConsent: v.partnerOffersConsent ?? false,
+      source: v.source,
+      firstName: v.firstName,
+      lastName: v.lastName,
+      countryCode: v.countryCode,
+      phone: v.phone || undefined,
+    };
+    subscribeAuth.mutate(payload);
+  }
+
+  function onAuthClick() {
+    if (anyPending) return;
+    const payload: SubscribeAuthInput = { partnerOffersConsent: false };
+    subscribeAuth.mutate(payload);
+  }
+
+  function onSignInSuccess() {
+    setSignInOpen(false);
+    // Session is now live; let the server-rendered page re-resolve isSignedIn
+    // so the form switches to the one-click "S'abonner" state.
+    router.refresh();
+  }
+
+  // ── State 3: signed in & already subscribed ──
   if (submitted) {
     return (
-      <section className="px-6 pb-12">
+      <section className="px-6 pt-10 pb-12 md:pt-12">
         <div className="rounded-2xl border border-line bg-cream-2 px-8 py-12 text-center">
           <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-accent-gold">
             You&apos;re in
@@ -84,8 +164,42 @@ export default function SubscribeForm({
     );
   }
 
+  // ── State 2: signed in, not yet subscribed to this athlete ──
+  if (isSignedIn) {
+    return (
+      <section className="px-6 pt-10 pb-12 md:pt-12">
+        <div className="overflow-hidden rounded-2xl border border-line bg-cream-2">
+          <div className="bg-ink px-6 py-6 text-center md:px-10 md:py-8">
+            <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-accent-gold">
+              Join the newsletter
+            </div>
+            <h2 className="mt-2 font-serif text-[28px] font-semibold leading-tight tracking-[-0.015em] text-cream md:text-[34px]">
+              Step inside {athleteFirstName}&apos;s season
+            </h2>
+          </div>
+
+          <div className="px-6 py-8 text-center md:px-10 md:py-10">
+            <p className="mb-6 text-[15px] leading-relaxed text-ink-2">
+              Vous êtes connecté. Abonnez-vous à la newsletter de{" "}
+              {athleteFirstName} en un clic.
+            </p>
+            <button
+              type="button"
+              onClick={onAuthClick}
+              disabled={anyPending}
+              className="w-full cursor-pointer rounded-md bg-accent-warm py-4 font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink transition hover:bg-accent-gold disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {anyPending ? "Inscription…" : "S'abonner →"}
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // ── State 1: anonymous — full form ──
   return (
-    <section className="px-6 pb-12">
+    <section className="px-6 pt-10 pb-12 md:pt-12">
       <div className="overflow-hidden rounded-2xl border border-line bg-cream-2">
         <div className="bg-ink px-6 py-6 text-center md:px-10 md:py-8">
           <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-accent-gold">
@@ -104,7 +218,7 @@ export default function SubscribeForm({
 
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(onSubmit)}
+              onSubmit={form.handleSubmit(onAnonSubmit)}
               className="space-y-6"
               noValidate
             >
@@ -291,15 +405,45 @@ export default function SubscribeForm({
 
               <button
                 type="submit"
-                disabled={subscribe.isPending}
+                disabled={anyPending}
                 className="w-full cursor-pointer rounded-md bg-accent-warm py-4 font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink transition hover:bg-accent-gold disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {subscribe.isPending ? "Signing up…" : "Sign up →"}
+                {anyPending ? "Signing up…" : "Sign up →"}
               </button>
+
+              <p className="text-center text-[12px] text-ink-3">
+                Déjà membre ?{" "}
+                <button
+                  type="button"
+                  onClick={() => setSignInOpen(true)}
+                  className="cursor-pointer font-semibold text-ink underline underline-offset-2 hover:text-accent-gold"
+                >
+                  Se connecter
+                </button>
+              </p>
             </form>
           </Form>
         </div>
       </div>
+
+      {otpEmail ? (
+        <OtpModal
+          open={true}
+          onOpenChange={(open) => {
+            if (!open) setOtpEmail(null);
+          }}
+          initialEmail={otpEmail}
+          onSuccess={onOtpSuccess}
+        />
+      ) : null}
+
+      {signInOpen ? (
+        <OtpModal
+          open={true}
+          onOpenChange={setSignInOpen}
+          onSuccess={onSignInSuccess}
+        />
+      ) : null}
     </section>
   );
 }
