@@ -1,4 +1,4 @@
-import { isAllowedMediaUrl } from "@/lib/schemas/common";
+import { isAllowedMediaUrl, isSafeHttpUrl } from "@/lib/schemas/common";
 import { toSlug } from "@/lib/newsletter/slug";
 import {
   SECTION_ORDER,
@@ -43,6 +43,12 @@ function sanitizedSupabaseUrl(v: unknown): string | undefined {
   return isAllowedMediaUrl(s) ? s : undefined;
 }
 
+function sanitizedSafeUrl(v: unknown): string | undefined {
+  const s = asString(v);
+  if (!s) return undefined;
+  return isSafeHttpUrl(s) ? s : undefined;
+}
+
 // Strip non-Supabase media URLs from a section's content tree.
 // Mutates a shallow clone, returns the cleaned content.
 function sanitizeSectionContent(
@@ -70,6 +76,19 @@ function sanitizeSectionContent(
       }
       content.subSection = cleaned;
     }
+
+    if (Array.isArray(content.matches)) {
+      content.matches = content.matches.map((m) => {
+        if (!m || typeof m !== "object" || Array.isArray(m)) return m;
+        const match = { ...(m as Record<string, unknown>) };
+        if (match.highlightUrl !== undefined) {
+          const cleaned = sanitizedSafeUrl(match.highlightUrl);
+          if (cleaned) match.highlightUrl = cleaned;
+          else delete match.highlightUrl;
+        }
+        return match;
+      });
+    }
   }
 
   if (type === "KIT") {
@@ -77,6 +96,24 @@ function sanitizeSectionContent(
       const cleaned = sanitizedSupabaseUrl(content.imageUrl);
       if (cleaned) content.imageUrl = cleaned;
       else delete content.imageUrl;
+    }
+    const cta = content.cta;
+    if (cta && typeof cta === "object" && !Array.isArray(cta)) {
+      const cleaned = { ...(cta as Record<string, unknown>) };
+      if (cleaned.url !== undefined) {
+        const safe = sanitizedSafeUrl(cleaned.url);
+        if (safe) cleaned.url = safe;
+        else delete cleaned.url;
+      }
+      content.cta = cleaned;
+    }
+  }
+
+  if (type === "ENGAGEMENT") {
+    if (content.pollUrl !== undefined) {
+      const cleaned = sanitizedSafeUrl(content.pollUrl);
+      if (cleaned) content.pollUrl = cleaned;
+      else delete content.pollUrl;
     }
   }
 
