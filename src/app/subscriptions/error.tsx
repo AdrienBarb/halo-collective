@@ -21,21 +21,21 @@ export default function SubscriptionsError({
   }, [error]);
 
   return (
-    <div lang="fr" className="mx-auto max-w-[1100px] space-y-6 px-5 py-10">
+    <div className="mx-auto max-w-[1100px] space-y-6 px-5 py-10">
       <div>
         <h1 className="font-serif text-[28px] font-semibold tracking-[-0.01em] text-ink">
-          Mes abonnements
+          My subscriptions
         </h1>
       </div>
       <div className="rounded-2xl border border-dashed border-line bg-cream-2 px-6 py-14 text-center">
         <p className="font-serif text-[20px] text-ink">
-          Impossible de charger vos abonnements.
+          Could not load your subscriptions.
         </p>
         <p className="mt-1 text-[13px] text-ink-3">
-          Une erreur est survenue. Réessayez dans un instant.
+          Something went wrong. Try again in a moment.
         </p>
         <Button onClick={reset} className="mt-5">
-          Réessayer
+          Try again
         </Button>
       </div>
     </div>

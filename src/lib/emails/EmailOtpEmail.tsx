@@ -10,14 +10,12 @@ interface EmailOtpEmailProps {
 export const EmailOtpEmail = ({ otp }: EmailOtpEmailProps) => {
   return (
     <EmailLayout
-      preview="Votre code de connexion Halo"
-      eyebrow="Connexion"
-      footerNote="Si vous n'avez pas demandé ce code, ignorez cet email. Le code expire dans 5 minutes."
+      preview="Your Halo sign-in code"
+      eyebrow="Sign in"
+      footerNote="If you didn't request this code, ignore this email. The code expires in 5 minutes."
     >
-      <EmailHeading>Votre code de connexion.</EmailHeading>
-      <EmailBody>
-        Saisissez ce code pour vous connecter à votre compte&nbsp;:
-      </EmailBody>
+      <EmailHeading>Your sign-in code.</EmailHeading>
+      <EmailBody>Enter this code to sign in to your account:</EmailBody>
       <Text
         style={{
           margin: "24px 0 0",
@@ -31,7 +29,7 @@ export const EmailOtpEmail = ({ otp }: EmailOtpEmailProps) => {
       >
         {otp}
       </Text>
-      <EmailBody>Ce code expire dans 5 minutes.</EmailBody>
+      <EmailBody>This code expires in 5 minutes.</EmailBody>
     </EmailLayout>
   );
 };

@@ -10,8 +10,8 @@ import { Button } from "@/components/ui/button";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Mes abonnements — Halo Collective",
-  description: "Les athlètes dont vous recevez la newsletter.",
+  title: "My subscriptions — Halo Collective",
+  description: "The athletes whose newsletter you receive.",
 };
 
 export default async function SubscriptionsPage() {
@@ -21,26 +21,26 @@ export default async function SubscriptionsPage() {
   const subscriptions = await listSubscriptionsByUser(session.user.id);
 
   return (
-    <div lang="fr" className="mx-auto max-w-[1100px] space-y-6 px-5 py-10">
+    <div className="mx-auto max-w-[1100px] space-y-6 px-5 py-10">
       <div>
         <h1 className="font-serif text-[28px] font-semibold tracking-[-0.01em] text-ink">
-          Mes abonnements
+          My subscriptions
         </h1>
         <p className="mt-1 text-[13px] text-ink-3">
-          Les athlètes dont vous recevez la newsletter.
+          The athletes whose newsletter you receive.
         </p>
       </div>
 
       {subscriptions.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-line bg-cream-2 px-6 py-14 text-center">
           <p className="font-serif text-[20px] text-ink">
-            Vous ne suivez encore aucun athlète.
+            You&apos;re not following any athlete yet.
           </p>
           <p className="mt-1 text-[13px] text-ink-3">
-            Découvrez le roster et abonnez-vous à votre premier athlète.
+            Discover the roster and subscribe to your first athlete.
           </p>
           <Button asChild className="mt-5">
-            <Link href="/">Voir les athlètes</Link>
+            <Link href="/">See athletes</Link>
           </Button>
         </div>
       ) : (

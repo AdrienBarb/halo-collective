@@ -87,7 +87,7 @@ export default function SubscribeForm({
       if (error.response?.data?.code === "EMAIL_EXISTS") {
         const email = form.getValues("email");
         // Fire-and-forget: open the modal immediately; the user can use the
-        // "Renvoyer le code" button inside if delivery fails.
+        // "Resend the code" button inside if delivery fails.
         authClient.emailOtp
           .sendVerificationOtp({ email, type: "sign-in" })
           .catch((e: unknown) => {
@@ -141,7 +141,7 @@ export default function SubscribeForm({
   function onSignInSuccess() {
     setSignInOpen(false);
     // Session is now live; let the server-rendered page re-resolve isSignedIn
-    // so the form switches to the one-click "S'abonner" state.
+    // so the form switches to the one-click "Subscribe" state.
     router.refresh();
   }
 
@@ -180,8 +180,8 @@ export default function SubscribeForm({
 
           <div className="px-6 py-8 text-center md:px-10 md:py-10">
             <p className="mb-6 text-[15px] leading-relaxed text-ink-2">
-              Vous êtes connecté. Abonnez-vous à la newsletter de{" "}
-              {athleteFirstName} en un clic.
+              You&apos;re signed in. Subscribe to {athleteFirstName}&apos;s
+              newsletter in one click.
             </p>
             <button
               type="button"
@@ -189,7 +189,7 @@ export default function SubscribeForm({
               disabled={anyPending}
               className="w-full cursor-pointer rounded-md bg-accent-warm py-4 font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink transition hover:bg-accent-gold disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {anyPending ? "Inscription…" : "S'abonner →"}
+              {anyPending ? "Subscribing…" : "Subscribe →"}
             </button>
           </div>
         </div>
@@ -412,13 +412,13 @@ export default function SubscribeForm({
               </button>
 
               <p className="text-center text-[12px] text-ink-3">
-                Déjà membre ?{" "}
+                Already a member?{" "}
                 <button
                   type="button"
                   onClick={() => setSignInOpen(true)}
                   className="cursor-pointer font-semibold text-ink underline underline-offset-2 hover:text-accent-gold"
                 >
-                  Se connecter
+                  Sign in
                 </button>
               </p>
             </form>

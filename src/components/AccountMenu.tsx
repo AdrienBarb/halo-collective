@@ -57,14 +57,13 @@ export default function AccountMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        aria-label="Compte"
+        aria-label="Account"
         className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-line bg-cream-2 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-ink transition hover:bg-cream-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
       >
         {initials(firstName, lastName, email)}
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        lang="fr"
         className="min-w-[220px] border-line bg-cream-2"
       >
         <DropdownMenuLabel>
@@ -88,7 +87,7 @@ export default function AccountMenu({
         <DropdownMenuItem asChild className="cursor-pointer">
           <Link href="/subscriptions">
             <Newspaper className="mr-2 h-4 w-4" />
-            Mes abonnements
+            My subscriptions
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -97,7 +96,7 @@ export default function AccountMenu({
           className="cursor-pointer"
         >
           <LogOut className="mr-2 h-4 w-4" />
-          Se déconnecter
+          Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

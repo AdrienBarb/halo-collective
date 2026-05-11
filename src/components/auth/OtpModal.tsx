@@ -70,7 +70,7 @@ export default function OtpModal({
         type: "sign-in",
       });
       if (result.error) {
-        setEmailError("Aucun compte trouvé pour cette adresse.");
+        setEmailError("No account found for this address.");
         return false;
       }
       const t = Date.now();
@@ -80,7 +80,7 @@ export default function OtpModal({
       return true;
     } catch (error) {
       console.error("Send OTP failed:", error);
-      setEmailError("Impossible d'envoyer le code. Réessayez.");
+      setEmailError("Could not send the code. Try again.");
       return false;
     } finally {
       setSending(false);
@@ -93,7 +93,7 @@ export default function OtpModal({
     setEmailError(null);
     const normalized = email.trim().toLowerCase();
     if (!EMAIL_PATTERN.test(normalized)) {
-      setEmailError("Adresse email invalide.");
+      setEmailError("Invalid email address.");
       return;
     }
     setEmail(normalized);
@@ -114,12 +114,12 @@ export default function OtpModal({
     try {
       const result = await authClient.signIn.emailOtp({ email, otp: code });
       if (result.error) {
-        throw new Error(result.error.message ?? "Code invalide");
+        throw new Error(result.error.message ?? "Invalid code");
       }
       onSuccess();
     } catch (error) {
       console.error("OTP verify failed:", error);
-      toast.error("Code invalide ou expiré. Réessayez.");
+      toast.error("Invalid or expired code. Try again.");
       setCode("");
     } finally {
       setVerifying(false);
@@ -150,9 +150,9 @@ export default function OtpModal({
         {step === "email" ? (
           <>
             <DialogHeader>
-              <DialogTitle>Se connecter</DialogTitle>
+              <DialogTitle>Sign in</DialogTitle>
               <DialogDescription>
-                Entrez votre email pour recevoir un code de connexion.
+                Enter your email to receive a sign-in code.
               </DialogDescription>
             </DialogHeader>
 
@@ -177,16 +177,16 @@ export default function OtpModal({
                 disabled={sending || !email}
                 className="w-full cursor-pointer rounded-md bg-accent-warm py-3 font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink transition hover:bg-accent-gold disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {sending ? "Envoi…" : "Recevoir le code"}
+                {sending ? "Sending…" : "Send the code"}
               </button>
             </form>
           </>
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle>Code de connexion</DialogTitle>
+              <DialogTitle>Sign-in code</DialogTitle>
               <DialogDescription>
-                Nous avons envoyé un code à 6 chiffres à{" "}
+                We sent a 6-digit code to{" "}
                 <span className="font-medium">{email}</span>.
               </DialogDescription>
             </DialogHeader>
@@ -213,8 +213,8 @@ export default function OtpModal({
               <div className="flex items-center justify-between text-[12px] text-ink-3">
                 <span>
                   {expired
-                    ? "Code expiré"
-                    : `Expire dans ${formatTimer(expiresInMs)}`}
+                    ? "Code expired"
+                    : `Expires in ${formatTimer(expiresInMs)}`}
                 </span>
                 <button
                   type="button"
@@ -223,10 +223,10 @@ export default function OtpModal({
                   className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-ink underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {sending
-                    ? "Envoi…"
+                    ? "Sending…"
                     : resendInMs > 0
-                      ? `Renvoyer (${Math.ceil(resendInMs / 1000)}s)`
-                      : "Renvoyer le code"}
+                      ? `Resend (${Math.ceil(resendInMs / 1000)}s)`
+                      : "Resend the code"}
                 </button>
               </div>
 
@@ -235,7 +235,7 @@ export default function OtpModal({
                 disabled={verifying || code.length !== OTP_LENGTH || expired}
                 className="w-full cursor-pointer rounded-md bg-accent-warm py-3 font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink transition hover:bg-accent-gold disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {verifying ? "Vérification…" : "Se connecter"}
+                {verifying ? "Verifying…" : "Sign in"}
               </button>
             </form>
           </>

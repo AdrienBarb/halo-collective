@@ -13,7 +13,7 @@ export async function sendOtpEmail(input: SendOtpEmailInput) {
   const result = await resendClient.emails.send({
     from: getRequiredEnv("RESEND_FROM_EMAIL"),
     to: email,
-    subject: "Votre code de connexion Halo",
+    subject: "Your Halo sign-in code",
     react: EmailOtpEmail({ otp }),
   });
 
