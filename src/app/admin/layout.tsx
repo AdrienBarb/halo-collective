@@ -1,15 +1,20 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getAdminUser } from "@/lib/services/currentUser";
 
 export const metadata = {
   title: "Admin · Halo Collective",
   robots: { index: false, follow: false },
 };
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const admin = await getAdminUser();
+  if (!admin) notFound();
+
   return (
     <div className="min-h-screen bg-cream">
       <header className="border-b border-line bg-cream-2">

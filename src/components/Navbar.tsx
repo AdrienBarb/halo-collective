@@ -1,20 +1,9 @@
-import { headers } from "next/headers";
 import Wordmark from "@/components/Wordmark";
 import AccountMenu from "@/components/AccountMenu";
-import { auth } from "@/lib/better-auth/auth";
-import { prisma } from "@/lib/db/prisma";
+import { getCurrentUser } from "@/lib/services/currentUser";
 
 export default async function Navbar() {
-  const session = await auth.api.getSession({ headers: await headers() });
-
-  let user: { email: string; firstName: string | null; lastName: string | null } | null =
-    null;
-  if (session?.user) {
-    user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { email: true, firstName: true, lastName: true },
-    });
-  }
+  const user = await getCurrentUser();
 
   return (
     <header
@@ -28,6 +17,7 @@ export default async function Navbar() {
             email={user.email}
             firstName={user.firstName}
             lastName={user.lastName}
+            role={user.role}
           />
         </div>
       ) : null}

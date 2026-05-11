@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
+import { adminGuard } from "@/lib/better-auth/adminGuard";
 import { errorHandler } from "@/lib/errors/errorHandler";
 import { publishNewsletter } from "@/lib/services/newsletter";
 
@@ -7,6 +8,9 @@ type Context = { params: Promise<{ id: string }> };
 
 export async function POST(req: NextRequest, ctx: Context) {
   try {
+    const { response } = await adminGuard();
+    if (response) return response;
+
     const { id } = await ctx.params;
     const newsletter = await publishNewsletter(id);
     revalidatePath(`/${newsletter.athlete.slug}`, "layout");

@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { LogOut, Shield } from "lucide-react";
+import { UserRole } from "@prisma/client";
 import { authClient } from "@/lib/better-auth/auth-client";
 import {
   DropdownMenu,
@@ -16,6 +18,7 @@ interface AccountMenuProps {
   email: string;
   firstName: string | null;
   lastName: string | null;
+  role: UserRole;
 }
 
 function initials(firstName: string | null, lastName: string | null, email: string) {
@@ -30,6 +33,7 @@ export default function AccountMenu({
   email,
   firstName,
   lastName,
+  role,
 }: AccountMenuProps) {
   const router = useRouter();
 
@@ -63,6 +67,17 @@ export default function AccountMenu({
           <div className="mt-0.5 text-[12px] text-ink-3">{email}</div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        {role === UserRole.ADMIN ? (
+          <>
+            <DropdownMenuItem asChild className="cursor-pointer">
+              <Link href="/admin">
+                <Shield className="mr-2 h-4 w-4" />
+                Admin
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        ) : null}
         <DropdownMenuItem
           onSelect={() => void onSignOut()}
           className="cursor-pointer"

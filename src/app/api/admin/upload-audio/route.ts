@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { adminGuard } from "@/lib/better-auth/adminGuard";
 import { uploadMedia } from "@/lib/storage/uploadMedia";
 import { errorHandler } from "@/lib/errors/errorHandler";
 import { BadRequestError } from "@/lib/errors/AppError";
@@ -65,6 +66,9 @@ function sniffAudioMime(buf: Buffer): AllowedMime | null {
 
 export async function POST(req: NextRequest) {
   try {
+    const { response } = await adminGuard();
+    if (response) return response;
+
     const formData = await req.formData();
     const file = formData.get("file");
 

@@ -24,6 +24,7 @@ export const auth = betterAuth({
       lastName: { type: "string", required: false, input: true },
       countryCode: { type: "string", required: false, input: true },
       phone: { type: "string", required: false, input: true },
+      role: { type: "string", required: false, input: false, defaultValue: "USER" },
     },
   },
   plugins: [
