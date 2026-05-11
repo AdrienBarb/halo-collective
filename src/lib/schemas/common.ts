@@ -53,11 +53,11 @@ export const mediaUrl = z
   .url("Must be a valid URL")
   .refine(isAllowedMediaUrl, "Must be a Supabase storage URL");
 
-/** Supabase-restricted media URL (optional, blank → undefined). */
+/** Supabase-restricted media URL (optional, blank/null → undefined). */
 export const optionalMediaUrl = z
-  .union([mediaUrl, z.literal(""), z.undefined()])
+  .union([mediaUrl, z.literal(""), z.null(), z.undefined()])
   .optional()
-  .transform((v) => (v === "" || v === undefined ? undefined : v));
+  .transform((v) => (v === "" || v === null || v === undefined ? undefined : v));
 
 /** Any http(s) URL (required). Blocks javascript:/data:/etc. */
 export const safeUrl = z
@@ -66,11 +66,11 @@ export const safeUrl = z
   .url("Must be a valid URL")
   .refine(isSafeHttpUrl, "Must be an http(s) URL");
 
-/** Any http(s) URL (optional, blank → undefined). */
+/** Any http(s) URL (optional, blank/null → undefined). */
 export const optionalSafeUrl = z
-  .union([safeUrl, z.literal(""), z.undefined()])
+  .union([safeUrl, z.literal(""), z.null(), z.undefined()])
   .optional()
-  .transform((v) => (v === "" || v === undefined ? undefined : v));
+  .transform((v) => (v === "" || v === null || v === undefined ? undefined : v));
 
 /** Trimmed string that becomes undefined when blank. */
 export const optionalTrimmedString = z
