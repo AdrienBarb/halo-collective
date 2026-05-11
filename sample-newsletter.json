@@ -1,0 +1,111 @@
+{
+  "title": "My week in Monte Carlo",
+  "slug": "my-week-in-monte-carlo",
+  "editionNumber": 1,
+  "editionDate": "2026-04-13",
+  "tournamentName": "Rolex Monte-Carlo Masters",
+  "tournamentContext": "Quarterfinal - best result here - first time past R16 in Monte Carlo",
+  "worldRankSnapshot": 11,
+  "sections": {
+    "DEBRIEF": {
+      "body": "Hey everyone. Monte Carlo. A year ago I was in qualifying here, losing a third set 6-0. This week I reached the quarterfinal. That's the kind of progress that keeps you going. Two clean wins - Monfils, then Lehecka - and then Alcaraz happened. 6-3, 6-0. A bagel in the second. I'll take it. The clay swing last year changed a lot of things for me. I want to keep building on that. Madrid is next.",
+      "pullQuote": {
+        "contextLabel": "After the QF vs Alcaraz",
+        "text": "He was on another level today. I had my chances in the first set. The second set... let's just say he was better. But I'm happy with the week - this is my best result here."
+      }
+    },
+    "RESULTS": {
+      "stats": [
+        { "value": "QF", "label": "Best result" },
+        { "value": "3", "label": "Matches" },
+        { "value": "2-1", "label": "W / L" }
+      ],
+      "matches": [
+        {
+          "result": "BYE",
+          "roundName": "1st Round",
+          "date": "6 April",
+          "contextNote": "Seeded #8"
+        },
+        {
+          "result": "W",
+          "opponentName": "G. Monfils",
+          "opponentCountry": "FRA",
+          "score": "6-4, 6-4",
+          "roundName": "2nd Round",
+          "date": "Tue 7 April - 1h16",
+          "commentary": "Ten years ago, I was a hitting partner here in Monte Carlo. Gael gave me some words that I never forgot. At the net after our match, I reminded him - 'You told me: grass is not your surface, here is your main.' He smiled straight away. He remembered. One of those moments you don't plan but that stay with you.",
+          "highlightUrl": "https://www.atptour.com/en/video/highlights-bublik-dials-in-to-end-monfils-montecarlo-2026-career"
+        },
+        {
+          "result": "W",
+          "opponentName": "J. Lehecka",
+          "opponentRank": "#13",
+          "opponentCountry": "CZE",
+          "score": "6-2, 7-5",
+          "roundName": "Round of 16",
+          "date": "Thu 9 April",
+          "highlightUrl": "https://www.atptour.com/en/video/highlights-bublik-downs-lehecka-for-maiden-monte-carlo-2026-qf-spot"
+        },
+        {
+          "result": "L",
+          "opponentName": "C. Alcaraz",
+          "opponentRank": "#1",
+          "opponentCountry": "ESP",
+          "score": "3-6, 0-6",
+          "roundName": "Quarterfinal",
+          "date": "Fri 10 April",
+          "highlightUrl": "https://www.atptour.com/en/news/alcaraz-bublik-monte-carlo-2026-friday"
+        }
+      ],
+      "pressLinks": [
+        {
+          "source": "Eurosport",
+          "headline": "Bublik, dix ans apres : le sparring-partner devenu bourreau de Monfils sur le Rocher",
+          "url": "https://www.eurosport.fr/tennis/atp-monte-carlo/2026/gael-monfils-et-son-defi-physique-pour-des-adieux-pleinement-reussis-jai-envie-de-faire-mieux-mais-mon-corps-ne-le-permet-pas_sto23288232/story.shtml"
+        },
+        {
+          "source": "Sky Sports",
+          "headline": "Alcaraz vs Bublik - Monte Carlo QF highlights",
+          "url": "https://www.skysports.com/tennis/video/33733/13530157/carlos-alcaraz-vs-alexander-bublik-monte-carlo-highlights"
+        },
+        {
+          "source": "Tennis Majors",
+          "headline": "Bublik ends Monfils's Monte Carlo farewell - and the memories he helped create",
+          "url": "https://www.tennismajors.com/atp/bublik-ends-monfilss-monte-carlo-farewell-and-the-memories-he-helped-create-847987.html"
+        },
+        {
+          "source": "Last Word on Sports",
+          "headline": "Alcaraz and Bublik set for first-ever meeting in Monte Carlo quarterfinals",
+          "url": "https://lastwordonsports.com/tennis/2026/04/09/carlos-alcaraz-alexander-bublik-first-meeting/"
+        }
+      ]
+    },
+    "WHATS_NEXT": {
+      "tournamentMeta": "BMW Open Munich - 14-20 April 2026 - Clay",
+      "body": "Munich first, then Madrid, then Rome, then Roland Garros. Last year the clay swing was where everything clicked - two titles, a Grand Slam quarterfinal. I want more of that. A QF here in Monte Carlo is a good start. The serve travels on this surface. Let's keep going.",
+      "schedule": [
+        { "dateRange": "Apr 14-20", "title": "BMW Open Munich", "description": "ATP 500 - Clay - main draw" },
+        { "dateRange": "Apr 22-May 4", "title": "Mutua Madrid Open", "description": "ATP 1000 - Clay" },
+        { "dateRange": "May 6-18", "title": "Internazionali BNL d'Italia", "description": "ATP 1000 - Rome - Clay" },
+        { "dateRange": "May 24-Jun 7", "title": "Roland-Garros", "description": "Grand Slam - Paris - Clay" }
+      ]
+    },
+    "KIT": {
+      "body": "The kit I wore all week in Monte Carlo.",
+      "cta": {
+        "label": "Discover the kit",
+        "url": "https://www.armani.com/en-wx/ea7/experience/athletes/"
+      }
+    },
+    "ENGAGEMENT": {
+      "question": "What was the highlight of my week in Monte Carlo?",
+      "pollOptions": [
+        { "label": "The win vs Monfils", "emoji": "🎯" },
+        { "label": "Beating Lehecka (ATP #13)", "emoji": "💪" },
+        { "label": "Reaching my first Monte Carlo QF", "emoji": "🏆" },
+        { "label": "Surviving clay as Alex Bublik", "emoji": "😂" }
+      ]
+    }
+  }
+}

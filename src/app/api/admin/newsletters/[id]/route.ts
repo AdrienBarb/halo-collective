@@ -24,13 +24,9 @@ export async function PUT(req: NextRequest, ctx: Context) {
     const body = await req.json();
     const data = updateNewsletterSchema.parse(body);
     const newsletter = await updateNewsletter(id, data);
+    void before;
 
-    const athleteSlug = newsletter.athlete.slug;
-    revalidatePath(`/${athleteSlug}`, "layout");
-    revalidatePath(`/${athleteSlug}/${before.slug}`);
-    if (newsletter.slug !== before.slug) {
-      revalidatePath(`/${athleteSlug}/${newsletter.slug}`);
-    }
+    revalidatePath(`/${newsletter.athlete.slug}`, "layout");
     return NextResponse.json(newsletter);
   } catch (error) {
     return errorHandler(error);
@@ -45,7 +41,6 @@ export async function DELETE(_req: NextRequest, ctx: Context) {
     const { id } = await ctx.params;
     const deleted = await deleteNewsletter(id);
     revalidatePath(`/${deleted.athlete.slug}`, "layout");
-    revalidatePath(`/${deleted.athlete.slug}/${deleted.slug}`);
     return NextResponse.json({ success: true });
   } catch (error) {
     return errorHandler(error);

@@ -8,8 +8,11 @@ import AthleteProfile from "@/components/athlete/AthleteProfile";
 
 export default async function AthleteHomePage({
   params,
+  searchParams,
 }: PageProps<"/[athleteSlug]">) {
   const { athleteSlug } = await params;
+  const sp = await searchParams;
+  const editionParam = typeof sp.edition === "string" ? sp.edition : null;
 
   // Kick off independent fetches in parallel: athlete lookup + session.
   const [athlete, session] = await Promise.all([
@@ -20,7 +23,6 @@ export default async function AthleteHomePage({
 
   const isSignedIn = Boolean(session?.user);
 
-  // Now editions + subscription check can run in parallel — both depend on athlete.
   const [editions, isSubscribed] = await Promise.all([
     listPublishedByAthleteId(athlete.id),
     isSignedIn
@@ -32,6 +34,7 @@ export default async function AthleteHomePage({
     <AthleteProfile
       athlete={athlete}
       editions={editions}
+      selectedSlug={editionParam}
       isSignedIn={isSignedIn}
       isSubscribed={isSubscribed}
     />

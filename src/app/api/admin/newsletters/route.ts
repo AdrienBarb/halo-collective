@@ -5,6 +5,7 @@ import { createNewsletterSchema } from "@/lib/schemas/newsletter";
 import {
   createNewsletter,
   listAllByAthleteId,
+  listAllForAdmin,
 } from "@/lib/services/newsletter";
 
 export async function GET(req: NextRequest) {
@@ -13,13 +14,9 @@ export async function GET(req: NextRequest) {
     if (response) return response;
 
     const athleteId = req.nextUrl.searchParams.get("athleteId");
-    if (!athleteId) {
-      return NextResponse.json(
-        { error: "athleteId is required" },
-        { status: 400 },
-      );
-    }
-    const newsletters = await listAllByAthleteId(athleteId);
+    const newsletters = athleteId
+      ? await listAllByAthleteId(athleteId)
+      : await listAllForAdmin();
     return NextResponse.json(newsletters);
   } catch (error) {
     return errorHandler(error);

@@ -43,6 +43,14 @@ enum NewsletterStatus {
   PUBLISHED
 }
 
+enum SectionType {
+  DEBRIEF
+  RESULTS
+  WHATS_NEXT
+  KIT
+  ENGAGEMENT
+}
+
 model Athlete {
   id           String   @id @default(cuid())
   slug         String   @unique
@@ -57,55 +65,77 @@ model Athlete {
   worldRank    Int?
   countryRank  Int?
   titlesCount  Int      @default(0)
+  socialLinks  Json?
   brevoListId  Int?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   newsletters   Newsletter[]
   subscriptions NewsletterSubscription[]
+  sponsors      Sponsor[]
 
   @@map("athlete")
 }
 
-model Newsletter {
-  id              String           @id @default(cuid())
-  athleteId       String
-  editionNumber   Int
-  title           String
-  slug            String
-  heroImageUrl    String?
-  status          NewsletterStatus @default(DRAFT)
-  publishedAt     DateTime?
-  renderedHtml    String?
-  brevoCampaignId String?
-  brevoSentAt     DateTime?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+model Sponsor {
+  id         String   @id @default(cuid())
+  athleteId  String
+  name       String
+  logoUrl    String
+  websiteUrl String
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  athlete        Athlete         @relation(fields: [athleteId], references: [id], onDelete: Cascade)
-  debriefSection DebriefSection?
+  athlete Athlete @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+
+  @@index([athleteId])
+  @@map("sponsor")
+}
+
+model Newsletter {
+  id                  String           @id @default(cuid())
+  athleteId           String
+  editionNumber       Int
+  editionDate         DateTime?
+  title               String
+  slug                String
+  heroImageUrl        String?
+  tournamentName      String?
+  tournamentLogoUrl   String?
+  tournamentContext   String?
+  worldRankSnapshot   Int?
+  countryRankSnapshot Int?
+  status              NewsletterStatus @default(DRAFT)
+  publishedAt         DateTime?
+  renderedHtml        String?
+  brevoCampaignId     String?
+  brevoSentAt         DateTime?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  athlete  Athlete             @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  sections NewsletterSection[]
 
   @@unique([athleteId, slug])
   @@unique([athleteId, editionNumber])
   @@map("newsletter")
 }
 
-model DebriefSection {
-  id                   String   @id @default(cuid())
-  newsletterId         String   @unique
-  body                 String
-  pullQuote            String?
-  pullQuoteContext     String?
-  voiceNoteUrl         String?
-  voiceNoteDurationSec Int?
-  voiceNoteLabel       String?
-  voiceNoteLocation    String?
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+model NewsletterSection {
+  id           String      @id @default(cuid())
+  newsletterId String
+  order        Int
+  type         SectionType
+  content      Json
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 
   newsletter Newsletter @relation(fields: [newsletterId], references: [id], onDelete: Cascade)
 
-  @@map("debrief_section")
+  @@unique([newsletterId, order])
+  @@index([newsletterId])
+  @@map("newsletter_section")
 }
 
 model NewsletterSubscription {

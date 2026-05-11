@@ -56,6 +56,8 @@ export async function createAthlete(input: CreateAthleteOutput) {
     worldRank,
     countryRank,
     titlesCount,
+    socialLinks,
+    sponsors,
   } = input;
   const countryName = resolveCountryName(countryCode);
 
@@ -76,6 +78,17 @@ export async function createAthlete(input: CreateAthleteOutput) {
           worldRank,
           countryRank,
           titlesCount,
+          socialLinks: socialLinks as Prisma.InputJsonValue | undefined,
+          sponsors: sponsors?.length
+            ? {
+                create: sponsors.map((s, i) => ({
+                  name: s.name,
+                  logoUrl: s.logoUrl,
+                  websiteUrl: s.websiteUrl,
+                  order: i,
+                })),
+              }
+            : undefined,
         },
       });
 
@@ -111,9 +124,20 @@ export async function updateAthlete(id: string, input: UpdateAthleteOutput) {
     data.countryCode = input.countryCode;
     data.countryName = resolveCountryName(input.countryCode);
   }
+  if (input.socialLinks !== undefined) {
+    data.socialLinks = input.socialLinks as Prisma.InputJsonValue;
+  }
 
   try {
-    return await prisma.athlete.update({ where: { id }, data });
+    return await prisma.$transaction(async (tx) => {
+      const athlete = await tx.athlete.update({ where: { id }, data });
+
+      if (input.sponsors !== undefined) {
+        await syncSponsors(tx, id, input.sponsors);
+      }
+
+      return athlete;
+    });
   } catch (error) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -122,6 +146,66 @@ export async function updateAthlete(id: string, input: UpdateAthleteOutput) {
       throw new NotFoundError("Athlete not found");
     }
     throw error;
+  }
+}
+
+/**
+ * Full-sync sponsors for an athlete: delete missing, update existing,
+ * create new — order follows array index. Called inside a transaction
+ * so the athlete row and its sponsors save atomically.
+ */
+async function syncSponsors(
+  tx: Prisma.TransactionClient,
+  athleteId: string,
+  sponsors: NonNullable<UpdateAthleteOutput["sponsors"]>,
+) {
+  const existing = await tx.sponsor.findMany({
+    where: { athleteId },
+    select: { id: true },
+  });
+  const incomingIds = new Set(
+    sponsors.map((s) => s.id).filter((id): id is string => Boolean(id)),
+  );
+  const toDelete = existing
+    .filter((e) => !incomingIds.has(e.id))
+    .map((e) => e.id);
+
+  if (toDelete.length > 0) {
+    await tx.sponsor.deleteMany({
+      where: { athleteId, id: { in: toDelete } },
+    });
+  }
+
+  for (let i = 0; i < sponsors.length; i++) {
+    const s = sponsors[i];
+    if (s.id) {
+      const { count } = await tx.sponsor.updateMany({
+        where: { id: s.id, athleteId },
+        data: {
+          name: s.name,
+          logoUrl: s.logoUrl,
+          websiteUrl: s.websiteUrl,
+          order: i,
+        },
+      });
+      // Refuse to silently no-op when a sponsor id doesn't belong to this
+      // athlete (or no longer exists) — that path was previously a data-loss bug.
+      if (count === 0) {
+        throw new NotFoundError(
+          `Sponsor ${s.id} not found for this athlete`,
+        );
+      }
+    } else {
+      await tx.sponsor.create({
+        data: {
+          athleteId,
+          name: s.name,
+          logoUrl: s.logoUrl,
+          websiteUrl: s.websiteUrl,
+          order: i,
+        },
+      });
+    }
   }
 }
 

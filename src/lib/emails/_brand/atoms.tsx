@@ -2,6 +2,68 @@ import { Button, Heading, Text } from "@react-email/components";
 import type { ReactNode } from "react";
 import { palette, fonts } from "@/lib/emails/_brand/theme";
 
+export function EmailParagraphs({
+  paragraphs,
+  firstMarginTop = 0,
+  gap = 10,
+}: {
+  paragraphs: string[];
+  firstMarginTop?: number;
+  gap?: number;
+}) {
+  if (paragraphs.length === 0) return null;
+  return (
+    <>
+      {paragraphs.map((p, i) => (
+        <Text
+          key={i}
+          style={{
+            margin: i === 0 ? `${firstMarginTop}px 0 0` : `${gap}px 0 0`,
+            color: palette.ink2,
+            fontFamily: fonts.serif,
+            fontSize: 15,
+            fontStyle: "italic",
+            lineHeight: 1.75,
+          }}
+        >
+          {p}
+        </Text>
+      ))}
+    </>
+  );
+}
+
+export function EmailCtaButton({
+  href,
+  children,
+}: {
+  href: string;
+  children: ReactNode;
+}) {
+  return (
+    <Button
+      href={href}
+      style={{
+        display: "block",
+        width: "100%",
+        boxSizing: "border-box",
+        backgroundColor: palette.ink,
+        color: palette.cream,
+        fontFamily: fonts.mono,
+        fontSize: 12,
+        fontWeight: 700,
+        letterSpacing: "0.18em",
+        textTransform: "uppercase",
+        textDecoration: "none",
+        padding: "14px 20px",
+        textAlign: "center",
+      }}
+    >
+      {children}
+    </Button>
+  );
+}
+
 export function EmailHeading({ children }: { children: ReactNode }) {
   return (
     <Heading

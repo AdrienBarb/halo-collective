@@ -147,21 +147,7 @@ export default function SubscribeForm({
 
   // ── State 3: signed in & already subscribed ──
   if (submitted) {
-    return (
-      <section className="px-6 pt-10 pb-12 md:pt-12">
-        <div className="rounded-2xl border border-line bg-cream-2 px-8 py-12 text-center">
-          <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-accent-gold">
-            You&apos;re in
-          </div>
-          <h3 className="mt-3 font-serif text-[28px] font-semibold leading-tight tracking-[-0.015em] text-ink md:text-[32px]">
-            Welcome to {athleteFirstName}&apos;s circle.
-          </h3>
-          <p className="mt-3 text-[15px] text-ink-3">
-            The next edition will land in your inbox.
-          </p>
-        </div>
-      </section>
-    );
+    return null;
   }
 
   // ── State 2: signed in, not yet subscribed to this athlete ──

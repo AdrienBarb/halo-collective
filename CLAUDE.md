@@ -45,8 +45,7 @@ npm run dev            # Start dev server
 npm run build          # Production build
 npm run lint           # ESLint
 npm run db:generate    # Generate Prisma client
-npm run db:migrate     # Run migrations (dev)
-npm run db:push        # Push schema (no migration file)
+npm run db:push        # Push schema directly (dev mode — no migration files)
 npm run db:studio      # Open Prisma Studio
 npm run email:dev      # Preview email templates
 ```
@@ -265,5 +264,5 @@ STRIPE_WEBHOOK_SECRET=
 1. `cp .env.example .env` and fill values
 2. `npm install`
 3. `npm run db:generate`
-4. `npm run db:migrate`
+4. `npm run db:push`
 5. `npm run dev` → `http://localhost:3000`

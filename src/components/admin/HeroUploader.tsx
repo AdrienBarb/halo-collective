@@ -7,12 +7,21 @@ import toast from "react-hot-toast";
 interface HeroUploaderProps {
   value?: string | null;
   onChange: (url: string) => void;
+  /** Top line of the placeholder. Defaults to "Issue cover image". */
+  emptyTitle?: string;
+  /** Helper line shown below. Defaults to a click-or-drop hint. */
+  emptyHelp?: string;
 }
 
 const ACCEPT = "image/jpeg,image/png,image/webp,image/avif";
 const HERO_GRADIENT = "linear-gradient(135deg,#5a6478 0%,#2c3340 100%)";
 
-export default function HeroUploader({ value, onChange }: HeroUploaderProps) {
+export default function HeroUploader({
+  value,
+  onChange,
+  emptyTitle = "Issue cover image",
+  emptyHelp = "Click or drop · 16:9 · used on web + email",
+}: HeroUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -91,10 +100,10 @@ export default function HeroUploader({ value, onChange }: HeroUploaderProps) {
           <span className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 text-cream">
             <CameraIcon />
             <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em]">
-              Add a cover
+              {emptyTitle}
             </span>
             <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-cream/70">
-              Click or drop an image
+              {emptyHelp}
             </span>
           </span>
         )}
@@ -114,7 +123,7 @@ export default function HeroUploader({ value, onChange }: HeroUploaderProps) {
           >
             <CameraIcon />
             <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-cream">
-              {isDragging ? "Drop to upload" : "Replace cover"}
+              {isDragging ? "Drop to upload" : "Replace"}
             </span>
           </span>
         ) : null}

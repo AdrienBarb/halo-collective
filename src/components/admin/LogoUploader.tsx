@@ -1,0 +1,108 @@
+"use client";
+
+import { useCallback, useRef, useState } from "react";
+import Image from "next/image";
+import toast from "react-hot-toast";
+
+interface LogoUploaderProps {
+  value?: string | null;
+  onChange: (url: string) => void;
+  size?: number;
+}
+
+const ACCEPT = "image/jpeg,image/png,image/webp,image/avif,image/svg+xml";
+
+export default function LogoUploader({
+  value,
+  onChange,
+  size = 56,
+}: LogoUploaderProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleFile = useCallback(
+    async (file: File) => {
+      setIsUploading(true);
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await fetch("/api/admin/upload", {
+          method: "POST",
+          body: formData,
+        });
+        if (!res.ok) {
+          const data = (await res.json().catch(() => ({}))) as {
+            error?: string;
+          };
+          throw new Error(data.error ?? "Upload failed");
+        }
+        const data = (await res.json()) as { url: string };
+        onChange(data.url);
+        toast.success("Logo uploaded");
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Upload failed");
+      } finally {
+        setIsUploading(false);
+        if (inputRef.current) inputRef.current.value = "";
+      }
+    },
+    [onChange],
+  );
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        disabled={isUploading}
+        aria-label={value ? "Replace logo" : "Upload logo"}
+        className="group relative shrink-0 overflow-hidden rounded border border-line bg-cream-3 transition-colors hover:border-accent-gold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-gold disabled:cursor-not-allowed"
+        style={{ width: size, height: size }}
+      >
+        {value ? (
+          <Image
+            src={value}
+            alt=""
+            fill
+            sizes={`${size}px`}
+            className="object-contain"
+            unoptimized
+          />
+        ) : (
+          <span className="pointer-events-none absolute inset-0 flex items-center justify-center font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-ink-3">
+            Upload<br />logo
+          </span>
+        )}
+
+        {value ? (
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 flex items-center justify-center bg-ink/55 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-cream opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+          >
+            Replace
+          </span>
+        ) : null}
+
+        {isUploading ? (
+          <span
+            aria-hidden
+            className="absolute inset-0 flex items-center justify-center bg-ink/65"
+          >
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-cream/30 border-t-cream" />
+          </span>
+        ) : null}
+      </button>
+
+      <input
+        ref={inputRef}
+        type="file"
+        accept={ACCEPT}
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleFile(file);
+        }}
+      />
+    </>
+  );
+}

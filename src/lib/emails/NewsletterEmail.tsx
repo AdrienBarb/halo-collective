@@ -1,32 +1,43 @@
-import { Img, Link, Section } from "@react-email/components";
-import type { DebriefSection } from "@prisma/client";
+import { Img, Link, Section, Text } from "@react-email/components";
 import { EmailLayout } from "@/lib/emails/_brand/EmailLayout";
-import { EmailHeading } from "@/lib/emails/_brand/atoms";
-import { EmailDebrief } from "@/lib/emails/blocks/Debrief";
-import { palette } from "@/lib/emails/_brand/theme";
+import { EmailButton, EmailHeading } from "@/lib/emails/_brand/atoms";
+import { palette, fonts } from "@/lib/emails/_brand/theme";
+import SectionRenderer, {
+  type EmailRawSection,
+} from "@/lib/emails/SectionRenderer";
+import { getTournamentLabel } from "@/lib/newsletter/labels";
+import type { SectionTypeValue } from "@/lib/schemas/newsletterSection";
 
 interface NewsletterEmailProps {
   title: string;
-  debrief: DebriefSection;
   heroImageUrl?: string | null;
   editionNumber: number;
   athleteName: string;
   editionUrl: string;
+  askQuestionUrl?: string | null;
+  tournamentName?: string | null;
+  tournamentContext?: string | null;
+  sections: EmailRawSection[];
   previewText?: string;
   unsubscribeUrl?: string;
 }
 
 export const NewsletterEmail = ({
   title,
-  debrief,
   heroImageUrl,
   editionNumber,
   athleteName,
   editionUrl,
+  askQuestionUrl,
+  tournamentName,
+  tournamentContext,
+  sections,
   previewText,
   unsubscribeUrl = "{{ unsubscribe }}",
 }: NewsletterEmailProps) => {
   const editionLabel = `Edition #${editionNumber.toString().padStart(2, "0")}`;
+  const tournamentLabel = getTournamentLabel(tournamentName);
+  const orderedSections = [...sections].sort((a, b) => a.order - b.order);
 
   return (
     <EmailLayout
@@ -45,10 +56,40 @@ export const NewsletterEmail = ({
         </>
       }
     >
+      {tournamentLabel ? (
+        <Text
+          style={{
+            margin: "0 0 8px",
+            color: palette.ink3,
+            fontFamily: fonts.mono,
+            fontSize: 10,
+            letterSpacing: "0.22em",
+            textTransform: "uppercase",
+          }}
+        >
+          {tournamentLabel}
+        </Text>
+      ) : null}
+
       <EmailHeading>{title}</EmailHeading>
 
+      {tournamentContext ? (
+        <Text
+          style={{
+            margin: "8px 0 0",
+            color: palette.loss,
+            fontFamily: fonts.mono,
+            fontSize: 11,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+          }}
+        >
+          {tournamentContext}
+        </Text>
+      ) : null}
+
       {heroImageUrl ? (
-        <Section style={{ marginTop: 24 }}>
+        <Section style={{ marginTop: 20 }}>
           <Img
             src={heroImageUrl}
             alt={title}
@@ -56,6 +97,7 @@ export const NewsletterEmail = ({
             style={{
               display: "block",
               width: "100%",
+              height: "auto",
               borderRadius: 8,
               objectFit: "cover",
             }}
@@ -63,31 +105,99 @@ export const NewsletterEmail = ({
         </Section>
       ) : null}
 
-      <EmailDebrief section={debrief} editionUrl={editionUrl} />
+      {orderedSections.map((section, index) => (
+        <SectionRenderer
+          key={section.id}
+          section={section}
+          index={index}
+          tournamentName={tournamentName}
+          askQuestionUrl={askQuestionUrl}
+        />
+      ))}
+
+      <Section style={{ marginTop: 28, textAlign: "center" }}>
+        <EmailButton href={editionUrl}>View in browser →</EmailButton>
+      </Section>
     </EmailLayout>
   );
 };
 
+const samplePreviewSections: EmailRawSection[] = [
+  {
+    id: "preview-debrief",
+    type: "DEBRIEF" satisfies SectionTypeValue,
+    order: 0,
+    content: {
+      body:
+        "Tough week on clay. Lost a tight one in the second round but I'm taking the lessons forward.\n\nThe serve held up. The forehand didn't. Back to work.",
+      pullQuote: {
+        contextLabel: "After the match",
+        text: "I'd rather lose like this than win playing safe.",
+      },
+    },
+  },
+  {
+    id: "preview-results",
+    type: "RESULTS" satisfies SectionTypeValue,
+    order: 1,
+    content: {
+      stats: [
+        { value: "1-1", label: "W/L" },
+        { value: "78%", label: "1st serve" },
+        { value: "12", label: "Aces" },
+      ],
+      matches: [
+        {
+          result: "W",
+          opponentName: "J. Doe",
+          opponentRank: "ATP #45",
+          opponentCountry: "🇫🇷",
+          score: "6-3 7-5",
+          roundName: "Round 1",
+          date: "Apr 9",
+        },
+        {
+          result: "L",
+          opponentName: "M. Smith",
+          opponentRank: "ATP #12",
+          opponentCountry: "🇪🇸",
+          score: "4-6 6-7",
+          roundName: "Round 2",
+          date: "Apr 11",
+          commentary: "Lost the tiebreak by a single point. Will replay this one in my head.",
+        },
+      ],
+    },
+  },
+  {
+    id: "preview-whatsnext",
+    type: "WHATS_NEXT" satisfies SectionTypeValue,
+    order: 2,
+    content: {
+      tournamentMeta: "ATP 500 · Hard · Madrid",
+      body: "Quick turnaround. Back on hard courts next week.",
+      schedule: [
+        {
+          dateRange: "Apr 22–28",
+          title: "Madrid Open",
+          description: "Singles main draw, qualifier TBD.",
+        },
+      ],
+    },
+  },
+];
+
 NewsletterEmail.PreviewProps = {
   title: "Monte Carlo: the comeback nobody saw",
-  debrief: {
-    id: "preview",
-    newsletterId: "preview",
-    body:
-      "Down a set and a break. Crowd dead. I told myself one point at a time — and somehow we found a way back.\n\nThis one's for everyone who stayed up watching.",
-    pullQuote: "One point at a time.",
-    pullQuoteContext: "Between sets — Monte Carlo, R3",
-    voiceNoteUrl: null,
-    voiceNoteDurationSec: 92,
-    voiceNoteLabel: "Voice note",
-    voiceNoteLocation: "Locker room · Monte Carlo",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  } satisfies DebriefSection,
   heroImageUrl: null,
   editionNumber: 1,
   athleteName: "Flavio Cobolli",
-  editionUrl: "https://halocollective.co/flavio-cobolli/monte-carlo-comeback",
+  editionUrl: "https://halocollective.co/flavio-cobolli?edition=monte-carlo-comeback",
+  askQuestionUrl:
+    "https://halocollective.co/athletes/flavio-cobolli/feedback",
+  tournamentName: "Monte Carlo",
+  tournamentContext: null,
+  sections: samplePreviewSections,
   previewText: "The comeback nobody saw",
 } satisfies NewsletterEmailProps;
 
