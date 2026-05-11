@@ -15,11 +15,28 @@ type Context = { params: Promise<{ slug: string }> };
 
 export async function POST(req: NextRequest, ctx: Context) {
   try {
-    const origin = checkOrigin(req);
-    if (!origin.ok) return origin.response;
-
     const { slug: rawSlug } = await ctx.params;
     const slug = rawSlug.trim().toLowerCase();
+
+    console.info(
+      JSON.stringify({
+        scope: "subscribe.request",
+        slug,
+        origin: req.headers.get("origin"),
+        referer: req.headers.get("referer"),
+        host: req.headers.get("host"),
+        xForwardedHost: req.headers.get("x-forwarded-host"),
+      }),
+    );
+
+    const origin = checkOrigin(req);
+    if (!origin.ok) {
+      console.warn(
+        JSON.stringify({ scope: "subscribe.blocked_by_origin", slug }),
+      );
+      return origin.response;
+    }
+
     const body = await req.json().catch(() => ({}));
 
     const session = await auth.api.getSession({ headers: req.headers });

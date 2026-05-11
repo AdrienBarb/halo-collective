@@ -16,18 +16,44 @@ function allowedOrigins(): string[] {
 export function checkOrigin(req: NextRequest):
   | { ok: true }
   | { ok: false; response: NextResponse } {
+  const rawOrigin = req.headers.get("origin");
+  const rawReferer = req.headers.get("referer");
   const origin =
-    req.headers.get("origin") ??
-    (req.headers.get("referer")
-      ? new URL(req.headers.get("referer")!).origin
-      : null);
+    rawOrigin ??
+    (rawReferer ? new URL(rawReferer).origin : null);
 
-  if (!origin || !allowedOrigins().includes(origin)) {
+  const allowed = allowedOrigins();
+
+  if (!origin || !allowed.includes(origin)) {
+    console.warn(
+      JSON.stringify({
+        scope: "checkOrigin.rejected",
+        url: req.url,
+        method: req.method,
+        rawOrigin,
+        rawReferer,
+        resolvedOrigin: origin,
+        allowed,
+        envBetterAuthUrl: process.env.BETTER_AUTH_URL ?? null,
+        envPublicBaseUrl: process.env.NEXT_PUBLIC_BASE_URL ?? null,
+        host: req.headers.get("host"),
+        xForwardedHost: req.headers.get("x-forwarded-host"),
+        xForwardedProto: req.headers.get("x-forwarded-proto"),
+      }),
+    );
     return {
       ok: false,
       response: NextResponse.json({ error: "Forbidden" }, { status: 403 }),
     };
   }
+
+  console.info(
+    JSON.stringify({
+      scope: "checkOrigin.accepted",
+      url: req.url,
+      resolvedOrigin: origin,
+    }),
+  );
 
   return { ok: true };
 }
