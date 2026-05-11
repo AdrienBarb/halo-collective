@@ -85,24 +85,24 @@ export default function Repeater<T>({
                     onClick={() => move(idx, -1)}
                     disabled={idx === 0}
                     aria-label="Move up"
-                    className="rounded-xs px-2 py-1 font-mono text-[12px] leading-none text-ink-3 transition-colors hover:bg-cream-3 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
+                    className="flex h-11 w-11 items-center justify-center rounded-xs font-mono text-[14px] leading-none text-ink-3 transition-colors hover:bg-cream-3 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
                   >
-                    ↑
+                    <span aria-hidden="true">↑</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => move(idx, 1)}
                     disabled={idx === items.length - 1}
                     aria-label="Move down"
-                    className="rounded-xs px-2 py-1 font-mono text-[12px] leading-none text-ink-3 transition-colors hover:bg-cream-3 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
+                    className="flex h-11 w-11 items-center justify-center rounded-xs font-mono text-[14px] leading-none text-ink-3 transition-colors hover:bg-cream-3 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
                   >
-                    ↓
+                    <span aria-hidden="true">↓</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => remove(idx)}
-                    aria-label="Remove"
-                    className="ml-1 rounded-xs px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3 transition-colors hover:bg-cream-3 hover:text-ink"
+                    aria-label="Remove row"
+                    className="ml-1 flex h-11 min-w-11 items-center justify-center rounded-xs px-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3 transition-colors hover:bg-cream-3 hover:text-ink"
                   >
                     Remove
                   </button>

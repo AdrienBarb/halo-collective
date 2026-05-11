@@ -6,8 +6,11 @@ import type {
   CreateNewsletterOutput,
   UpdateNewsletterOutput,
 } from "@/lib/schemas/newsletter";
-import type { SectionTypeValue } from "@/lib/schemas/newsletterSection";
-import { validateSectionContent } from "@/lib/schemas/newsletterSection";
+import type {
+  EditionModeValue,
+  SectionTypeValue,
+} from "@/lib/schemas/newsletterSection";
+import { validateSectionBlocks } from "@/lib/schemas/newsletterSection";
 import {
   BadRequestError,
   ConflictError,
@@ -19,20 +22,96 @@ import config from "@/lib/config";
 import { render } from "@react-email/render";
 import { NewsletterEmail } from "@/lib/emails/NewsletterEmail";
 
-const MAX_CREATE_ATTEMPTS = 50;
+// Cap slug-collision retries at a small number. The original 50× was
+// excessive; if we collide ~5 times the slug strategy is wrong and we
+// should fail loudly rather than silently retry.
+const MAX_CREATE_ATTEMPTS = 5;
+
+function logNewsletter(event: string, data: Record<string, unknown>) {
+  console.log(JSON.stringify({ scope: "newsletter.service", event, ...data }));
+}
+
+// Decide whether a Prisma P2002 unique-violation refers to a specific
+// constraint target. Prisma 7 with the pg driver adapter often surfaces
+// `meta.target` as the Postgres constraint *name* (e.g.
+// `newsletter_athleteId_editionNumber_key`) rather than a `string[]` of
+// field names — and the constraint name is sometimes omitted entirely,
+// leaving only the human-readable `error.message`. We scan all three so
+// detection is resilient across driver versions.
+function p2002Haystack(
+  error: Prisma.PrismaClientKnownRequestError,
+): string {
+  const target = error.meta?.target;
+  const targetStr = Array.isArray(target)
+    ? target.join(",")
+    : typeof target === "string"
+      ? target
+      : "";
+  return `${targetStr} ${error.message}`.toLowerCase();
+}
+
+function isSlugCollision(error: Prisma.PrismaClientKnownRequestError): boolean {
+  return p2002Haystack(error).includes("slug");
+}
+
+function isEditionNumberCollision(
+  error: Prisma.PrismaClientKnownRequestError,
+): boolean {
+  return p2002Haystack(error).includes("editionnumber");
+}
+
+function logPrismaUniqueViolation(
+  scope: string,
+  error: Prisma.PrismaClientKnownRequestError,
+  context: Record<string, unknown>,
+) {
+  logNewsletter("p2002_unique_violation", {
+    scope,
+    target: error.meta?.target ?? null,
+    modelName: error.meta?.modelName ?? null,
+    message: error.message,
+    ...context,
+  });
+}
+
+interface SectionRowInput {
+  type: SectionTypeValue;
+  order: number;
+  blocks: Prisma.InputJsonValue;
+}
 
 /**
- * Maps validated input to Prisma update data, preserving the difference between
- * "field absent" (undefined → skip column) and "field cleared" (null → set null).
- * This is what lets users blank a previously-set optional header field.
+ * Validate every section's blocks against the per-(type, mode) schema
+ * and shape them into a row payload Prisma can persist. Validation runs
+ * before any DB writes; a single bad block fails the whole batch so we
+ * never half-commit an edition. The single Prisma.InputJsonValue cast
+ * is centralised here.
  */
+function buildSectionRows(
+  sections: Array<{ type: SectionTypeValue; blocks: unknown }>,
+  mode: EditionModeValue,
+): SectionRowInput[] {
+  return sections.map((s, index) => ({
+    type: s.type,
+    order: index,
+    // .parse() output (including Zod defaults) is what we persist —
+    // keeps stored JSON canonical with the schema.
+    blocks: validateSectionBlocks(s.type, mode, s.blocks) as Prisma.InputJsonValue,
+  }));
+}
+
 interface HeaderFields {
   title?: string;
   heroImageUrl?: string | null;
   editionDate?: Date | null;
+  editionMode?: EditionModeValue;
   tournamentName?: string | null;
   tournamentLogoUrl?: string | null;
-  tournamentContext?: string | null;
+  tournamentCategory?: string | null;
+  tournamentLocation?: string | null;
+  tournamentSurface?: string | null;
+  tournamentStartDate?: Date | null;
+  tournamentEndDate?: Date | null;
   worldRankSnapshot?: number | null;
   countryRankSnapshot?: number | null;
 }
@@ -46,9 +125,14 @@ function buildHeaderData(
     title: input.title,
     heroImageUrl: input.heroImageUrl,
     editionDate: input.editionDate,
+    editionMode: input.editionMode,
     tournamentName: input.tournamentName,
     tournamentLogoUrl: input.tournamentLogoUrl,
-    tournamentContext: input.tournamentContext,
+    tournamentCategory: input.tournamentCategory,
+    tournamentLocation: input.tournamentLocation,
+    tournamentSurface: input.tournamentSurface,
+    tournamentStartDate: input.tournamentStartDate,
+    tournamentEndDate: input.tournamentEndDate,
     worldRankSnapshot: input.worldRankSnapshot,
     countryRankSnapshot: input.countryRankSnapshot,
   };
@@ -114,6 +198,7 @@ export async function getNewsletterById(id: string) {
 
 export async function createNewsletter(input: CreateNewsletterOutput) {
   const { athleteId, slug: baseSlug, editionNumber, sections, title } = input;
+  const editionMode: EditionModeValue = input.editionMode ?? "WEEKLY";
 
   const athlete = await prisma.athlete.findUnique({
     where: { id: athleteId },
@@ -123,11 +208,7 @@ export async function createNewsletter(input: CreateNewsletterOutput) {
     throw new NotFoundError("Athlete not found");
   }
 
-  const sectionsToCreate = (sections ?? []).map((s, index) => ({
-    type: s.type,
-    order: index,
-    content: validateSectionContent(s.type, s.content) as Prisma.InputJsonValue,
-  }));
+  const sectionsToCreate = buildSectionRows(sections ?? [], editionMode);
 
   for (let attempt = 0; attempt < MAX_CREATE_ATTEMPTS; attempt++) {
     const slug = attempt === 0 ? baseSlug : `${baseSlug}-${attempt + 1}`;
@@ -138,11 +219,16 @@ export async function createNewsletter(input: CreateNewsletterOutput) {
           slug,
           editionNumber,
           title,
+          editionMode,
           heroImageUrl: input.heroImageUrl,
           editionDate: input.editionDate,
           tournamentName: input.tournamentName,
           tournamentLogoUrl: input.tournamentLogoUrl,
-          tournamentContext: input.tournamentContext,
+          tournamentCategory: input.tournamentCategory,
+          tournamentLocation: input.tournamentLocation,
+          tournamentSurface: input.tournamentSurface,
+          tournamentStartDate: input.tournamentStartDate,
+          tournamentEndDate: input.tournamentEndDate,
           worldRankSnapshot: input.worldRankSnapshot,
           countryRankSnapshot: input.countryRankSnapshot,
           sections: sectionsToCreate.length
@@ -156,22 +242,23 @@ export async function createNewsletter(input: CreateNewsletterOutput) {
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === "P2002"
       ) {
-        // `meta.target` can be an array of column names, a constraint
-        // name string, or — with the pg driver adapter — `undefined`
-        // entirely. Fall back to the error message which always names
-        // the offending fields, e.g.
-        //   "Unique constraint failed on the fields: (`athleteId`, `editionNumber`)"
-        const rawTarget = error.meta?.target;
-        const probe = [
-          Array.isArray(rawTarget) ? rawTarget.join(",") : String(rawTarget ?? ""),
-          error.message,
-        ].join(" ");
-        if (probe.includes("editionNumber")) {
+        logPrismaUniqueViolation("createNewsletter", error, {
+          athleteId,
+          baseSlug,
+          editionNumber,
+          attempt: attempt + 1,
+        });
+        if (isEditionNumberCollision(error)) {
           throw new ConflictError(
             `Edition number ${editionNumber} already exists for this athlete`,
           );
         }
-        if (probe.includes("slug")) {
+        if (isSlugCollision(error)) {
+          logNewsletter("slug_collision_retry", {
+            athleteId,
+            baseSlug,
+            attempt: attempt + 1,
+          });
           continue;
         }
       }
@@ -185,13 +272,21 @@ export async function updateNewsletter(
   id: string,
   input: UpdateNewsletterOutput,
 ) {
-  // Validate every section before opening the transaction — invalid blocks
-  // must fail before any rows are touched.
-  const sectionsToReplace = input.sections?.map((s, index) => ({
-    type: s.type,
-    order: index,
-    content: validateSectionContent(s.type, s.content) as Prisma.InputJsonValue,
-  }));
+  // Need the current editionMode to validate WEEK_RECAP blocks correctly
+  // when the editor doesn't change it in this update.
+  const existing = await prisma.newsletter.findUnique({
+    where: { id },
+    select: { editionMode: true },
+  });
+  if (!existing) {
+    throw new NotFoundError("Newsletter not found");
+  }
+  const editionMode: EditionModeValue =
+    input.editionMode ?? (existing.editionMode as EditionModeValue);
+
+  const sectionsToReplace = input.sections
+    ? buildSectionRows(input.sections, editionMode)
+    : undefined;
 
   try {
     return await prisma.$transaction(async (tx) => {
@@ -208,6 +303,9 @@ export async function updateNewsletter(
         data: {
           slug: input.slug,
           editionNumber: input.editionNumber,
+          // Any edit invalidates the cached Brevo HTML — the next
+          // publish should re-render from current data.
+          renderedHtml: null,
           ...buildHeaderData(input),
         },
         include: {
@@ -233,7 +331,6 @@ export async function updateNewsletter(
 
 export async function cloneFromPreviousEdition(athleteId: string) {
   for (let attempt = 0; attempt < MAX_CREATE_ATTEMPTS; attempt++) {
-    // Re-read each attempt so we pick up any concurrently-created edition.
     const previous = await prisma.newsletter.findFirst({
       where: { athleteId },
       orderBy: { editionNumber: "desc" },
@@ -246,17 +343,40 @@ export async function cloneFromPreviousEdition(athleteId: string) {
     const nextEditionNumber = previous.editionNumber + 1;
     const baseSlug = `edition-${nextEditionNumber}`;
     const slug = attempt === 0 ? baseSlug : `${baseSlug}-${attempt + 1}`;
+    const editionMode = previous.editionMode as EditionModeValue;
 
-    // Re-validate each section's content to prevent legacy bad JSON from
-    // propagating untouched into the new edition.
-    const sectionsToCreate = previous.sections.map((s) => ({
-      type: s.type,
-      order: s.order,
-      content: validateSectionContent(
-        s.type as SectionTypeValue,
-        s.content,
-      ) as Prisma.InputJsonValue,
-    }));
+    // Re-validate every section against the *current* schema; drop
+    // (and log) any whose stored shape no longer parses. Without this
+    // a single legacy block would 500 the whole clone.
+    const sectionsToCreate: SectionRowInput[] = [];
+    let nextOrder = 0;
+    for (const s of previous.sections) {
+      try {
+        const blocks = validateSectionBlocks(
+          s.type as SectionTypeValue,
+          editionMode,
+          s.blocks,
+        );
+        sectionsToCreate.push({
+          type: s.type as SectionTypeValue,
+          order: nextOrder++,
+          blocks: blocks as Prisma.InputJsonValue,
+        });
+      } catch (validationError) {
+        logNewsletter("clone_dropped_section", {
+          athleteId,
+          previousId: previous.id,
+          sectionId: s.id,
+          sectionType: s.type,
+          // Don't dump the full ZodError (verbose, may leak structure
+          // shape) — just the kinds of issues seen.
+          reason:
+            validationError instanceof Error
+              ? validationError.name
+              : "validation_failed",
+        });
+      }
+    }
 
     try {
       return await prisma.newsletter.create({
@@ -265,14 +385,21 @@ export async function cloneFromPreviousEdition(athleteId: string) {
           slug,
           editionNumber: nextEditionNumber,
           title: previous.title,
+          editionMode,
           heroImageUrl: previous.heroImageUrl,
           editionDate: null,
           tournamentName: previous.tournamentName,
           tournamentLogoUrl: previous.tournamentLogoUrl,
-          tournamentContext: previous.tournamentContext,
+          tournamentCategory: previous.tournamentCategory,
+          tournamentLocation: previous.tournamentLocation,
+          tournamentSurface: previous.tournamentSurface,
+          tournamentStartDate: previous.tournamentStartDate,
+          tournamentEndDate: previous.tournamentEndDate,
           worldRankSnapshot: previous.worldRankSnapshot,
           countryRankSnapshot: previous.countryRankSnapshot,
-          sections: { create: sectionsToCreate },
+          sections: sectionsToCreate.length
+            ? { create: sectionsToCreate }
+            : undefined,
         },
         include: { sections: { orderBy: { order: "asc" } } },
       });
@@ -281,10 +408,19 @@ export async function cloneFromPreviousEdition(athleteId: string) {
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === "P2002"
       ) {
-        const target = (error.meta?.target as string[] | undefined) ?? [];
-        // Either slug collision or editionNumber collision — both are retryable
-        // because we re-read `previous` each iteration and rebuild slug+number.
-        if (target.includes("slug") || target.includes("editionNumber")) {
+        logPrismaUniqueViolation("cloneFromPreviousEdition", error, {
+          athleteId,
+          slug,
+          editionNumber: nextEditionNumber,
+          attempt: attempt + 1,
+        });
+        if (isSlugCollision(error) || isEditionNumberCollision(error)) {
+          logNewsletter("clone_collision_retry", {
+            athleteId,
+            slug,
+            editionNumber: nextEditionNumber,
+            attempt: attempt + 1,
+          });
           continue;
         }
       }
@@ -362,35 +498,82 @@ function buildAskQuestionUrl(athleteSlug: string): string {
   ).toString();
 }
 
-async function renderNewsletterEmail(
-  newsletter: NewsletterWithAthlete,
+export interface NewsletterEmailRenderInput {
+  title: string;
+  slug: string;
+  heroImageUrl?: string | null;
+  editionNumber: number;
+  editionMode: EditionModeValue;
+  tournamentName?: string | null;
+  tournamentCategory?: string | null;
+  tournamentLocation?: string | null;
+  tournamentSurface?: string | null;
+  tournamentStartDate?: Date | string | null;
+  tournamentEndDate?: Date | string | null;
+  sections: Array<{
+    id: string;
+    type: SectionTypeValue;
+    order: number;
+    blocks: unknown;
+  }>;
+}
+
+async function renderEmailHtml(
+  athlete: Pick<Athlete, "firstName" | "lastName" | "slug">,
+  input: NewsletterEmailRenderInput,
 ): Promise<string> {
-  const editionUrl = buildEditionUrl(newsletter.athlete.slug, newsletter.slug);
-  const askQuestionUrl = buildAskQuestionUrl(newsletter.athlete.slug);
-  const athleteName = `${newsletter.athlete.firstName} ${newsletter.athlete.lastName}`;
+  const editionUrl = buildEditionUrl(athlete.slug, input.slug);
+  const askQuestionUrl = buildAskQuestionUrl(athlete.slug);
+  const athleteName = `${athlete.firstName} ${athlete.lastName}`;
   return render(
     NewsletterEmail({
-      title: newsletter.title,
-      heroImageUrl: newsletter.heroImageUrl,
-      editionNumber: newsletter.editionNumber,
+      title: input.title,
+      heroImageUrl: input.heroImageUrl,
+      editionNumber: input.editionNumber,
+      editionMode: input.editionMode,
       athleteName,
       editionUrl,
       askQuestionUrl,
-      tournamentName: newsletter.tournamentName,
-      tournamentContext: newsletter.tournamentContext,
-      sections: newsletter.sections.map((s) => ({
-        id: s.id,
-        type: s.type as SectionTypeValue,
-        order: s.order,
-        content: s.content,
-      })),
+      tournamentName: input.tournamentName,
+      tournamentCategory: input.tournamentCategory,
+      tournamentLocation: input.tournamentLocation,
+      tournamentSurface: input.tournamentSurface,
+      tournamentStartDate: input.tournamentStartDate,
+      tournamentEndDate: input.tournamentEndDate,
+      sections: input.sections,
     }),
   );
 }
 
-export async function renderNewsletterHtml(id: string): Promise<string> {
-  const newsletter = await loadNewsletterWithAthlete(id);
-  return renderNewsletterEmail(newsletter);
+async function renderNewsletterEmail(
+  newsletter: NewsletterWithAthlete,
+): Promise<string> {
+  return renderEmailHtml(newsletter.athlete, {
+    title: newsletter.title,
+    slug: newsletter.slug,
+    heroImageUrl: newsletter.heroImageUrl,
+    editionNumber: newsletter.editionNumber,
+    editionMode: newsletter.editionMode as EditionModeValue,
+    tournamentName: newsletter.tournamentName,
+    tournamentCategory: newsletter.tournamentCategory,
+    tournamentLocation: newsletter.tournamentLocation,
+    tournamentSurface: newsletter.tournamentSurface,
+    tournamentStartDate: newsletter.tournamentStartDate,
+    tournamentEndDate: newsletter.tournamentEndDate,
+    sections: newsletter.sections.map((s) => ({
+      id: s.id,
+      type: s.type as SectionTypeValue,
+      order: s.order,
+      blocks: s.blocks,
+    })),
+  });
+}
+
+export async function renderNewsletterPreviewEmail(
+  athlete: Pick<Athlete, "firstName" | "lastName" | "slug">,
+  input: NewsletterEmailRenderInput,
+): Promise<string> {
+  return renderEmailHtml(athlete, input);
 }
 
 async function claimForSending(
@@ -483,9 +666,12 @@ export async function publishNewsletter(id: string) {
   await claimForSending(id, renderedHtml);
   logBrevo("claimed", { newsletterId: id });
 
+  // Defense-in-depth: schema already rejects CRLF in title, but strip
+  // any survivors before handing the string to Brevo as `subject`.
+  const subject = newsletter.title.replace(/[\r\n\t]+/g, " ").slice(0, 200);
   const campaignId = await createCampaign({
     name: `${athleteName} — Edition #${newsletter.editionNumber} (${newsletter.slug})`,
-    subject: newsletter.title,
+    subject,
     htmlContent: renderedHtml,
     sender: { name: athleteName, email: brevoConfig.senderEmail },
     listIds: [newsletter.athlete.brevoListId],

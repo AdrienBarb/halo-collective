@@ -21,12 +21,56 @@ export interface NewsletterLabels {
     askMe: string;
     read: string;
     highlights: string;
+    watchOnYoutube: string;
     feedback: string;
+    enterDraw: string;
+    learnMore: string;
+  };
+  monetisationEyebrows: {
+    kit: string;
+    partner_content: string;
+    affiliate: string;
+    paid_content: string;
+    athlete_product: string;
+    donation: string;
+    fan_experience: string;
+  };
+  engagementEyebrows: {
+    poll: string;
+    prediction: string;
+    quiz: string;
+    prize_draw: string;
+    qa: string;
+    survey: string;
+    challenge: string;
   };
   eyebrows: {
     press: string;
     partners: string;
     exclusiveMember: string;
+  };
+  engagementInteractive: {
+    signInToParticipate: string;
+    subscribeToParticipate: string;
+    submit: string;
+    submitting: string;
+    yourAnswerRecorded: string;
+    changeMyAnswer: string;
+    closed: string;
+    correctAnswer: string;
+    incorrectAnswer: string;
+    enterDraw: string;
+    drawConsent: string;
+    inDraw: string;
+    drawClosed: string;
+    iDidIt: string;
+    youDidIt: string;
+    /** Use `{count}` placeholder */
+    reactionCountTemplate: string;
+    /** Use `{count}` placeholder */
+    votesCountTemplate: string;
+    yourQuestionPlaceholder: string;
+    yourAnswerPlaceholder: string;
   };
   reassuranceText: string;
   questionIntro: string;
@@ -36,30 +80,30 @@ export interface NewsletterLabels {
 
 const EN: NewsletterLabels = {
   sections: {
-    DEBRIEF: {
+    ATHLETE_REVIEW: {
       number: "01",
-      eyebrow: "My debrief",
-      titleTemplate: "My {tournament} debrief",
+      eyebrow: "My week",
+      titleTemplate: "My week",
     },
-    RESULTS: {
+    WEEK_RECAP: {
       number: "02",
-      eyebrow: "Tournament recap",
-      titleTemplate: "My results in {tournament}",
+      eyebrow: "Week recap",
+      titleTemplate: "What happened this week",
     },
-    WHATS_NEXT: {
+    COMING_UP: {
       number: "03",
       eyebrow: "Coming up",
-      titleTemplate: "What's coming this week",
+      titleTemplate: "What's coming next",
     },
-    KIT: {
+    MONETISATION: {
       number: "04",
-      eyebrow: "My kit",
-      titleTemplate: "What I played with in {tournament}",
+      eyebrow: "Picks",
+      titleTemplate: "What I'm into right now",
     },
-    ENGAGEMENT: {
+    FAN_ENGAGEMENT: {
       number: "05",
       eyebrow: "Your turn",
-      titleTemplate: "The question of the week",
+      titleTemplate: "Your turn",
     },
   },
   ctas: {
@@ -67,45 +111,87 @@ const EN: NewsletterLabels = {
     askMe: "Ask me a question →",
     read: "Read",
     highlights: "Highlights",
+    watchOnYoutube: "Watch on YouTube",
     feedback: "Share your feedback on this newsletter →",
+    enterDraw: "Enter the draw →",
+    learnMore: "Learn more →",
+  },
+  monetisationEyebrows: {
+    kit: "My kit",
+    partner_content: "Partner",
+    affiliate: "Recommended",
+    paid_content: "Members-only",
+    athlete_product: "From me",
+    donation: "Support",
+    fan_experience: "Experience",
+  },
+  engagementEyebrows: {
+    poll: "Poll",
+    prediction: "Prediction",
+    quiz: "Quiz",
+    prize_draw: "Prize draw",
+    qa: "Ask me anything",
+    survey: "Quick survey",
+    challenge: "Challenge",
   },
   eyebrows: {
     press: "What they wrote about me",
     partners: "My partners",
     exclusiveMember: "Exclusive member",
   },
+  engagementInteractive: {
+    signInToParticipate: "Sign in to participate",
+    subscribeToParticipate: "Subscribe to participate",
+    submit: "Submit",
+    submitting: "Submitting…",
+    yourAnswerRecorded: "Your answer is in. Thanks!",
+    changeMyAnswer: "Change my answer",
+    closed: "Closed",
+    correctAnswer: "Correct answer!",
+    incorrectAnswer: "Not quite — the correct answer is highlighted",
+    enterDraw: "Enter the draw",
+    drawConsent: "I agree to the prize draw terms",
+    inDraw: "You're in the draw ✓",
+    drawClosed: "Draw closed",
+    iDidIt: "I did it ✊",
+    youDidIt: "You did it ✊",
+    reactionCountTemplate: "{count} fans did it",
+    votesCountTemplate: "{count} votes",
+    yourQuestionPlaceholder: "Type your question…",
+    yourAnswerPlaceholder: "Type your answer…",
+  },
   reassuranceText:
     "I'll pick 3 fan questions and answer them in the next newsletter.",
   questionIntro: "Vote to help me prioritise — I'll respond in the next edition.",
-  tournamentLabelTemplate: "My week in {tournament}",
+  tournamentLabelTemplate: "My week at {tournament}",
 };
 
 const FR: NewsletterLabels = {
   sections: {
-    DEBRIEF: {
+    ATHLETE_REVIEW: {
       number: "01",
-      eyebrow: "Mon débrief",
-      titleTemplate: "Mon débrief {tournament}",
+      eyebrow: "Ma semaine",
+      titleTemplate: "Ma semaine",
     },
-    RESULTS: {
+    WEEK_RECAP: {
       number: "02",
-      eyebrow: "Récap tournoi",
-      titleTemplate: "Mes résultats à {tournament}",
+      eyebrow: "Récap de la semaine",
+      titleTemplate: "Ce qui s'est passé cette semaine",
     },
-    WHATS_NEXT: {
+    COMING_UP: {
       number: "03",
       eyebrow: "La suite",
-      titleTemplate: "Ce qui m'attend cette semaine",
+      titleTemplate: "Ce qui m'attend",
     },
-    KIT: {
+    MONETISATION: {
       number: "04",
-      eyebrow: "Mon kit",
-      titleTemplate: "Ce avec quoi j'ai joué à {tournament}",
+      eyebrow: "Mes coups de cœur",
+      titleTemplate: "Ce que j'utilise en ce moment",
     },
-    ENGAGEMENT: {
+    FAN_ENGAGEMENT: {
       number: "05",
       eyebrow: "À toi de jouer",
-      titleTemplate: "Le pronostic de la semaine",
+      titleTemplate: "À toi de jouer",
     },
   },
   ctas: {
@@ -113,12 +199,54 @@ const FR: NewsletterLabels = {
     askMe: "Pose-moi une question →",
     read: "Lire",
     highlights: "Résumé",
+    watchOnYoutube: "Voir sur YouTube",
     feedback: "Partage ton avis sur cette newsletter →",
+    enterDraw: "Participer au tirage →",
+    learnMore: "En savoir plus →",
+  },
+  monetisationEyebrows: {
+    kit: "Mon kit",
+    partner_content: "Partenaire",
+    affiliate: "Mes recos",
+    paid_content: "Membres",
+    athlete_product: "De ma part",
+    donation: "Soutenir",
+    fan_experience: "Expérience",
+  },
+  engagementEyebrows: {
+    poll: "Sondage",
+    prediction: "Pronostic",
+    quiz: "Quiz",
+    prize_draw: "Tirage au sort",
+    qa: "Pose-moi tes questions",
+    survey: "Mini-sondage",
+    challenge: "Défi",
   },
   eyebrows: {
     press: "Ce qu'on a écrit sur moi",
     partners: "Mes partenaires",
     exclusiveMember: "Membre exclusif",
+  },
+  engagementInteractive: {
+    signInToParticipate: "Connecte-toi pour participer",
+    subscribeToParticipate: "Abonne-toi pour participer",
+    submit: "Envoyer",
+    submitting: "Envoi…",
+    yourAnswerRecorded: "Ta réponse est enregistrée. Merci !",
+    changeMyAnswer: "Modifier ma réponse",
+    closed: "Terminé",
+    correctAnswer: "Bonne réponse !",
+    incorrectAnswer: "Pas tout à fait — la bonne réponse est surlignée",
+    enterDraw: "Participer au tirage",
+    drawConsent: "J'accepte les conditions du tirage",
+    inDraw: "Tu participes au tirage ✓",
+    drawClosed: "Tirage terminé",
+    iDidIt: "Je l'ai fait ✊",
+    youDidIt: "Tu l'as fait ✊",
+    reactionCountTemplate: "{count} fans l'ont fait",
+    votesCountTemplate: "{count} votes",
+    yourQuestionPlaceholder: "Écris ta question…",
+    yourAnswerPlaceholder: "Écris ta réponse…",
   },
   reassuranceText:
     "Je sélectionne 3 questions de fans et j'y réponds dans la prochaine newsletter.",

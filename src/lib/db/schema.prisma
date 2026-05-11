@@ -23,6 +23,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   subscriptions NewsletterSubscription[]
+  engagementResponses FanEngagementResponse[]
 
   @@unique([email])
   @@map("user")
@@ -44,11 +45,16 @@ enum NewsletterStatus {
 }
 
 enum SectionType {
-  DEBRIEF
-  RESULTS
-  WHATS_NEXT
-  KIT
-  ENGAGEMENT
+  ATHLETE_REVIEW
+  WEEK_RECAP
+  COMING_UP
+  MONETISATION
+  FAN_ENGAGEMENT
+}
+
+enum EditionMode {
+  TOURNAMENT
+  WEEKLY
 }
 
 model Athlete {
@@ -98,12 +104,17 @@ model Newsletter {
   athleteId           String
   editionNumber       Int
   editionDate         DateTime?
+  editionMode         EditionMode      @default(WEEKLY)
   title               String
   slug                String
   heroImageUrl        String?
   tournamentName      String?
   tournamentLogoUrl   String?
-  tournamentContext   String?
+  tournamentCategory  String?
+  tournamentLocation  String?
+  tournamentSurface   String?
+  tournamentStartDate DateTime?
+  tournamentEndDate   DateTime?
   worldRankSnapshot   Int?
   countryRankSnapshot Int?
   status              NewsletterStatus @default(DRAFT)
@@ -114,12 +125,40 @@ model Newsletter {
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt
 
-  athlete  Athlete             @relation(fields: [athleteId], references: [id], onDelete: Cascade)
-  sections NewsletterSection[]
+  athlete   Athlete                  @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  sections  NewsletterSection[]
+  responses FanEngagementResponse[]
 
   @@unique([athleteId, slug])
   @@unique([athleteId, editionNumber])
   @@map("newsletter")
+}
+
+model FanEngagementResponse {
+  id            String   @id @default(cuid())
+  newsletterId  String
+  blockId       String
+  blockKind     String
+  userId        String
+
+  optionIndex   Int?
+  isCorrect     Boolean?
+  reaction      String?
+  rating        Int?
+  text          String?  @db.Text
+  consentGiven  Boolean?
+
+  payload       Json
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  newsletter    Newsletter @relation(fields: [newsletterId], references: [id], onDelete: Cascade)
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([newsletterId, blockId, userId])
+  @@index([newsletterId, blockId])
+  @@index([userId])
+  @@map("fan_engagement_response")
 }
 
 model NewsletterSection {
@@ -127,7 +166,7 @@ model NewsletterSection {
   newsletterId String
   order        Int
   type         SectionType
-  content      Json
+  blocks       Json
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 

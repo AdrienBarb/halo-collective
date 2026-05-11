@@ -1,84 +1,90 @@
 import { Section, Text } from "@react-email/components";
 import {
-  debriefContentSchema,
-  engagementContentSchema,
   isSectionMeaningful,
-  kitContentSchema,
-  resultsContentSchema,
-  whatsNextContentSchema,
+  safeParseSectionBlocks,
+  type AthleteReviewBlock,
+  type ComingUpBlock,
+  type EditionModeValue,
+  type FanEngagementBlock,
+  type MonetisationBlock,
   type SectionTypeValue,
+  type WeekRecapTournamentBlock,
+  type WeekRecapWeeklyBlock,
 } from "@/lib/schemas/newsletterSection";
 import {
   getNewsletterLabels,
   getSectionTitle,
 } from "@/lib/newsletter/labels";
 import { palette, fonts } from "@/lib/emails/_brand/theme";
-import DebriefSection from "@/lib/emails/sections/DebriefSection";
-import EngagementSection from "@/lib/emails/sections/EngagementSection";
-import KitSection from "@/lib/emails/sections/KitSection";
-import ResultsSection from "@/lib/emails/sections/ResultsSection";
-import WhatsNextSection from "@/lib/emails/sections/WhatsNextSection";
+import AthleteReviewSection from "@/lib/emails/sections/AthleteReviewSection";
+import ComingUpSection from "@/lib/emails/sections/ComingUpSection";
+import FanEngagementSection from "@/lib/emails/sections/FanEngagementSection";
+import MonetisationSection from "@/lib/emails/sections/MonetisationSection";
+import WeekRecapSection from "@/lib/emails/sections/WeekRecapSection";
 
 export interface EmailRawSection {
   id: string;
   type: SectionTypeValue;
   order: number;
-  content: unknown;
+  blocks: unknown;
 }
 
 interface SectionRendererProps {
   section: EmailRawSection;
   index: number;
+  editionMode: EditionModeValue;
   tournamentName?: string | null;
+  /** URL used by FAN_ENGAGEMENT CTAs — points to the web reader. */
   askQuestionUrl?: string | null;
 }
 
 function renderBody(
   section: EmailRawSection,
-  askQuestionUrl: string | null | undefined,
+  mode: EditionModeValue,
+  ctaUrl: string | null | undefined,
 ): React.ReactNode {
+  const parsed = safeParseSectionBlocks(section.type, mode, section.blocks);
+  if (!parsed.success) return null;
+
   switch (section.type) {
-    case "DEBRIEF": {
-      const parsed = debriefContentSchema.safeParse(section.content);
-      return parsed.success ? <DebriefSection content={parsed.data} /> : null;
-    }
-    case "RESULTS": {
-      const parsed = resultsContentSchema.safeParse(section.content);
-      return parsed.success ? <ResultsSection content={parsed.data} /> : null;
-    }
-    case "WHATS_NEXT": {
-      const parsed = whatsNextContentSchema.safeParse(section.content);
-      return parsed.success ? (
-        <WhatsNextSection content={parsed.data} />
-      ) : null;
-    }
-    case "KIT": {
-      const parsed = kitContentSchema.safeParse(section.content);
-      return parsed.success ? <KitSection content={parsed.data} /> : null;
-    }
-    case "ENGAGEMENT": {
-      const parsed = engagementContentSchema.safeParse(section.content);
-      return parsed.success ? (
-        <EngagementSection
-          content={parsed.data}
-          askQuestionUrl={askQuestionUrl}
+    case "ATHLETE_REVIEW":
+      return (
+        <AthleteReviewSection blocks={parsed.data as AthleteReviewBlock[]} />
+      );
+    case "WEEK_RECAP":
+      return (
+        <WeekRecapSection
+          blocks={
+            parsed.data as Array<WeekRecapTournamentBlock | WeekRecapWeeklyBlock>
+          }
         />
-      ) : null;
-    }
-    default:
-      return null;
+      );
+    case "COMING_UP":
+      return <ComingUpSection blocks={parsed.data as ComingUpBlock[]} />;
+    case "MONETISATION":
+      return (
+        <MonetisationSection blocks={parsed.data as MonetisationBlock[]} />
+      );
+    case "FAN_ENGAGEMENT":
+      return (
+        <FanEngagementSection
+          blocks={parsed.data as FanEngagementBlock[]}
+          ctaUrl={ctaUrl ?? undefined}
+        />
+      );
   }
 }
 
 export default function SectionRenderer({
   section,
   index,
+  editionMode,
   tournamentName,
   askQuestionUrl,
 }: SectionRendererProps) {
-  if (!isSectionMeaningful(section.type, section.content)) return null;
+  if (!isSectionMeaningful(section.type, section.blocks)) return null;
 
-  const body = renderBody(section, askQuestionUrl);
+  const body = renderBody(section, editionMode, askQuestionUrl);
   if (body === null) return null;
 
   const labels = getNewsletterLabels();

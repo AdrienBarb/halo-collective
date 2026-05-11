@@ -24,7 +24,12 @@ function resolveCountryName(code: string): string {
 }
 
 export const getAthleteBySlug = cache(async (slug: string) => {
-  return prisma.athlete.findUnique({ where: { slug } });
+  return prisma.athlete.findUnique({
+    where: { slug },
+    include: {
+      sponsors: { orderBy: { order: "asc" } },
+    },
+  });
 });
 
 export const listAllAthletes = cache(async () => {

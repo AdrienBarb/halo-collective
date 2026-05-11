@@ -1,17 +1,47 @@
 import { Img, Link, Section, Text } from "@react-email/components";
 import type { MediaBlock as MediaBlockType } from "@/lib/schemas/newsletterSection";
+import { splitParagraphs } from "@/lib/newsletter/splitParagraphs";
+import { parseYouTubeId } from "@/lib/newsletter/youtube";
 import { palette, fonts } from "@/lib/emails/_brand/theme";
+import { EmailParagraphs } from "@/lib/emails/_brand/atoms";
 
 interface MediaBlockProps {
   media: MediaBlockType;
 }
 
 export default function MediaBlock({ media }: MediaBlockProps) {
+  if (media.kind === "text") {
+    return (
+      <Section style={{ marginBottom: 16 }}>
+        <EmailParagraphs paragraphs={splitParagraphs(media.body)} />
+      </Section>
+    );
+  }
+
+  if (media.kind === "image") {
+    return (
+      <Section style={{ marginBottom: 16 }}>
+        <Img
+          src={media.url}
+          alt={media.alt ?? ""}
+          width="536"
+          style={{
+            display: "block",
+            width: "100%",
+            height: "auto",
+            borderRadius: 8,
+          }}
+        />
+      </Section>
+    );
+  }
+
   if (media.kind === "video") {
+    const isYouTube = parseYouTubeId(media.url) !== null;
     return (
       <Section style={{ marginBottom: 16 }}>
         <Link
-          href={media.videoUrl}
+          href={media.url}
           style={{
             display: "block",
             backgroundColor: palette.ink,
@@ -47,17 +77,19 @@ export default function MediaBlock({ media }: MediaBlockProps) {
               textAlign: "center",
             }}
           >
-            ▶ Watch
+            ▶ {isYouTube ? "Watch on YouTube" : "Watch"}
           </Text>
         </Link>
       </Section>
     );
   }
 
+  // audio
+  const meta = [media.location, media.durationLabel].filter(Boolean).join(" · ");
   return (
     <Section style={{ marginBottom: 16 }}>
       <Link
-        href={media.audioUrl}
+        href={media.url}
         style={{
           display: "block",
           backgroundColor: palette.cream,
@@ -93,29 +125,33 @@ export default function MediaBlock({ media }: MediaBlockProps) {
                 </div>
               </td>
               <td style={{ verticalAlign: "middle", paddingLeft: 12 }}>
-                <Text
-                  style={{
-                    margin: 0,
-                    color: palette.ink,
-                    fontFamily: fonts.sans,
-                    fontSize: 14,
-                    fontWeight: 600,
-                  }}
-                >
-                  {media.title}
-                </Text>
-                <Text
-                  style={{
-                    margin: "4px 0 0",
-                    color: palette.ink3,
-                    fontFamily: fonts.mono,
-                    fontSize: 10,
-                    letterSpacing: "0.18em",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {media.location} · {media.durationLabel}
-                </Text>
+                {media.title ? (
+                  <Text
+                    style={{
+                      margin: 0,
+                      color: palette.ink,
+                      fontFamily: fonts.sans,
+                      fontSize: 14,
+                      fontWeight: 600,
+                    }}
+                  >
+                    {media.title}
+                  </Text>
+                ) : null}
+                {meta ? (
+                  <Text
+                    style={{
+                      margin: "4px 0 0",
+                      color: palette.ink3,
+                      fontFamily: fonts.mono,
+                      fontSize: 10,
+                      letterSpacing: "0.18em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {meta}
+                  </Text>
+                ) : null}
               </td>
             </tr>
           </tbody>

@@ -1,26 +1,38 @@
 import "dotenv/config";
+import { randomUUID } from "node:crypto";
 import { Buffer } from "node:buffer";
 import { NewsletterStatus, Sport, type Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
 import { supabaseStorage } from "@/lib/storage/client";
 import { ensureAthleteList } from "@/lib/brevo/lists";
-import type { SectionTypeValue } from "@/lib/schemas/newsletterSection";
+import type {
+  EditionModeValue,
+  SectionTypeValue,
+} from "@/lib/schemas/newsletterSection";
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is not set — refusing to seed");
 }
 
 // ── Supabase asset uploader ──────────────────────────────────────────
-//
-// Newsletter imagery (hero, tournament logo, kit photo) and sponsor
-// logos originate on the Brevo CDN. We mirror them into the project's
-// `media` bucket so the public site references our own storage. Each
-// asset is keyed by a stable filename — the upload is skipped when the
-// object already exists, making the seed idempotent and cheap to rerun.
 
 const MEDIA_BUCKET = "media";
 const SEED_PREFIX = "seed";
 const assetUrlCache = new Map<string, string>();
+let bucketEnsured = false;
+
+async function ensureMediaBucket(): Promise<void> {
+  if (bucketEnsured) return;
+  const { data } = await supabaseStorage.storage.getBucket(MEDIA_BUCKET);
+  if (!data) {
+    const { error } = await supabaseStorage.storage.createBucket(MEDIA_BUCKET, {
+      public: true,
+    });
+    if (error && !/already exists/i.test(error.message)) throw error;
+    console.log(`  ↑ created bucket ${MEDIA_BUCKET} (public)`);
+  }
+  bucketEnsured = true;
+}
 
 async function ensureSeedAsset(
   filename: string,
@@ -29,12 +41,12 @@ async function ensureSeedAsset(
   const cached = assetUrlCache.get(filename);
   if (cached) return cached;
 
+  await ensureMediaBucket();
+
   const objectPath = `${SEED_PREFIX}/${filename}`;
   const bucket = supabaseStorage.storage.from(MEDIA_BUCKET);
-
   const publicUrl = bucket.getPublicUrl(objectPath).data.publicUrl;
 
-  // Skip re-upload when the object is already there.
   const { data: existing } = await bucket.list(SEED_PREFIX, {
     search: filename,
     limit: 1,
@@ -124,9 +136,7 @@ const athletes: AthleteSeed[] = [
     titlesCount: 9,
     bio: "Kazakh tennis player known for his creative, unpredictable game.",
     avatarUrl: "/brand/heroes/alexander-bublik.jpg",
-    socialLinks: {
-      instagram: "https://www.instagram.com/bublik/",
-    },
+    socialLinks: { instagram: "https://www.instagram.com/bublik/" },
   },
   {
     slug: "flavio-cobolli",
@@ -150,10 +160,6 @@ const athletes: AthleteSeed[] = [
 ];
 
 // ── Sponsor seeds ────────────────────────────────────────────────────
-//
-// Logos live on Brevo's CDN; the seed mirrors each one into Supabase
-// before persisting the Sponsor row. Order controls display sequence
-// in the athlete header and newsletter sponsor strip.
 
 type SponsorSeed = {
   name: string;
@@ -202,53 +208,11 @@ const sponsorsByAthlete: Record<string, SponsorSeed[]> = {
       websiteUrl: "https://www.on.com/en-us/collection/tennis",
     },
     {
-      name: "Tecnifibre",
-      logoFilename: "sponsor-iga-tecnifibre.png",
-      logoSourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69cf809de07c75ded60a2489.png",
-      websiteUrl: "https://www.tecnifibre.com/en",
-    },
-    {
-      name: "OSHEE",
-      logoFilename: "sponsor-iga-oshee.png",
-      logoSourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69cf80a2186f62d83f9a664f.png",
-      websiteUrl: "https://oshee.eu",
-    },
-    {
       name: "Rolex",
       logoFilename: "sponsor-iga-rolex.png",
       logoSourceUrl:
         "https://img.mailinblue.com/10839939/images/content_library/original/69cf80a770316a71384e8dfb.png",
       websiteUrl: "https://www.rolex.com",
-    },
-    {
-      name: "Oral-B",
-      logoFilename: "sponsor-iga-oral-b.png",
-      logoSourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69cf80ac163e39a9bf8d4c06.png",
-      websiteUrl: "https://oralb.com",
-    },
-    {
-      name: "Lego",
-      logoFilename: "sponsor-iga-lego.png",
-      logoSourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69cf80b270316a71384e8e02.png",
-      websiteUrl: "https://www.lego.com",
-    },
-    {
-      name: "Visa",
-      logoFilename: "sponsor-iga-visa.png",
-      logoSourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69cf80b8186f62d83f9a6657.png",
-      websiteUrl: "https://www.visa.com",
-    },
-    {
-      name: "Infosys",
-      logoFilename: "sponsor-iga-infosys.png",
-      logoSourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69cf80c3e07c75ded60a249f.png",
-      websiteUrl: "https://www.infosys.com",
     },
   ],
   "alexander-bublik": [
@@ -259,79 +223,52 @@ const sponsorsByAthlete: Record<string, SponsorSeed[]> = {
         "https://img.mailinblue.com/10839939/images/content_library/original/69dc9d33b27fae1e5f03cfdf.png",
       websiteUrl: "https://www.armani.com/en-wx/ea7/experience/athletes/",
     },
-    {
-      name: "Diadem",
-      logoFilename: "sponsor-bublik-diadem.png",
-      logoSourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69dc9d385283d836eca904e4.png",
-      websiteUrl: "https://diademsports.com",
-    },
-    {
-      name: "Bianchet",
-      logoFilename: "sponsor-bublik-bianchet.png",
-      logoSourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69dc9d3b65b942fd5925da56.png",
-      websiteUrl: "https://www.bianchet.com/the-brand/partners-friends",
-    },
-    {
-      name: "Lexus",
-      logoFilename: "sponsor-bublik-lexus.png",
-      logoSourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69dc9d405283d836eca904e9.png",
-      websiteUrl: "https://discoverlexus.com",
-    },
-    {
-      name: "Codos",
-      logoFilename: "sponsor-bublik-codos.jpg",
-      logoSourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69dc9d45648713cd2e9ca7b5.jpg",
-      websiteUrl: "https://codos.network",
-    },
   ],
 };
 
-// ── Newsletter seeds ─────────────────────────────────────────────────
-//
-// Hero, tournament logo and kit imagery are referenced by filename;
-// `ensureSeedAsset` uploads them into Supabase at run time. Section
-// content matches the per-type Zod schemas in newsletterSection.ts.
+// ── Newsletter seeds (block-shaped) ──────────────────────────────────
 
-type SectionSeed = {
-  type: SectionTypeValue;
-  content: Prisma.InputJsonValue;
-};
-
-type AssetRef = {
-  filename: string;
-  sourceUrl: string;
-};
+type AssetRef = { filename: string; sourceUrl: string };
 
 type NewsletterSeed = {
   athleteSlug: string;
   editionNumber: number;
   editionDate: Date;
+  editionMode: EditionModeValue;
   title: string;
   slug: string;
-  tournamentName: string;
-  tournamentContext: string;
+  tournamentName: string | null;
+  tournamentCategory: string | null;
+  tournamentLocation: string | null;
+  tournamentSurface: string | null;
+  tournamentStartDate: Date | null;
+  tournamentEndDate: Date | null;
   worldRankSnapshot: number;
   countryRankSnapshot: number;
   hero: AssetRef;
-  tournamentLogo: AssetRef;
+  tournamentLogo: AssetRef | null;
   kitImage: AssetRef | null;
-  buildSections: (assets: { kitImageUrl: string | null }) => SectionSeed[];
+  buildSections: (assets: {
+    kitImageUrl: string | null;
+    tournamentLogoUrl: string | null;
+  }) => Array<{ type: SectionTypeValue; blocks: Prisma.InputJsonValue }>;
 };
 
 const newsletters: NewsletterSeed[] = [
-  // ── Flavio Cobolli — Monte Carlo #01 ───────────────────────────
+  // ── 1. Flavio Cobolli — Monte Carlo (TOURNAMENT) ───────────────────
   {
     athleteSlug: "flavio-cobolli",
     editionNumber: 1,
     editionDate: new Date("2026-04-08"),
+    editionMode: "TOURNAMENT",
     title: "Monte Carlo: what a week",
     slug: "monte-carlo-2026",
     tournamentName: "Rolex Monte-Carlo Masters",
-    tournamentContext: "2nd Round — Rolex Monte-Carlo Masters 2026",
+    tournamentCategory: "ATP Masters 1000",
+    tournamentLocation: "Monte Carlo, Monaco",
+    tournamentSurface: "Clay",
+    tournamentStartDate: new Date("2026-04-06"),
+    tournamentEndDate: new Date("2026-04-12"),
     worldRankSnapshot: 16,
     countryRankSnapshot: 3,
     hero: {
@@ -349,134 +286,164 @@ const newsletters: NewsletterSeed[] = [
       sourceUrl:
         "https://img.mailinblue.com/10839939/images/content_library/original/69eb6d5447ca91d8a8df3daa.jpg",
     },
-    buildSections: ({ kitImageUrl }) => [
+    buildSections: ({ kitImageUrl, tournamentLogoUrl }) => [
       {
-        type: "DEBRIEF",
-        content: {
-          body:
-            "Monte Carlo. One of the tournaments I look forward to the most — the clay, the setting, the atmosphere on those courts. First round against Comesana was a real battle. I dropped the second set but came back in the third. 7-5, 2-6, 6-3 — took what I needed. Then Blockx in the second round. He played better than me. 3-6, 3-6, no arguments. Disappointing — but the clay swing is just starting and there's a lot ahead.",
-          pullQuote: {
-            contextLabel: "After R2 vs Blockx",
-            text:
-              "He was better today. I didn't play my best when it mattered — and at this level, that's the match. You take it, you learn, you move on.",
+        type: "ATHLETE_REVIEW",
+        blocks: [
+          {
+            kind: "text",
+            body:
+              "Monte Carlo. One of the tournaments I look forward to the most — the clay, the setting, the atmosphere. First round against Comesaña was a real battle. I dropped the second set but came back in the third. 7-5, 2-6, 6-3.\n\nThen Blockx in the second round. He played better than me. 3-6, 3-6, no arguments. Disappointing — but the clay swing is just starting and there's a lot ahead.",
           },
-        },
+        ],
       },
       {
-        type: "RESULTS",
-        content: {
-          stats: [
-            { value: "R2", label: "Singles" },
-            { value: "#10", label: "Seed" },
-            { value: "1-1", label: "W / L" },
-          ],
-          matches: [
-            {
-              result: "W",
-              opponentName: "F. Comesaña",
-              opponentRank: "#99",
-              opponentCountry: "ARG",
-              score: "7-5 2-6 6-3",
-              roundName: "Round 1",
-              date: "6 April",
-              commentary:
-                "Comesana is a tough opener on clay — heavy ball, fights for every point, never gives you rhythm for free. I lost the second set and had to find something extra in the third. Not my cleanest match but I found what I needed when it counted.",
-              highlightUrl: "https://www.youtube.com/watch?v=AA2_J2gaj5I",
-            },
-            {
-              result: "L",
-              opponentName: "A. Blockx",
-              opponentRank: "#91",
-              opponentCountry: "BEL",
-              score: "3-6 3-6",
-              roundName: "Round 2",
-              date: "8 April",
-              commentary:
-                "Blockx played a clean match. He's a good mover on clay and he made it difficult from the first game. I never found my baseline game — couldn't impose my forehand, couldn't build the points the way I wanted. Those days happen.",
-              highlightUrl:
-                "https://www.tennistv.com/videos/4484136/monte-carlo-2026-r2-cobolli-blockx-short-highlights",
-            },
-          ],
-          pressLinks: [
-            {
-              source: "ATP Tour",
-              headline: "Blockx claims seeded scalp of Cobolli in Monte-Carlo",
-              url: "https://www.atptour.com/en/news/blockx-fonseca-monte-carlo-2026-monday",
-            },
-            {
-              source: "ATP Tour",
-              headline: "All results — Rolex Monte-Carlo Masters 2026",
-              url: "https://www.atptour.com/en/scores/archive/monte-carlo/410/2026/results",
-            },
-          ],
-        },
-      },
-      {
-        type: "WHATS_NEXT",
-        content: {
-          tournamentMeta:
-            "BMW Open by Bitpanda · 14-20 April 2026 · ATP 500 · 🟤 Clay",
-          body:
-            "Munich first — ATP 500, clay, a tournament I've always enjoyed. Then Madrid, Rome, Roland Garros. This is the swing where I want to show what I can do. Monte Carlo was a short week, but there were good signs. Time to build on them.",
-          schedule: [
-            {
-              dateRange: "Apr 8-9",
-              title: "Rest days in Rome",
-              description:
-                "Back home. Family, proper food, no racket. Reset the head after Monte Carlo.",
-            },
-            {
-              dateRange: "Apr 10-12",
-              title: "Training block",
-              description:
-                "Back on court. Clay work, serve practice, match patterns. Getting sharp again before Munich.",
-            },
-            {
-              dateRange: "Apr 13",
-              title: "Arrival in Munich",
-              description:
-                "BMW Open starts April 14. Arriving the day before to get a feel for the courts at MTTC Iphitos.",
-            },
-          ],
-        },
-      },
-      {
-        type: "KIT",
-        content: {
-          body:
-            "Clay season means different demands on everything — your shoes, your skin, your kit. On's CloudFly gives me the traction I need on Monte Carlo's red clay, and La Roche-Posay SPF 50 is part of my pre-match routine when you're outside for hours.",
-          ...(kitImageUrl ? { imageUrl: kitImageUrl } : {}),
-          cta: {
-            label: "Discover On's clay season gear",
-            url: "https://www.on.com/en-us/collection/tennis",
+        type: "WEEK_RECAP",
+        blocks: [
+          {
+            kind: "tournament_summary",
+            logoUrl: tournamentLogoUrl ?? undefined,
+            name: "Rolex Monte-Carlo Masters",
+            category: "ATP Masters 1000",
+            location: "Monte Carlo, Monaco",
+            surface: "Clay",
+            dateRange: "6–12 April 2026",
           },
-        },
+          { kind: "hero_metric", value: "R2", label: "Best result" },
+          { kind: "hero_metric", value: "#10", label: "Seed" },
+          { kind: "hero_metric", value: "1-1", label: "W / L" },
+          {
+            kind: "match_card",
+            result: "W",
+            roundName: "Round 1",
+            opponentName: "F. Comesaña",
+            opponentRank: "#99",
+            opponentCountry: "ARG",
+            score: "7-5 2-6 6-3",
+            date: "6 April",
+            commentary:
+              "Tough opener on clay — heavy ball, fights for every point. Lost the second, found something extra in the third.",
+            highlightUrl: "https://www.youtube.com/watch?v=AA2_J2gaj5I",
+          },
+          {
+            kind: "match_card",
+            result: "L",
+            roundName: "Round 2",
+            opponentName: "A. Blockx",
+            opponentRank: "#91",
+            opponentCountry: "BEL",
+            score: "3-6 3-6",
+            date: "8 April",
+            commentary:
+              "Blockx played a clean match. I never found my baseline game. Those days happen.",
+            highlightUrl:
+              "https://www.tennistv.com/videos/4484136/monte-carlo-2026-r2-cobolli-blockx-short-highlights",
+          },
+          {
+            kind: "media_link",
+            source: "ATP Tour",
+            headline: "Blockx claims seeded scalp of Cobolli in Monte-Carlo",
+            url: "https://www.atptour.com/en/news/blockx-fonseca-monte-carlo-2026-monday",
+          },
+        ],
       },
       {
-        type: "ENGAGEMENT",
-        content: {
-          question: "What do you want to see from Munich?",
-          pollOptions: [
-            { label: "Tactical breakdown of a match", emoji: "🌟", isHighlighted: false },
-            { label: "A day in my life on tour", emoji: "🏊", isHighlighted: false },
-            { label: "My pre-match preparation routine", emoji: "🏁", isHighlighted: false },
-            { label: "What it means to play in Italy", emoji: "🎶", isHighlighted: false },
-          ],
-          pollUrl: "https://flaviocobolli.com/vote/munich26",
-        },
+        type: "COMING_UP",
+        blocks: [
+          {
+            kind: "text",
+            body:
+              "Munich first — ATP 500, clay, a tournament I've always enjoyed. Then Madrid, Rome, Roland Garros. Monte Carlo was a short week, but there were good signs. Time to build on them.",
+          },
+          {
+            kind: "schedule_item",
+            dateRange: "Apr 8–9",
+            title: "Rest in Rome",
+            description: "Family, proper food, no racket. Reset the head.",
+          },
+          {
+            kind: "schedule_item",
+            dateRange: "Apr 10–12",
+            title: "Training block",
+            description: "Clay work, serve practice, match patterns.",
+          },
+          {
+            kind: "schedule_item",
+            dateRange: "Apr 13",
+            title: "Arrival in Munich",
+            description: "BMW Open starts April 14.",
+          },
+        ],
+      },
+      {
+        type: "MONETISATION",
+        blocks: [
+          {
+            kind: "kit",
+            id: randomUUID(),
+            title: "My clay-season kit",
+            body:
+              "On's CloudFly gives me the traction I need on Monte Carlo's red clay, and La Roche-Posay SPF 50 is part of my pre-match routine when you're outside for hours.",
+            media: kitImageUrl
+              ? { kind: "image", url: kitImageUrl }
+              : undefined,
+            cta: {
+              label: "Discover On's clay season gear",
+              url: "https://www.on.com/en-us/collection/tennis",
+            },
+          },
+          {
+            kind: "partner_content",
+            id: randomUUID(),
+            partnerName: "La Roche-Posay",
+            title: "What I use to protect my skin on tour",
+            body: "Anthelios UVMune 400 — SPF 50, sweat-resistant.",
+            cta: {
+              label: "See the routine",
+              url: "https://www.laroche-posay.com",
+            },
+          },
+        ],
+      },
+      {
+        type: "FAN_ENGAGEMENT",
+        blocks: [
+          {
+            kind: "poll",
+            id: randomUUID(),
+            question: "What do you want to see from Munich?",
+            options: [
+              { label: "Tactical breakdown of a match", emoji: "🎾", isHighlighted: false },
+              { label: "A day in my life on tour", emoji: "🏊", isHighlighted: false },
+              { label: "My pre-match routine", emoji: "🏁", isHighlighted: false },
+              { label: "Playing at home in Italy", emoji: "🇮🇹", isHighlighted: false },
+            ],
+          },
+          {
+            kind: "qa",
+            id: randomUUID(),
+            prompt: "Ask me a question for the Munich edition",
+            reassurance: "I'll pick 3 and answer them next week.",
+          },
+        ],
       },
     ],
   },
 
-  // ── Flavio Cobolli — Munich #02 ────────────────────────────────
+  // ── 2. Flavio Cobolli — Madrid prep (WEEKLY) ───────────────────────
   {
     athleteSlug: "flavio-cobolli",
     editionNumber: 2,
-    editionDate: new Date("2026-04-20"),
-    title: "Munich: a final to remember",
-    slug: "munich-2026",
-    tournamentName: "BMW Open by Bitpanda",
-    tournamentContext: "Runner-up — BMW Open Munich 2026",
+    editionDate: new Date("2026-04-22"),
+    editionMode: "WEEKLY",
+    title: "This week in Madrid prep",
+    slug: "madrid-prep-2026",
+    tournamentName: null,
+    tournamentCategory: null,
+    tournamentLocation: null,
+    tournamentSurface: null,
+    tournamentStartDate: null,
+    tournamentEndDate: null,
     worldRankSnapshot: 13,
     countryRankSnapshot: 3,
     hero: {
@@ -484,11 +451,7 @@ const newsletters: NewsletterSeed[] = [
       sourceUrl:
         "https://img.mailinblue.com/10839939/images/content_library/original/69eb24fa96b9e15bbc850490.jpg",
     },
-    tournamentLogo: {
-      filename: "cobolli-munich-logo.jpeg",
-      sourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69eb25cce00691c2189eb88c.jpeg",
-    },
+    tournamentLogo: null,
     kitImage: {
       filename: "cobolli-munich-kit.jpeg",
       sourceUrl:
@@ -496,174 +459,132 @@ const newsletters: NewsletterSeed[] = [
     },
     buildSections: ({ kitImageUrl }) => [
       {
-        type: "DEBRIEF",
-        content: {
-          body:
-            "Munich is done. A runner-up finish against Ben Shelton — 2-6, 5-7. It hurts to lose a final. But this week was one I'll carry with me for a long time. No sets dropped until Sunday. Zverev in the semis — the biggest win of my career. Shelton was simply better in the final. There will be other finals on clay.",
-          pullQuote: {
-            contextLabel: "Post-final · Munich · 19 April",
-            text:
-              "I'm proud of this week. I beat Zverev — one of the best players in the world on this surface — and reached my third ATP 500 final. The level I showed gives me a lot of confidence heading into the rest of the clay season.",
+        type: "ATHLETE_REVIEW",
+        blocks: [
+          {
+            kind: "text",
+            body:
+              "No match week. Back in Rome with the team. The body needs it after five days in Munich and the back-to-back travel from Monte Carlo.\n\nLight on court, heavy in the gym. Trying to land in Madrid sharp.",
           },
-        },
+        ],
       },
       {
-        type: "RESULTS",
-        content: {
-          stats: [
-            { value: "Final", label: "Result" },
-            { value: "ATP 500", label: "Category" },
-            { value: "4-1", label: "W / L" },
-          ],
-          matches: [
-            {
-              result: "W",
-              opponentName: "D. Dedura-Palomero",
-              opponentCountry: "GER",
-              score: "6-4 7-5",
-              roundName: "Round 1",
-              date: "14 April",
-              highlightUrl:
-                "https://www.atptour.com/en/video/highlights-cobolli-dashes-nextgenatp-deduras-munich-2026-hopes",
-            },
-            {
-              result: "W",
-              opponentName: "Z. Bergs",
-              opponentRank: "#40",
-              opponentCountry: "BEL",
-              score: "6-2 6-3",
-              roundName: "Round of 16",
-              date: "15 April",
-              highlightUrl:
-                "https://www.atptour.com/en/video/highlights-cobolli-sinks-bergs-to-book-qf-spot-in-munich-2026",
-            },
-            {
-              result: "W",
-              opponentName: "V. Kopriva",
-              opponentCountry: "CZE",
-              score: "6-3 6-2",
-              roundName: "Quarterfinal",
-              date: "17 April",
-              highlightUrl:
-                "https://www.atptour.com/en/video/highlights-cobolli-marches-past-kopriva-into-munich-2026-sfs",
-            },
-            {
-              result: "W",
-              opponentName: "A. Zverev",
-              opponentRank: "#3",
-              opponentCountry: "GER",
-              score: "6-3 6-3",
-              roundName: "Semifinal",
-              date: "18 April",
-              contextNote: "Biggest career win",
-              commentary:
-                "I served well, returned deep, and trusted my forehand on the big points. Walking off court I knew the level was there — now it was about backing it up in the final.",
-              highlightUrl:
-                "https://www.atptour.com/en/video/highlights-cobolli-fires-past-zverev-into-munich-2026-final",
-            },
-            {
-              result: "L",
-              opponentName: "B. Shelton",
-              opponentRank: "#6",
-              opponentCountry: "USA",
-              score: "2-6 5-7",
-              roundName: "Final",
-              date: "19 April",
-              commentary:
-                "Shelton came out at a level I couldn't match in the first set. The second was close. That's sport.",
-              highlightUrl:
-                "https://www.atptour.com/en/video/extended-highlights-shelton-defeats-cobolli-for-munich-2026-title",
-            },
-          ],
-          pressLinks: [
-            {
-              source: "ATP Tour",
-              headline: "Cobolli hits 32 winners to stun defending champion Zverev",
-              url: "https://www.atptour.com/en/news/zverev-cobolli-munich-2026-sfs",
-            },
-            {
-              source: "Tennis365",
-              headline: "Shelton defeats Cobolli in Munich final",
-              url: "https://www.tennis365.com/tennis-news/ben-shelton-flavio-cobolli-prize-money-ranking-points-bmw-open-munich",
-            },
-            {
-              source: "Tennis Gazette",
-              headline:
-                "Cobolli sends heartfelt message to Shelton after emotional Munich week",
-              url: "https://www.thetennisgazette.com/news/flavio-cobolli-sends-message-to-ben-shelton-on-social-media-after-losing-to-him-in-the-final-in-munich/",
-            },
-          ],
-        },
+        type: "WEEK_RECAP",
+        blocks: [
+          {
+            kind: "training_update",
+            body:
+              "Three days of clay sessions at home — short, intense. Focused on the second-serve return and the inside-out forehand. Both felt better by Friday.",
+          },
+          {
+            kind: "recovery_travel_update",
+            body:
+              "Daily ice baths and physio. Slept ten hours most nights. Family dinners every evening — that's the real reset.",
+          },
+          {
+            kind: "stats_update",
+            rankingCurrent: "#13",
+            rankingChange: "+3 since Munich final",
+            body:
+              "First time inside the top 15. The Munich final pushed me up — I want to defend the points by going deep in Madrid.",
+          },
+          {
+            kind: "quote",
+            text:
+              "The best thing about this week is that I don't have to win anything. I just have to be ready.",
+            attribution: "Me, to my coach, Tuesday morning",
+          },
+        ],
       },
       {
-        type: "WHATS_NEXT",
-        content: {
-          tournamentMeta:
-            "Mutua Madrid Open · 25 April–4 May 2026 · Masters 1000 · 🟤 Clay",
-          body:
-            "Munich is behind me. Madrid is next. This is the clay block I've been building toward for two years — I want to go deep at every tournament between here and Roland Garros. I'm arriving with confidence and a clear head.",
-          schedule: [
-            {
-              dateRange: "20-21 Apr",
-              title: "Rest day in Rome",
-              description:
-                "Back home. Family, proper food, no racket. Reset the mind after an intense week.",
-            },
-            {
-              dateRange: "22-24 Apr",
-              title: "Light clay block",
-              description:
-                "Short sessions on clay. Physio, footwork. Keep the legs fresh after five days in Munich.",
-            },
-            {
-              dateRange: "25 Apr",
-              title: "Arrival in Madrid",
-              description:
-                "Set up at the Caja Magica. First practice on altitude clay. The conditions are very different from Munich.",
-            },
-            {
-              dateRange: "Late Apr–May",
-              title: "Mutua Madrid Open",
-              description:
-                "Masters 1000. My goal: go further than I ever have at this level. The confidence from Munich is real.",
-            },
-          ],
-        },
+        type: "COMING_UP",
+        blocks: [
+          {
+            kind: "text",
+            body:
+              "Madrid next. Different altitude, different ball — the conditions reward the heavy hitters. I want to take the lessons from Munich into the Caja Mágica.",
+          },
+          {
+            kind: "schedule_item",
+            dateRange: "Apr 23–24",
+            title: "Final prep in Rome",
+            description: "Sharper sessions. Serve patterns. Travel Friday.",
+          },
+          {
+            kind: "schedule_item",
+            dateRange: "Apr 25",
+            title: "Arrival in Madrid",
+            description: "First practice on the centre court. Get the bounce in the legs.",
+          },
+          {
+            kind: "schedule_item",
+            dateRange: "Apr 27 – May 4",
+            title: "Mutua Madrid Open",
+            description: "Masters 1000. Goal: go further than I ever have at this level.",
+          },
+        ],
       },
       {
-        type: "KIT",
-        content: {
-          body:
-            "Four wins, one final. The On kit moved with me from day one. The Head racket gave me everything against Zverev. When you stop thinking about your gear — that's when you know it's right.",
-          ...(kitImageUrl ? { imageUrl: kitImageUrl } : {}),
-          cta: { label: "Discover my kit", url: "https://flaviocobolli.com/kit" },
-        },
+        type: "MONETISATION",
+        blocks: [
+          {
+            kind: "athlete_product",
+            id: randomUUID(),
+            title: "My training journal — the one I actually use",
+            body:
+              "After two years of testing notebooks, I finally made my own. 90 days, one page per session.",
+            media: kitImageUrl
+              ? { kind: "image", url: kitImageUrl }
+              : undefined,
+            price: "€24",
+            cta: {
+              label: "Get the journal",
+              url: "https://flaviocobolli.com/shop/journal",
+            },
+          },
+        ],
       },
       {
-        type: "ENGAGEMENT",
-        content: {
-          question: "What's my biggest weapon on clay?",
-          pollOptions: [
-            { label: "Aggressive baseline game", isHighlighted: false },
-            { label: "Return of serve", isHighlighted: false },
-            { label: "Speed and movement", isHighlighted: false },
-            { label: "Mental toughness under pressure", isHighlighted: false },
-          ],
-          pollUrl: "https://flaviocobolli.com/vote/clay26",
-        },
+        type: "FAN_ENGAGEMENT",
+        blocks: [
+          {
+            kind: "prediction",
+            id: randomUUID(),
+            prompt: "How far do you think I'll go in Madrid?",
+            options: [
+              { label: "R32", isHighlighted: false },
+              { label: "R16", isHighlighted: false },
+              { label: "QF or better", isHighlighted: false },
+            ],
+          },
+          {
+            kind: "prize_draw",
+            id: randomUUID(),
+            title: "Win a match-worn Munich shirt",
+            body:
+              "One signed shirt from the Munich final. Open to members worldwide.",
+            ctaLabel: "Enter the draw",
+            closesAt: "Apr 30, 2026",
+          },
+        ],
       },
     ],
   },
 
-  // ── Iga Świątek — Miami #02 ─────────────────────────────────────
+  // ── 3. Iga Świątek — Miami (TOURNAMENT) ────────────────────────────
   {
     athleteSlug: "iga-swiatek",
-    editionNumber: 2,
+    editionNumber: 1,
     editionDate: new Date("2026-03-24"),
+    editionMode: "TOURNAMENT",
     title: "Miami: a tough quarter",
     slug: "miami-2026",
     tournamentName: "Miami Open",
-    tournamentContext: "Six-time Grand Slam champion",
+    tournamentCategory: "WTA 1000",
+    tournamentLocation: "Miami Gardens, USA",
+    tournamentSurface: "Hard",
+    tournamentStartDate: new Date("2026-03-17"),
+    tournamentEndDate: new Date("2026-03-29"),
     worldRankSnapshot: 4,
     countryRankSnapshot: 1,
     hero: {
@@ -681,153 +602,138 @@ const newsletters: NewsletterSeed[] = [
       sourceUrl:
         "https://img.mailinblue.com/10839939/images/content_library/original/69d037f05588fb598df7fb04.png",
     },
-    buildSections: ({ kitImageUrl }) => [
+    buildSections: ({ kitImageUrl, tournamentLogoUrl }) => [
       {
-        type: "DEBRIEF",
-        content: {
-          body:
-            "Miami is done — and it hurts. I dominated the first set against Magda, played exactly how I wanted to. Then something shifted. In the second and third sets, I lost grip of everything I'd built. She led 5-2 in the third — I saved two match points, got back to 5-3. But she closed it out. 73 opening-round wins, gone. Clay season starts now — and that's where I feel most like myself.",
-          pullQuote: {
-            contextLabel: "Post-match interview",
-            text:
-              "I stopped doing anything well tactically. Tennis feels complicated in my head. I know it's supposed to be simple. In terms of my mentality and how I feel on court, it's going to take a while.",
+        type: "ATHLETE_REVIEW",
+        blocks: [
+          {
+            kind: "text",
+            body:
+              "Miami is done — and it hurts. I dominated the first set against Magda, played exactly how I wanted to. Then something shifted. She led 5-2 in the third — I saved two match points, got back to 5-3. But she closed it out. 73 opening-round wins, gone.\n\nClay season starts now — and that's where I feel most like myself.",
           },
-        },
+        ],
       },
       {
-        type: "RESULTS",
-        content: {
-          stats: [
-            { value: "R2", label: "Singles" },
-            { value: "0-1", label: "W / L" },
-          ],
-          matches: [
-            {
-              result: "BYE",
-              roundName: "Round 1",
-              date: "Mar 18",
-              contextNote: "Seed #2",
-            },
-            {
-              result: "L",
-              opponentName: "M. Linette",
-              opponentRank: "#50",
-              opponentCountry: "POL",
-              score: "6-1 5-7 3-6",
-              roundName: "Round 2",
-              date: "Mar 20",
-              contextNote: "All-Polish clash",
-              commentary:
-                "I led the first set, broke her twice, won 88% of first-serve points. And then I lost the thread completely. Magda raced to 5-2 in the third — I saved two of her match points and pulled it back to 5-3. But she closed it out on her fourth chance. When you save match points and still lose, it stings differently.",
-              highlightUrl:
-                "https://www.wtatennis.com/news/4472909/linette-ends-swiateks-73-match-opening-win-streak-into-miami-third-round",
-            },
-          ],
-          pressLinks: [
-            {
-              source: "Sky Sports",
-              headline: "Swiatek suffers shock first-round defeat in Miami",
-              url: "https://www.skysports.com/tennis/news/12110/13522050/miami-open-iga-swiatek-suffers-shock-first-round-defeat",
-            },
-            {
-              source: "WTA",
-              headline:
-                "Linette ends Swiatek's 73-match opening-round win streak",
-              url: "https://www.wtatennis.com/news/4472909/linette-ends-swiateks-73-match-opening-win-streak",
-            },
-          ],
-          subSection: {
-            label: "A new chapter",
+        type: "WEEK_RECAP",
+        blocks: [
+          {
+            kind: "tournament_summary",
+            logoUrl: tournamentLogoUrl ?? undefined,
+            name: "Miami Open",
+            category: "WTA 1000",
+            location: "Miami Gardens, USA",
+            surface: "Hard",
+            dateRange: "17–29 March 2026",
+          },
+          { kind: "hero_metric", value: "R2", label: "Best result" },
+          { kind: "hero_metric", value: "#2", label: "Seed" },
+          { kind: "hero_metric", value: "0-1", label: "W / L" },
+          {
+            kind: "match_card",
+            result: "BYE",
+            roundName: "Round 1",
+            date: "Mar 18",
+            contextNote: "Seed #2",
+          },
+          {
+            kind: "match_card",
+            result: "L",
+            roundName: "Round 2",
+            opponentName: "M. Linette",
+            opponentRank: "#50",
+            opponentCountry: "POL",
+            score: "6-1 5-7 3-6",
+            date: "Mar 20",
+            contextNote: "All-Polish clash",
+            commentary:
+              "I led the first set, broke her twice, won 88% of first-serve points. Then I lost the thread completely. When you save match points and still lose, it stings differently.",
+          },
+          {
+            kind: "media_link",
+            source: "WTA",
+            headline: "Linette ends Świątek's 73-match opening-round streak",
+            url: "https://www.wtatennis.com/news/4472909/linette-ends-swiateks-73-match-opening-win-streak",
+          },
+        ],
+      },
+      {
+        type: "COMING_UP",
+        blocks: [
+          {
+            kind: "text",
             body:
-              "This wasn't a decision I made in Miami. The process started in Doha, after the loss to Sakkari. Wim and I sat down and talked for a long time — we tried to find solutions. When I looked at the whole picture honestly, I knew I needed a different direction. Two years together, one Wimbledon title — I'm grateful for all of it. Now I head to Rafa's academy in Manacor to work with Francisco Roig. A new voice, a new perspective. This is not panic. This is a decision I made with a clear head.",
-            pressLinks: [
-              {
-                source: "Tennis.com",
-                headline: "Swiatek splits from coach Fissette following Miami loss",
-                url: "https://www.tennis.com/news/articles/iga-swiatek-announces-split-from-coach-wim-fissette-following-miami-open-loss",
-              },
-              {
-                source: "Yahoo Sports",
-                headline:
-                  "Swiatek already spotted with new coach Roig — 9 days after Fissette split",
-                url: "https://sports.yahoo.com/articles/iga-swiatek-spotted-coach-just-171900446.html",
-              },
+              "Two weeks on hard court, two early exits. Now I go home. The clay season is where I've always found my best tennis, and I need it more than ever right now.",
+          },
+          {
+            kind: "schedule_item",
+            dateRange: "Mar 21–23",
+            title: "Flight home to Poland",
+            description: "Family, rest, no racket.",
+          },
+          {
+            kind: "schedule_item",
+            dateRange: "Mar 24–28",
+            title: "Active recovery",
+            description: "Ice baths, physio, sleep. Mental reset with my team.",
+          },
+          {
+            kind: "schedule_item",
+            dateRange: "Apr 14–20",
+            title: "Porsche Grand Prix Stuttgart",
+            description: "First clay tournament of the season. Defending title territory.",
+          },
+        ],
+      },
+      {
+        type: "MONETISATION",
+        blocks: [
+          {
+            kind: "athlete_product",
+            id: randomUUID(),
+            title: "Recovery essentials",
+            body:
+              "After a tough stretch, recovery is part of the job. The bag I travel with — and what's inside it.",
+            media: kitImageUrl
+              ? { kind: "image", url: kitImageUrl }
+              : undefined,
+            cta: { label: "See what's in my bag", url: "https://igaswiatek.com/recovery" },
+          },
+        ],
+      },
+      {
+        type: "FAN_ENGAGEMENT",
+        blocks: [
+          {
+            kind: "poll",
+            id: randomUUID(),
+            question:
+              "Which part of my game should I focus on heading into clay?",
+            options: [
+              { label: "Serve consistency", isHighlighted: false },
+              { label: "Mental resilience in tight sets", isHighlighted: false },
+              { label: "Forehand under pressure", isHighlighted: false },
+              { label: "Just trust yourself", emoji: "🏆", isHighlighted: true },
             ],
           },
-        },
-      },
-      {
-        type: "WHATS_NEXT",
-        content: {
-          tournamentMeta:
-            "Stuttgart · Madrid · Roland Garros · 🟤 Clay season begins",
-          body:
-            "Two weeks on hard court, two early exits. Now I go home. The clay season is where I've always found my best tennis, and I need it more than ever right now. I'll take a few days off, reset completely, and then build toward Stuttgart and Madrid.",
-          schedule: [
-            {
-              dateRange: "Mar 21-23",
-              title: "Flight home to Poland",
-              description: "Family, rest, no racket.",
-            },
-            {
-              dateRange: "Mar 24-28",
-              title: "Active recovery",
-              description:
-                "Ice baths, physio, sleep. Mental reset with my team and Daria.",
-            },
-            {
-              dateRange: "Mar 29–Apr 5",
-              title: "Clay transition",
-              description:
-                "First sessions on clay. Footwork, timing, topspin.",
-            },
-            {
-              dateRange: "Apr 14-20",
-              title: "Porsche Grand Prix Stuttgart",
-              description:
-                "First clay tournament of the season. Defending title territory.",
-            },
-          ],
-        },
-      },
-      {
-        type: "KIT",
-        content: {
-          body:
-            "After a tough stretch, recovery is also part of the job. Lego builds, a good book, sleep without an alarm — and my Tecnifibre resting in the corner until I'm ready to pick it up again. We'll be back soon.",
-          ...(kitImageUrl ? { imageUrl: kitImageUrl } : {}),
-        },
-      },
-      {
-        type: "ENGAGEMENT",
-        content: {
-          question:
-            "Which part of my game should I focus on heading into the clay season?",
-          pollOptions: [
-            { label: "Serve consistency", isHighlighted: false },
-            { label: "Mental resilience in tight sets", isHighlighted: false },
-            { label: "Forehand under pressure", isHighlighted: false },
-            {
-              label: "Everything is fine — just trust yourself!",
-              emoji: "🏆",
-              isHighlighted: true,
-            },
-          ],
-          pollUrl: "https://igaswiatek.com/vote/clay26",
-        },
+        ],
       },
     ],
   },
 
-  // ── Alexander Bublik — Monte Carlo #01 ──────────────────────────
+  // ── 4. Alexander Bublik — Monte Carlo (TOURNAMENT) ─────────────────
   {
     athleteSlug: "alexander-bublik",
     editionNumber: 1,
     editionDate: new Date("2026-04-13"),
+    editionMode: "TOURNAMENT",
     title: "Monte Carlo: a quarterfinal to build on",
     slug: "monte-carlo-2026",
     tournamentName: "Rolex Monte-Carlo Masters",
-    tournamentContext: "ATP World No. 11 · Kazakhstan",
+    tournamentCategory: "ATP Masters 1000",
+    tournamentLocation: "Monte Carlo, Monaco",
+    tournamentSurface: "Clay",
+    tournamentStartDate: new Date("2026-04-06"),
+    tournamentEndDate: new Date("2026-04-12"),
     worldRankSnapshot: 11,
     countryRankSnapshot: 1,
     hero: {
@@ -845,136 +751,120 @@ const newsletters: NewsletterSeed[] = [
       sourceUrl:
         "https://img.mailinblue.com/10839939/images/content_library/original/69dc9d52648713cd2e9ca7ba.jpg",
     },
-    buildSections: ({ kitImageUrl }) => [
+    buildSections: ({ kitImageUrl, tournamentLogoUrl }) => [
       {
-        type: "DEBRIEF",
-        content: {
-          body:
-            "Hey everyone. Monte Carlo. A year ago I was in qualifying here, losing a third set 6-0. This week I reached the quarterfinal. That's the kind of progress that keeps you going. Two clean wins — Monfils, then Lehečka — and then Alcaraz happened. 6-3, 6-0. A bagel in the second. I'll take it. The clay swing last year changed a lot of things for me. I want to keep building on that. Madrid is next.",
-          pullQuote: {
-            contextLabel: "After the QF vs Alcaraz",
-            text:
-              "He was on another level today. I had my chances in the first set. The second set… let's just say he was better. But I'm happy with the week — this is my best result here.",
+        type: "ATHLETE_REVIEW",
+        blocks: [
+          {
+            kind: "text",
+            body:
+              "Hey everyone. Monte Carlo. A year ago I was in qualifying here, losing a third set 6-0. This week I reached the quarterfinal. That's the kind of progress that keeps you going.\n\nTwo clean wins — Monfils, then Lehečka — and then Alcaraz happened. 6-3, 6-0. A bagel in the second. I'll take it.",
           },
-        },
+        ],
       },
       {
-        type: "RESULTS",
-        content: {
-          stats: [
-            { value: "QF", label: "Best result" },
-            { value: "3", label: "Matches" },
-            { value: "2-1", label: "W / L" },
-          ],
-          matches: [
-            {
-              result: "BYE",
-              roundName: "1st Round",
-              date: "6 April",
-              contextNote: "Seeded #8",
-            },
-            {
-              result: "W",
-              opponentName: "G. Monfils",
-              opponentCountry: "FRA",
-              score: "6-4 6-4",
-              roundName: "Round 2",
-              date: "Tue 7 April",
-              contextNote: "1h16",
-              commentary:
-                "Ten years ago, I was a hitting partner here in Monte Carlo. Gaël gave me some words that I never forgot. At the net after our match, I reminded him — 'You told me: grass is not your surface, here is your main.' He smiled straight away. He remembered. One of those moments you don't plan but that stay with you.",
-              highlightUrl:
-                "https://www.atptour.com/en/video/highlights-bublik-dials-in-to-end-monfils-montecarlo-2026-career",
-            },
-            {
-              result: "W",
-              opponentName: "J. Lehečka",
-              opponentRank: "#13",
-              opponentCountry: "CZE",
-              score: "6-2 7-5",
-              roundName: "Round of 16",
-              date: "Thu 9 April",
-              highlightUrl:
-                "https://www.atptour.com/en/video/highlights-bublik-downs-lehecka-for-maiden-monte-carlo-2026-qf-spot",
-            },
-            {
-              result: "L",
-              opponentName: "C. Alcaraz",
-              opponentRank: "#1",
-              opponentCountry: "ESP",
-              score: "3-6 0-6",
-              roundName: "Quarterfinal",
-              date: "Fri 10 April",
-              highlightUrl:
-                "https://www.atptour.com/en/news/alcaraz-bublik-monte-carlo-2026-friday",
-            },
-          ],
-          pressLinks: [
-            {
-              source: "Eurosport",
-              headline:
-                "Bublik, dix ans après : le sparring-partner devenu bourreau de Monfils sur le Rocher",
-              url: "https://www.eurosport.fr/tennis/atp-monte-carlo/2026/gael-monfils-et-son-defi-physique-pour-des-adieux-pleinement-reussis-jai-envie-de-faire-mieux-mais-mon-corps-ne-le-permet-pas_sto23288232/story.shtml",
-            },
-            {
-              source: "Sky Sports",
-              headline: "Alcaraz vs Bublik — Monte Carlo QF highlights",
-              url: "https://www.skysports.com/tennis/video/33733/13530157/carlos-alcaraz-vs-alexander-bublik-monte-carlo-highlights",
-            },
-            {
-              source: "Tennis Majors",
-              headline:
-                "Bublik ends Monfils's Monte Carlo farewell — and the memories he helped create",
-              url: "https://www.tennismajors.com/atp/bublik-ends-monfilss-monte-carlo-farewell-and-the-memories-he-helped-create-847987.html",
-            },
-            {
-              source: "Last Word on Sports",
-              headline:
-                "Alcaraz and Bublik set for first-ever meeting in Monte Carlo quarterfinals",
-              url: "https://lastwordonsports.com/tennis/2026/04/09/carlos-alcaraz-alexander-bublik-first-meeting/",
-            },
-          ],
-        },
-      },
-      {
-        type: "WHATS_NEXT",
-        content: {
-          tournamentMeta: "BMW Open Munich · 14-20 April 2026 · 🟤 Clay",
-          body:
-            "Munich first, then Madrid, then Rome, then Roland Garros. Last year the clay swing was where everything clicked — two titles, a Grand Slam quarterfinal. I want more of that. A QF here in Monte Carlo is a good start. The serve travels on this surface. Let's keep going.",
-          schedule: [],
-        },
-      },
-      {
-        type: "KIT",
-        content: {
-          body: "The kit I wore all week in Monte Carlo.",
-          ...(kitImageUrl ? { imageUrl: kitImageUrl } : {}),
-          cta: {
-            label: "Discover the kit",
-            url: "https://www.armani.com/en-wx/ea7/experience/athletes/",
+        type: "WEEK_RECAP",
+        blocks: [
+          {
+            kind: "tournament_summary",
+            logoUrl: tournamentLogoUrl ?? undefined,
+            name: "Rolex Monte-Carlo Masters",
+            category: "ATP Masters 1000",
+            location: "Monte Carlo, Monaco",
+            surface: "Clay",
+            dateRange: "6–12 April 2026",
           },
-        },
+          { kind: "hero_metric", value: "QF", label: "Best result" },
+          { kind: "hero_metric", value: "3", label: "Matches" },
+          { kind: "hero_metric", value: "2-1", label: "W / L" },
+          {
+            kind: "match_card",
+            result: "BYE",
+            roundName: "Round 1",
+            date: "6 April",
+            contextNote: "Seeded #8",
+          },
+          {
+            kind: "match_card",
+            result: "W",
+            roundName: "Round 2",
+            opponentName: "G. Monfils",
+            opponentCountry: "FRA",
+            score: "6-4 6-4",
+            date: "7 April",
+            commentary:
+              "Ten years ago I was a hitting partner here. At the net after the match Gaël remembered telling me clay would be my main surface — neither of us had forgotten.",
+            highlightUrl:
+              "https://www.atptour.com/en/video/highlights-bublik-dials-in-to-end-monfils-montecarlo-2026-career",
+          },
+          {
+            kind: "match_card",
+            result: "W",
+            roundName: "Round of 16",
+            opponentName: "J. Lehečka",
+            opponentRank: "#13",
+            opponentCountry: "CZE",
+            score: "6-2 7-5",
+            date: "9 April",
+            highlightUrl:
+              "https://www.atptour.com/en/video/highlights-bublik-downs-lehecka-for-maiden-monte-carlo-2026-qf-spot",
+          },
+          {
+            kind: "match_card",
+            result: "L",
+            roundName: "Quarterfinal",
+            opponentName: "C. Alcaraz",
+            opponentRank: "#1",
+            opponentCountry: "ESP",
+            score: "3-6 0-6",
+            date: "10 April",
+            highlightUrl:
+              "https://www.atptour.com/en/news/alcaraz-bublik-monte-carlo-2026-friday",
+          },
+        ],
       },
       {
-        type: "ENGAGEMENT",
-        content: {
-          question: "What was the highlight of my week in Monte Carlo?",
-          pollOptions: [
-            { label: "The win vs Monfils", emoji: "🎯", isHighlighted: false },
-            { label: "Beating Lehečka (ATP #13)", emoji: "💪", isHighlighted: false },
-            {
-              label: "Reaching my first Monte Carlo QF",
-              emoji: "🏆",
-              isHighlighted: false,
+        type: "COMING_UP",
+        blocks: [
+          {
+            kind: "text",
+            body:
+              "Munich first, then Madrid, then Rome, then Roland Garros. Last year the clay swing was where everything clicked. A QF here is a good start. The serve travels on this surface. Let's keep going.",
+          },
+        ],
+      },
+      {
+        type: "MONETISATION",
+        blocks: [
+          {
+            kind: "kit",
+            id: randomUUID(),
+            title: "The kit I wore all week",
+            media: kitImageUrl
+              ? { kind: "image", url: kitImageUrl }
+              : undefined,
+            cta: {
+              label: "Discover the kit",
+              url: "https://www.armani.com/en-wx/ea7/experience/athletes/",
             },
-            {
-              label: "Surviving clay as Alex Bublik",
-              emoji: "😂",
-              isHighlighted: true,
-            },
-          ],
-        },
+          },
+        ],
+      },
+      {
+        type: "FAN_ENGAGEMENT",
+        blocks: [
+          {
+            kind: "poll",
+            id: randomUUID(),
+            question: "What was the highlight of my week in Monte Carlo?",
+            options: [
+              { label: "The win vs Monfils", emoji: "🎯", isHighlighted: false },
+              { label: "Beating Lehečka", emoji: "💪", isHighlighted: false },
+              { label: "First Monte Carlo QF", emoji: "🏆", isHighlighted: false },
+              { label: "Surviving clay as me", emoji: "😂", isHighlighted: true },
+            ],
+          },
+        ],
       },
     ],
   },
@@ -993,16 +883,13 @@ async function syncAthlete(seed: AthleteSeed): Promise<string> {
     update: data,
     create: data,
   });
-
   const brevoListId = await ensureAthleteList(result);
   console.log(`✓ athlete ${result.slug} (brevoListId: ${brevoListId})`);
   return result.id;
 }
 
 async function syncSponsors(athleteId: string, seeds: SponsorSeed[]) {
-  // Wipe and recreate to keep ordering and content fully driven by seed.
   await prisma.sponsor.deleteMany({ where: { athleteId } });
-
   for (let order = 0; order < seeds.length; order++) {
     const s = seeds[order];
     const logoUrl = await ensureSeedAsset(s.logoFilename, s.logoSourceUrl);
@@ -1024,15 +911,14 @@ async function syncNewsletter(
   n: NewsletterSeed,
 ): Promise<void> {
   const heroImageUrl = await ensureSeedAsset(n.hero.filename, n.hero.sourceUrl);
-  const tournamentLogoUrl = await ensureSeedAsset(
-    n.tournamentLogo.filename,
-    n.tournamentLogo.sourceUrl,
-  );
+  const tournamentLogoUrl = n.tournamentLogo
+    ? await ensureSeedAsset(n.tournamentLogo.filename, n.tournamentLogo.sourceUrl)
+    : null;
   const kitImageUrl = n.kitImage
     ? await ensureSeedAsset(n.kitImage.filename, n.kitImage.sourceUrl)
     : null;
 
-  const sections = n.buildSections({ kitImageUrl });
+  const sections = n.buildSections({ kitImageUrl, tournamentLogoUrl });
 
   await prisma.newsletter.deleteMany({
     where: { athleteId, editionNumber: n.editionNumber },
@@ -1043,12 +929,17 @@ async function syncNewsletter(
       athleteId,
       editionNumber: n.editionNumber,
       editionDate: n.editionDate,
+      editionMode: n.editionMode,
       title: n.title,
       slug: n.slug,
       heroImageUrl,
       tournamentName: n.tournamentName,
       tournamentLogoUrl,
-      tournamentContext: n.tournamentContext,
+      tournamentCategory: n.tournamentCategory,
+      tournamentLocation: n.tournamentLocation,
+      tournamentSurface: n.tournamentSurface,
+      tournamentStartDate: n.tournamentStartDate,
+      tournamentEndDate: n.tournamentEndDate,
       worldRankSnapshot: n.worldRankSnapshot,
       countryRankSnapshot: n.countryRankSnapshot,
       status: NewsletterStatus.PUBLISHED,
@@ -1057,14 +948,12 @@ async function syncNewsletter(
         create: sections.map((s, order) => ({
           type: s.type,
           order,
-          content: s.content,
+          blocks: s.blocks,
         })),
       },
     },
   });
-  console.log(
-    `  ✓ newsletter #${created.editionNumber} ${created.slug}`,
-  );
+  console.log(`  ✓ newsletter #${created.editionNumber} ${created.slug}`);
 }
 
 async function main() {
@@ -1073,11 +962,8 @@ async function main() {
   for (const a of athletes) {
     const id = await syncAthlete(a);
     athleteIdBySlug.set(a.slug, id);
-
     const sponsorSeeds = sponsorsByAthlete[a.slug] ?? [];
-    if (sponsorSeeds.length > 0) {
-      await syncSponsors(id, sponsorSeeds);
-    }
+    if (sponsorSeeds.length > 0) await syncSponsors(id, sponsorSeeds);
   }
 
   for (const n of newsletters) {

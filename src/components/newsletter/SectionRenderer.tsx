@@ -1,81 +1,124 @@
 import {
-  debriefContentSchema,
-  engagementContentSchema,
   isSectionMeaningful,
-  kitContentSchema,
-  resultsContentSchema,
-  whatsNextContentSchema,
+  safeParseSectionBlocks,
+  type AthleteReviewBlock,
+  type ComingUpBlock,
+  type EditionModeValue,
+  type FanEngagementBlock,
+  type MonetisationBlock,
   type SectionTypeValue,
+  type WeekRecapTournamentBlock,
+  type WeekRecapWeeklyBlock,
 } from "@/lib/schemas/newsletterSection";
 import {
   getNewsletterLabels,
   getSectionTitle,
 } from "@/lib/newsletter/labels";
-import DebriefSection from "./sections/DebriefSection";
-import EngagementSection from "./sections/EngagementSection";
-import KitSection from "./sections/KitSection";
-import ResultsSection from "./sections/ResultsSection";
-import WhatsNextSection from "./sections/WhatsNextSection";
+import AthleteReviewSection from "./sections/AthleteReviewSection";
+import ComingUpSection from "./sections/ComingUpSection";
+import FanEngagementSection from "./sections/FanEngagementSection";
+import MonetisationSection from "./sections/MonetisationSection";
+import WeekRecapSection from "./sections/WeekRecapSection";
 
 export interface RawSection {
   id: string;
   type: SectionTypeValue;
   order: number;
-  content: unknown;
+  blocks: unknown;
 }
 
 interface SectionRendererProps {
   section: RawSection;
   index: number;
+  editionMode: EditionModeValue;
   /** Tournament name for the parent newsletter — drives derived section titles. */
   tournamentName?: string | null;
-  /** Athlete slug — used by ENGAGEMENT to build the "Ask me a question" URL. */
+  /** Athlete slug — used by FAN_ENGAGEMENT to build engagement URLs. */
   athleteSlug?: string;
+  /** Newsletter id — required for FAN_ENGAGEMENT API calls. */
+  newsletterId?: string;
+  /** When true, FAN_ENGAGEMENT blocks render without firing live fetches. */
+  previewMode?: boolean;
 }
 
-function renderBody(
-  section: RawSection,
-  athleteSlug: string | undefined,
-): React.ReactNode {
+interface RenderBodyArgs {
+  section: RawSection;
+  mode: EditionModeValue;
+  athleteSlug: string | undefined;
+  newsletterId: string | undefined;
+  previewMode: boolean;
+}
+
+function renderBody({
+  section,
+  mode,
+  athleteSlug,
+  newsletterId,
+  previewMode,
+}: RenderBodyArgs): React.ReactNode {
+  const parsed = safeParseSectionBlocks(section.type, mode, section.blocks);
+  if (!parsed.success) {
+    // Don't silently swallow — surface the failure so we can spot
+    // schema drift in browser monitoring (Sentry / PostHog console
+    // capture) instead of just seeing sections vanish in production.
+    console.warn("newsletter.section_parse_failed", {
+      sectionId: section.id,
+      sectionType: section.type,
+      editionMode: mode,
+      issues: parsed.error.issues.slice(0, 5),
+    });
+    return null;
+  }
+
   switch (section.type) {
-    case "DEBRIEF": {
-      const parsed = debriefContentSchema.safeParse(section.content);
-      return parsed.success ? <DebriefSection content={parsed.data} /> : null;
-    }
-    case "RESULTS": {
-      const parsed = resultsContentSchema.safeParse(section.content);
-      return parsed.success ? <ResultsSection content={parsed.data} /> : null;
-    }
-    case "WHATS_NEXT": {
-      const parsed = whatsNextContentSchema.safeParse(section.content);
-      return parsed.success ? <WhatsNextSection content={parsed.data} /> : null;
-    }
-    case "KIT": {
-      const parsed = kitContentSchema.safeParse(section.content);
-      return parsed.success ? <KitSection content={parsed.data} /> : null;
-    }
-    case "ENGAGEMENT": {
-      const parsed = engagementContentSchema.safeParse(section.content);
-      return parsed.success ? (
-        <EngagementSection content={parsed.data} athleteSlug={athleteSlug} />
-      ) : null;
-    }
-    default:
-      return null;
+    case "ATHLETE_REVIEW":
+      return (
+        <AthleteReviewSection blocks={parsed.data as AthleteReviewBlock[]} />
+      );
+    case "WEEK_RECAP":
+      return (
+        <WeekRecapSection
+          blocks={
+            parsed.data as Array<WeekRecapTournamentBlock | WeekRecapWeeklyBlock>
+          }
+        />
+      );
+    case "COMING_UP":
+      return <ComingUpSection blocks={parsed.data as ComingUpBlock[]} />;
+    case "MONETISATION":
+      return (
+        <MonetisationSection blocks={parsed.data as MonetisationBlock[]} />
+      );
+    case "FAN_ENGAGEMENT":
+      return (
+        <FanEngagementSection
+          blocks={parsed.data as FanEngagementBlock[]}
+          athleteSlug={athleteSlug}
+          newsletterId={newsletterId}
+          previewMode={previewMode}
+        />
+      );
   }
 }
 
 export default function SectionRenderer({
   section,
   index,
+  editionMode,
   tournamentName,
   athleteSlug,
+  newsletterId,
+  previewMode = false,
 }: SectionRendererProps) {
-  // Empty sections are hidden entirely — banner included. This is the
-  // contract the editor relies on: "if no value, we don't show it".
-  if (!isSectionMeaningful(section.type, section.content)) return null;
+  if (!isSectionMeaningful(section.type, section.blocks)) return null;
 
-  const body = renderBody(section, athleteSlug);
+  const body = renderBody({
+    section,
+    mode: editionMode,
+    athleteSlug,
+    newsletterId,
+    previewMode,
+  });
   if (body === null) return null;
 
   const labels = getNewsletterLabels();

@@ -1,43 +1,34 @@
 import {
-  debriefContentSchema,
-  engagementContentSchema,
-  kitContentSchema,
-  resultsContentSchema,
-  whatsNextContentSchema,
+  blocksFor,
+  type EditionModeValue,
   type SectionTypeValue,
 } from "@/lib/schemas/newsletterSection";
 
 // ── Section draft type ────────────────────────────────────────────────
 //
-// Drafts live in editor state and are validated against strict Zod
-// schemas at submit time. With the fixed-5-shape model, drafts only
-// carry `type` + `content` — labels and titles are derived at render
-// time from `src/lib/newsletter/labels.ts`.
+// Drafts live in editor state and are validated against (type, mode)
+// block-list schemas at submit time. The form maintains one draft per
+// section type; blocks are the editor's working list.
 
 export interface SectionDraft {
   type: SectionTypeValue;
-  content: unknown;
+  blocks: unknown[];
 }
 
-const CONTENT_SCHEMAS = {
-  DEBRIEF: debriefContentSchema,
-  RESULTS: resultsContentSchema,
-  WHATS_NEXT: whatsNextContentSchema,
-  KIT: kitContentSchema,
-  ENGAGEMENT: engagementContentSchema,
-} as const;
-
-export function validateSectionDraft(draft: SectionDraft):
-  | { ok: true; content: unknown }
+export function validateSectionDraft(
+  draft: SectionDraft,
+  mode: EditionModeValue,
+):
+  | { ok: true; blocks: unknown[] }
   | { ok: false; message: string } {
-  const result = CONTENT_SCHEMAS[draft.type].safeParse(draft.content);
+  const result = blocksFor(draft.type, mode).safeParse(draft.blocks);
   if (!result.success) {
     const first = result.error.issues[0];
-    const path = first.path.join(".") || "content";
+    const path = first.path.join(".") || "blocks";
     return {
       ok: false,
       message: `${path}: ${first.message}`,
     };
   }
-  return { ok: true, content: result.data };
+  return { ok: true, blocks: result.data as unknown[] };
 }

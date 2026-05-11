@@ -4,13 +4,17 @@ import type {
   Athlete,
   Newsletter,
   NewsletterSection,
+  Sponsor,
 } from "@prisma/client";
 import { flagFor } from "@/lib/athlete/flag";
 import SectionRenderer, {
   type RawSection,
 } from "@/components/newsletter/SectionRenderer";
 import { getTournamentLabel } from "@/lib/newsletter/labels";
-import type { SectionTypeValue } from "@/lib/schemas/newsletterSection";
+import type {
+  EditionModeValue,
+  SectionTypeValue,
+} from "@/lib/schemas/newsletterSection";
 import SubscribeForm from "@/components/athlete/SubscribeForm";
 import EditionTabsClient, {
   type EditionTab,
@@ -20,12 +24,15 @@ type EditionWithSections = Newsletter & {
   sections: NewsletterSection[];
 };
 
+type AthleteWithSponsors = Athlete & { sponsors: Sponsor[] };
+
 interface AthleteProfileProps {
-  athlete: Athlete;
+  athlete: AthleteWithSponsors;
   editions: EditionWithSections[];
   selectedSlug: string | null;
   isSignedIn: boolean;
   isSubscribed: boolean;
+  previewMode?: boolean;
 }
 
 function toRawSection(section: NewsletterSection): RawSection {
@@ -33,8 +40,17 @@ function toRawSection(section: NewsletterSection): RawSection {
     id: section.id,
     type: section.type as SectionTypeValue,
     order: section.order,
-    content: section.content,
+    blocks: section.blocks,
   };
+}
+
+function tournamentMetaLine(edition: EditionWithSections): string | null {
+  const parts = [
+    edition.tournamentCategory,
+    edition.tournamentLocation,
+    edition.tournamentSurface,
+  ].filter(Boolean);
+  return parts.length > 0 ? parts.join(" · ") : null;
 }
 
 function toEditionTab(edition: EditionWithSections): EditionTab {
@@ -56,6 +72,7 @@ export default function AthleteProfile({
   selectedSlug,
   isSignedIn,
   isSubscribed,
+  previewMode = false,
 }: AthleteProfileProps) {
   const fullName = `${athlete.firstName} ${athlete.lastName}`;
   const flag = flagFor(athlete.countryCode);
@@ -94,6 +111,8 @@ export default function AthleteProfile({
 
         <StatsRow athlete={athlete} />
 
+        <SponsorsStrip sponsors={athlete.sponsors} />
+
         {isSubscribed && selected && defaultEdition ? (
           <>
             <EditionTabsClient
@@ -119,9 +138,9 @@ export default function AthleteProfile({
                 <h2 className="mt-2 font-serif text-[32px] font-semibold leading-[1.08] tracking-[-0.02em] text-ink md:text-[44px]">
                   {selected.title}
                 </h2>
-                {selected.tournamentContext ? (
-                  <div className="mt-2 font-mono text-[11px] uppercase tracking-[0.18em] text-loss">
-                    {selected.tournamentContext}
+                {tournamentMetaLine(selected) ? (
+                  <div className="mt-2 font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3">
+                    {tournamentMetaLine(selected)}
                   </div>
                 ) : null}
               </header>
@@ -132,8 +151,11 @@ export default function AthleteProfile({
                     key={section.id}
                     section={toRawSection(section)}
                     index={i}
+                    editionMode={selected.editionMode as EditionModeValue}
                     tournamentName={selected.tournamentName}
                     athleteSlug={athlete.slug}
+                    newsletterId={selected.id}
+                    previewMode={previewMode}
                   />
                 ))}
               </div>
@@ -288,6 +310,42 @@ function StatsRow({ athlete }: { athlete: Athlete }) {
       />
       <Stat value={athlete.titlesCount.toString()} label="Titles" />
     </dl>
+  );
+}
+
+function SponsorsStrip({ sponsors }: { sponsors: Sponsor[] }) {
+  if (sponsors.length === 0) return null;
+  return (
+    <section
+      aria-label="Sponsors"
+      className="border-b border-line px-6 py-5"
+    >
+      <div className="text-center font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
+        Partners
+      </div>
+      <ul className="mt-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-5">
+        {sponsors.map((s) => (
+          <li key={s.id}>
+            <a
+              href={s.websiteUrl}
+              target="_blank"
+              rel="noopener noreferrer sponsored"
+              className="block opacity-80 transition-opacity hover:opacity-100"
+              aria-label={s.name}
+            >
+              <Image
+                src={s.logoUrl}
+                alt={s.name}
+                width={120}
+                height={40}
+                className="h-8 w-auto object-contain md:h-9"
+                unoptimized
+              />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

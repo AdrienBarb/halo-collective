@@ -58,14 +58,6 @@ export default async function EditNewsletterPage({
                 View live ↗
               </Link>
             ) : null}
-            <Link
-              href={`/api/admin/newsletters/${newsletter.id}/preview`}
-              target="_blank"
-              rel="noreferrer"
-              className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-ink-2 transition-colors hover:text-ink"
-            >
-              Preview email ↗
-            </Link>
             <PublishToggle
               newsletterId={newsletter.id}
               status={newsletter.status}

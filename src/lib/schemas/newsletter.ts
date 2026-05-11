@@ -7,17 +7,30 @@ import {
   optionalMediaUrl,
   slugSchema,
 } from "@/lib/schemas/common";
-import { addSectionSchema } from "@/lib/schemas/newsletterSection";
+import { addSectionSchema, editionModeSchema } from "@/lib/schemas/newsletterSection";
 
 const headerFields = {
-  title: z.string().trim().min(1, "Title is required"),
+  // Title is also used as the Brevo email subject — block line breaks
+  // and tabs so a malicious or compromised admin can't inject headers,
+  // and cap length to keep subject lines sane.
+  title: z
+    .string()
+    .trim()
+    .min(1, "Title is required")
+    .max(200, "Title must be 200 characters or fewer")
+    .regex(/^[^\r\n\t]+$/, "Title cannot contain line breaks or tabs"),
   slug: slugSchema,
   heroImageUrl: clearableMediaUrl,
   editionNumber: z.coerce.number().int().positive(),
   editionDate: clearableDate,
+  editionMode: editionModeSchema.default("WEEKLY"),
   tournamentName: clearableTrimmedString,
   tournamentLogoUrl: clearableMediaUrl,
-  tournamentContext: clearableTrimmedString,
+  tournamentCategory: clearableTrimmedString,
+  tournamentLocation: clearableTrimmedString,
+  tournamentSurface: clearableTrimmedString,
+  tournamentStartDate: clearableDate,
+  tournamentEndDate: clearableDate,
   worldRankSnapshot: clearablePositiveInt,
   countryRankSnapshot: clearablePositiveInt,
 };
@@ -25,7 +38,6 @@ const headerFields = {
 export const createNewsletterSchema = z.object({
   athleteId: z.string().min(1, "Athlete is required"),
   ...headerFields,
-  // For create, heroImageUrl is required-optional (no clearing semantics needed).
   heroImageUrl: optionalMediaUrl,
   tournamentLogoUrl: optionalMediaUrl,
   sections: z.array(addSectionSchema).optional(),
@@ -37,9 +49,14 @@ export const updateNewsletterSchema = z.object({
   heroImageUrl: headerFields.heroImageUrl,
   editionNumber: headerFields.editionNumber.optional(),
   editionDate: headerFields.editionDate,
+  editionMode: headerFields.editionMode.optional(),
   tournamentName: headerFields.tournamentName,
   tournamentLogoUrl: headerFields.tournamentLogoUrl,
-  tournamentContext: headerFields.tournamentContext,
+  tournamentCategory: headerFields.tournamentCategory,
+  tournamentLocation: headerFields.tournamentLocation,
+  tournamentSurface: headerFields.tournamentSurface,
+  tournamentStartDate: headerFields.tournamentStartDate,
+  tournamentEndDate: headerFields.tournamentEndDate,
   worldRankSnapshot: headerFields.worldRankSnapshot,
   countryRankSnapshot: headerFields.countryRankSnapshot,
   sections: z.array(addSectionSchema).optional(),
@@ -51,6 +68,7 @@ export const newsletterFormSchema = updateNewsletterSchema
     title: headerFields.title,
     slug: headerFields.slug,
     editionNumber: headerFields.editionNumber,
+    editionMode: headerFields.editionMode,
   });
 
 export type CreateNewsletterInput = z.input<typeof createNewsletterSchema>;
