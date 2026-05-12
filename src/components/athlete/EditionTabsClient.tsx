@@ -136,7 +136,7 @@ export default function EditionTabsClient({
       <div
         ref={scrollerRef}
         onScroll={updateScrollState}
-        className="-mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-2 motion-safe:scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 scroll-px-1 motion-safe:scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
       >
         {editions.map((edition) => {
           const isActive = edition.slug === selectedSlug;
