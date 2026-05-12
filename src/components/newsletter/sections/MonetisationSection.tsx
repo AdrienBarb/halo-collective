@@ -18,13 +18,14 @@ export default function MonetisationSection({ blocks }: MonetisationSectionProps
   return (
     <div className="space-y-6">
       {heroImage ? (
-        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-cream-3">
+        <div className="overflow-hidden rounded-xl bg-cream-3">
           <Image
             src={heroImage.url}
             alt={heroImage.alt ?? ""}
-            fill
+            width={820}
+            height={1000}
             sizes="(max-width: 820px) 100vw, 820px"
-            className="object-cover"
+            className="h-auto w-full"
             unoptimized
             referrerPolicy="no-referrer"
           />

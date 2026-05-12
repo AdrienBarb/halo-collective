@@ -133,67 +133,25 @@ type AthleteSeed = {
 
 const athletes: AthleteSeed[] = [
   {
-    slug: "iga-swiatek",
-    firstName: "Iga",
-    lastName: "Świątek",
-    countryCode: "POL",
-    countryName: "Poland",
-    tour: "WTA",
-    sport: Sport.TENNIS,
-    worldRank: 4,
-    countryRank: 1,
-    titlesCount: 22,
-    bio: "Polish tennis player and former world No. 1, multi-Slam champion.",
-    avatar: {
-      filename: "athlete-iga-swiatek-avatar.jpg",
-      sourceUrl: "/brand/heroes/iga-swiatek.jpg",
-    },
-    socialLinks: {
-      instagram: "https://www.instagram.com/iga.swiatek/",
-      facebook: "https://www.facebook.com/IgaSwiatek/",
-      x: "https://x.com/iga_swiatek",
-      linkedin: "https://www.linkedin.com/in/iga-swiatek/",
-      foundation: "https://www.instagram.com/igaswiatekfoundation/",
-    },
-  },
-  {
-    slug: "alexander-bublik",
-    firstName: "Alexander",
-    lastName: "Bublik",
-    countryCode: "KAZ",
-    countryName: "Kazakhstan",
+    slug: "arthur-rinderknech",
+    firstName: "Arthur",
+    lastName: "Rinderknech",
+    countryCode: "FRA",
+    countryName: "France",
     tour: "ATP",
     sport: Sport.TENNIS,
-    worldRank: 11,
+    worldRank: 27,
     countryRank: 1,
-    titlesCount: 9,
-    bio: "Kazakh tennis player known for his creative, unpredictable game.",
-    avatar: {
-      filename: "athlete-alexander-bublik-avatar.jpg",
-      sourceUrl: "/brand/heroes/alexander-bublik.jpg",
-    },
-    socialLinks: { instagram: "https://www.instagram.com/bublik/" },
-  },
-  {
-    slug: "flavio-cobolli",
-    firstName: "Flavio",
-    lastName: "Cobolli",
-    countryCode: "ITA",
-    countryName: "Italy",
-    tour: "ATP",
-    sport: Sport.TENNIS,
-    worldRank: 13,
-    countryRank: 3,
     titlesCount: 1,
-    bio: "Italian tennis player on the ATP tour, breakthrough season in 2025.",
+    bio: "Joueur français de tennis, #1 français à l'ATP. Né à Gassin, formé à Rennes.",
     avatar: {
-      filename: "athlete-flavio-cobolli-avatar.jpg",
-      sourceUrl: "/brand/portraits/flavio-cobolli.jpg",
+      filename: "athlete-arthur-rinderknech-avatar.jpg",
+      sourceUrl: "/brand/heroes/arthur-rinderknech.jpg",
     },
     socialLinks: {
-      instagram: "https://www.instagram.com/flavio_cobbo/",
-      x: "https://x.com/cobollifla",
-      tiktok: "https://www.tiktok.com/@flaviocobolli",
+      instagram:
+        "https://www.instagram.com/arthurrinder?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==",
+      x: "https://x.com/arthurrinder?s=20",
     },
   },
 ];
@@ -208,59 +166,34 @@ type SponsorSeed = {
 };
 
 const sponsorsByAthlete: Record<string, SponsorSeed[]> = {
-  "flavio-cobolli": [
+  "arthur-rinderknech": [
     {
-      name: "On",
-      logoFilename: "sponsor-cobolli-on.png",
+      name: "Psycho Bunny",
+      logoFilename: "sponsor-arthur-psycho-bunny.png",
       logoSourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69ea408040d7a6d42fd37c0c.png",
-      websiteUrl: "https://www.on.com/en/collection/tennis",
+        "https://img.mailinblue.com/10839939/images/content_library/original/69c3fee5808eb23066b339e9.png",
+      websiteUrl: "https://psychobunny.com",
     },
     {
-      name: "Renault",
-      logoFilename: "sponsor-cobolli-renault.jpg",
+      name: "Tecnifibre",
+      logoFilename: "sponsor-arthur-tecnifibre.png",
       logoSourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69ea40af606f3c5150bc5cba.jpg",
-      websiteUrl: "https://www.renault.com",
+        "https://img.mailinblue.com/10839939/images/content_library/original/69c3ff480b0eb0e5dc3d5275.png",
+      websiteUrl: "https://www.tecnifibre.com",
     },
     {
-      name: "Polaroid",
-      logoFilename: "sponsor-cobolli-polaroid.jpg",
+      name: "Extia",
+      logoFilename: "sponsor-arthur-extia.png",
       logoSourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69ea4097f27f57227b8cdd98.jpg",
-      websiteUrl: "https://www.polaroid.com",
+        "https://img.mailinblue.com/10839939/images/content_library/original/69c3ff1987384ceb6aab04d1.png",
+      websiteUrl: "https://www.extia-group.com",
     },
     {
-      name: "La Roche-Posay",
-      logoFilename: "sponsor-cobolli-la-roche-posay.png",
+      name: "Fosvia",
+      logoFilename: "sponsor-arthur-fosvia.png",
       logoSourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69ea40c840d7a6d42fd37c22.png",
-      websiteUrl: "https://www.laroche-posay.com",
-    },
-  ],
-  "iga-swiatek": [
-    {
-      name: "On",
-      logoFilename: "sponsor-iga-on.png",
-      logoSourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69cf809870316a71384e8df5.png",
-      websiteUrl: "https://www.on.com/en-us/collection/tennis",
-    },
-    {
-      name: "Rolex",
-      logoFilename: "sponsor-iga-rolex.png",
-      logoSourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69cf80a770316a71384e8dfb.png",
-      websiteUrl: "https://www.rolex.com",
-    },
-  ],
-  "alexander-bublik": [
-    {
-      name: "Armani EA7",
-      logoFilename: "sponsor-bublik-armani-ea7.png",
-      logoSourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69dc9d33b27fae1e5f03cfdf.png",
-      websiteUrl: "https://www.armani.com/en-wx/ea7/experience/athletes/",
+        "https://img.mailinblue.com/10839939/images/content_library/original/69c3ff370b0eb0e5dc3d526b.png",
+      websiteUrl: "https://www.fosvia.com",
     },
   ],
 };
@@ -292,36 +225,36 @@ type NewsletterSeed = {
 };
 
 const newsletters: NewsletterSeed[] = [
-  // ── 1. Flavio Cobolli — Monte Carlo (TOURNAMENT) ───────────────────
+  // ── #01 — Indian Wells (TOURNAMENT) ────────────────────────────────
   {
-    athleteSlug: "flavio-cobolli",
+    athleteSlug: "arthur-rinderknech",
     editionNumber: 1,
-    editionDate: new Date("2026-04-08"),
+    editionDate: new Date("2026-03-17"),
     editionMode: "TOURNAMENT",
-    title: "Monte Carlo: what a week",
-    slug: "monte-carlo-2026",
-    tournamentName: "Rolex Monte-Carlo Masters",
+    title: "Retour sur ma semaine",
+    slug: "indian-wells-2026",
+    tournamentName: "BNP Paribas Open",
     tournamentCategory: "ATP Masters 1000",
-    tournamentLocation: "Monte Carlo, Monaco",
-    tournamentSurface: "Clay",
-    tournamentStartDate: new Date("2026-04-06"),
-    tournamentEndDate: new Date("2026-04-12"),
-    worldRankSnapshot: 16,
-    countryRankSnapshot: 3,
+    tournamentLocation: "Indian Wells, USA",
+    tournamentSurface: "Dur",
+    tournamentStartDate: new Date("2026-03-04"),
+    tournamentEndDate: new Date("2026-03-15"),
+    worldRankSnapshot: 27,
+    countryRankSnapshot: 1,
     hero: {
-      filename: "cobolli-monte-carlo-hero.jpeg",
+      filename: "arthur-indian-wells-hero.jpg",
       sourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69eb6d2f47ca91d8a8df3d97.jpeg",
+        "https://img.mailinblue.com/10839939/images/content_library/original/69d4d56906cc717826a737b3.jpg",
     },
     tournamentLogo: {
-      filename: "cobolli-monte-carlo-logo.jpg",
+      filename: "arthur-indian-wells-bnp-logo.png",
       sourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69eb6df5f51ddaf490543aee.jpg",
+        "https://img.mailinblue.com/10839939/images/content_library/original/69d4d56c79eef569b558bf96.png",
     },
     kitImage: {
-      filename: "cobolli-monte-carlo-kit.jpg",
+      filename: "arthur-indian-wells-psycho-bunny-kit.jpg",
       sourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69eb6d5447ca91d8a8df3daa.jpg",
+        "https://img.mailinblue.com/10839939/images/content_library/original/69d4d57206cc717826a737b9.jpg",
     },
     buildSections: ({ kitImageUrl, tournamentLogoUrl }) => [
       {
@@ -330,7 +263,7 @@ const newsletters: NewsletterSeed[] = [
           {
             kind: "text",
             body:
-              "Monte Carlo. One of the tournaments I look forward to the most — the clay, the setting, the atmosphere. First round against Comesaña was a real battle. I dropped the second set but came back in the third. 7-5, 2-6, 6-3.\n\nThen Blockx in the second round. He played better than me. 3-6, 3-6, no arguments. Disappointing — but the clay swing is just starting and there's a lot ahead.",
+              "Indian Wells c'est terminé. En simple, j'ai pris le premier set à Alcaraz, mené un break dans le 2e. Mes ischio-jambiers ont crampé — c'est lui qui m'a mis dans cet état. En double avec Valentin, on bat Medvedev, Djokovic, Tsitsipas, Rublev, Khachanov. On arrive en finale d'un Masters 1000. Finale perdue, mais la tête haute.\n\n« Il y en a peut-être un dans le monde capable de tenir cette intensité. J'aurais aimé être le premier à le battre en 2026, mais ça ne sera pas pour ce soir. » — Après le match vs Alcaraz",
           },
         ],
       },
@@ -340,47 +273,125 @@ const newsletters: NewsletterSeed[] = [
           {
             kind: "tournament_summary",
             logoUrl: tournamentLogoUrl ?? undefined,
-            name: "Rolex Monte-Carlo Masters",
+            name: "BNP Paribas Open",
             category: "ATP Masters 1000",
-            location: "Monte Carlo, Monaco",
-            surface: "Clay",
-            dateRange: "6–12 April 2026",
+            location: "Indian Wells, USA",
+            surface: "Dur",
+            dateRange: "4–15 Mars 2026",
           },
-          { kind: "hero_metric", value: "R2", label: "Best result" },
-          { kind: "hero_metric", value: "#10", label: "Seed" },
-          { kind: "hero_metric", value: "1-1", label: "W / L" },
+          { kind: "hero_metric", value: "3e tour", label: "En simple" },
+          { kind: "hero_metric", value: "Finaliste", label: "En double" },
+          { kind: "hero_metric", value: "4-1", label: "V / D" },
+          {
+            kind: "match_card",
+            result: "EXEMPT",
+            roundName: "Simple · 1er Tour",
+            date: "4 Mars",
+            contextNote: "Tête de série #26",
+          },
           {
             kind: "match_card",
             result: "W",
-            roundName: "Round 1",
-            opponentName: "F. Comesaña",
-            opponentRank: "#99",
+            roundName: "Simple · 2e Tour",
+            opponentName: "J.M. Cerundolo",
+            opponentRank: "#20",
             opponentCountry: "ARG",
-            score: "7-5 2-6 6-3",
-            date: "6 April",
-            commentary:
-              "Tough opener on clay — heavy ball, fights for every point. Lost the second, found something extra in the third.",
-            highlightUrl: "https://www.youtube.com/watch?v=AA2_J2gaj5I",
+            date: "7 Mars",
+            contextNote: "Walkover · forfait blessure de Cerundolo",
           },
           {
             kind: "match_card",
             result: "L",
-            roundName: "Round 2",
-            opponentName: "A. Blockx",
-            opponentRank: "#91",
-            opponentCountry: "BEL",
-            score: "3-6 3-6",
-            date: "8 April",
+            roundName: "Simple · 3e Tour",
+            opponentName: "C. Alcaraz",
+            opponentRank: "#1",
+            opponentCountry: "ESP",
+            score: "7-6(6) 3-6 2-6",
+            date: "9 Mars",
             commentary:
-              "Blockx played a clean match. I never found my baseline game. Those days happen.",
+              "Premier set pris, break d'avance dans le 2e. Les ischios ont lâché — c'est lui qui m'a mis dans cet état.",
             highlightUrl:
-              "https://www.tennistv.com/videos/4484136/monte-carlo-2026-r2-cobolli-blockx-short-highlights",
+              "https://www.atptour.com/en/video/highlights-alcaraz-earns-comeback-win-vs-rinderknech-in-indian-wells-2026",
+          },
+          {
+            kind: "match_card",
+            result: "W",
+            roundName: "Double · 1er Tour",
+            opponentName: "Medvedev / Tien",
+            score: "7-5 6-3",
+            date: "9 Mars",
+            contextNote: "avec V. Vacherot",
+            highlightUrl:
+              "https://www.atptour.com/en/video/hot-shot-tweener-denied-rinderknechvacherot-outfox-medvedevtien-in-indian-wells-2026",
+          },
+          {
+            kind: "match_card",
+            result: "W",
+            roundName: "Double · 2e Tour",
+            opponentName: "Djokovic / Tsitsipas",
+            score: "7-6(4) 7-5",
+            date: "11 Mars",
+            contextNote: "avec V. Vacherot",
+            highlightUrl:
+              "https://www.atptour.com/en/video/highlights-rinderknechvacherot-down-djokovictsitsipas-in-indian-wells-2026-doubles",
+          },
+          {
+            kind: "match_card",
+            result: "W",
+            roundName: "Double · Quart de finale",
+            opponentName: "Khachanov / Rublev",
+            score: "6-3 6-4",
+            date: "13 Mars",
+            contextNote: "avec V. Vacherot",
+          },
+          {
+            kind: "match_card",
+            result: "W",
+            roundName: "Double · Demi-finale",
+            opponentName: "Goransson / Bhambri",
+            score: "7-5 6(4)-7 [10-5]",
+            date: "14 Mars",
+            contextNote: "avec V. Vacherot",
+            highlightUrl:
+              "https://www.atptour.com/en/video/extended-highlights-rinderknechvacherot--andreozziguinard-earn-sf-wins-in-indian-wells-2026",
+          },
+          {
+            kind: "match_card",
+            result: "L",
+            roundName: "Double · Finale 🥈",
+            opponentName: "Andreozzi / Guinard",
+            score: "6-7(3) 3-6",
+            date: "15 Mars",
+            contextNote: "avec V. Vacherot",
+            commentary:
+              "Je repense encore à ce set point à 5-4. On avait le dessus. Valentin et moi, on vient du circuit universitaire. Arriver en finale d'un Masters 1000 et battre Djokovic, Tsitsipas, Rublev, Khachanov — personne ne nous avait prédit ça. La défaite fait mal. Mais on revient.",
+            highlightUrl:
+              "https://www.tennistv.com/videos/4469534/indian-wells-2026-final-andreozzi-guinard-rinderknech-vacherot-short-highlights",
           },
           {
             kind: "media_link",
-            source: "ATP Tour",
-            headline: "Blockx claims seeded scalp of Cobolli in Monte-Carlo",
-            url: "https://www.atptour.com/en/news/blockx-fonseca-monte-carlo-2026-monday",
+            source: "Eurosport",
+            headline: "Rinderknech a bousculé l'intouchable Alcaraz",
+            url: "https://www.eurosport.fr/tennis/indian-wells-2026-arthur-rinderknech-a-bouscule-lintouchable-carlos-alcaraz-taylor-fritz-et-alexander-bublik-deja-elimines_sto23279360/story.shtml",
+          },
+          {
+            kind: "media_link",
+            source: "L'Équipe / WLT",
+            headline:
+              "« Il y en a peut-être un dans le monde capable de faire ça »",
+            url: "https://www.welovetennis.fr/atp/atp-indian-wells/rinderknech-encore-battu-par-alcaraz-il-y-en-a-peut-etre-un-dans-le-monde-capable-de-faire-cela",
+          },
+          {
+            kind: "media_link",
+            source: "BNP Paribas Open",
+            headline: "Family Affair : les cousins renversent Djokovic/Tsitsipas",
+            url: "https://bnpparibasopen.com/news/doubles-sf1-highlights-indian-wells-2026",
+          },
+          {
+            kind: "media_link",
+            source: "Tennis Up To Date",
+            headline: "Rinderknech & Vacherot : course en finale inoubliable",
+            url: "https://tennisuptodate.com/atp/cousins-rinderknech-and-vacherot-fall-just-short-in-indian-wells-doubles-final-after-standout-run",
           },
         ],
       },
@@ -390,25 +401,7 @@ const newsletters: NewsletterSeed[] = [
           {
             kind: "text",
             body:
-              "Munich first — ATP 500, clay, a tournament I've always enjoyed. Then Madrid, Rome, Roland Garros. Monte Carlo was a short week, but there were good signs. Time to build on them.",
-          },
-          {
-            kind: "schedule_item",
-            dateRange: "Apr 8–9",
-            title: "Rest in Rome",
-            description: "Family, proper food, no racket. Reset the head.",
-          },
-          {
-            kind: "schedule_item",
-            dateRange: "Apr 10–12",
-            title: "Training block",
-            description: "Clay work, serve practice, match patterns.",
-          },
-          {
-            kind: "schedule_item",
-            dateRange: "Apr 13",
-            title: "Arrival in Munich",
-            description: "BMW Open starts April 14.",
+              "Rolex Monte-Carlo Masters · 6–13 Avril 2026 · Tête de série #26 · 🟤 Terre battue\n\nMonte-Carlo dans trois semaines. La terre battue, c'est là où je veux vraiment faire parler de moi cette saison. Je rentre à Rennes quelques jours. Ensuite direction Monte-Carlo pour une préparation spécifique. Je veux arriver à 100%.",
           },
         ],
       },
@@ -418,165 +411,15 @@ const newsletters: NewsletterSeed[] = [
           {
             kind: "kit",
             id: randomUUID(),
-            title: "My clay-season kit",
+            title: "Mon équipement de la semaine",
             body:
-              "On's CloudFly gives me the traction I need on Monte Carlo's red clay, and La Roche-Posay SPF 50 is part of my pre-match routine when you're outside for hours.",
+              "La tenue Psycho Bunny que j'ai portée toute la semaine à Indian Wells.",
             media: kitImageUrl
               ? { kind: "image", url: kitImageUrl }
               : undefined,
             cta: {
-              label: "Discover On's clay season gear",
-              url: "https://www.on.com/en-us/collection/tennis",
-            },
-          },
-          {
-            kind: "partner_content",
-            id: randomUUID(),
-            partnerName: "La Roche-Posay",
-            title: "What I use to protect my skin on tour",
-            body: "Anthelios UVMune 400 — SPF 50, sweat-resistant.",
-            cta: {
-              label: "See the routine",
-              url: "https://www.laroche-posay.com",
-            },
-          },
-        ],
-      },
-      {
-        type: "FAN_ENGAGEMENT",
-        blocks: [
-          {
-            kind: "poll",
-            id: randomUUID(),
-            question: "What do you want to see from Munich?",
-            options: [
-              { label: "Tactical breakdown of a match", emoji: "🎾", isHighlighted: false },
-              { label: "A day in my life on tour", emoji: "🏊", isHighlighted: false },
-              { label: "My pre-match routine", emoji: "🏁", isHighlighted: false },
-              { label: "Playing at home in Italy", emoji: "🇮🇹", isHighlighted: false },
-            ],
-          },
-          {
-            kind: "qa",
-            id: randomUUID(),
-            prompt: "Ask me a question for the Munich edition",
-            reassurance: "I'll pick 3 and answer them next week.",
-          },
-        ],
-      },
-    ],
-  },
-
-  // ── 2. Flavio Cobolli — Madrid prep (WEEKLY) ───────────────────────
-  {
-    athleteSlug: "flavio-cobolli",
-    editionNumber: 2,
-    editionDate: new Date("2026-04-22"),
-    editionMode: "WEEKLY",
-    title: "This week in Madrid prep",
-    slug: "madrid-prep-2026",
-    tournamentName: null,
-    tournamentCategory: null,
-    tournamentLocation: null,
-    tournamentSurface: null,
-    tournamentStartDate: null,
-    tournamentEndDate: null,
-    worldRankSnapshot: 13,
-    countryRankSnapshot: 3,
-    hero: {
-      filename: "cobolli-munich-hero.jpg",
-      sourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69eb24fa96b9e15bbc850490.jpg",
-    },
-    tournamentLogo: null,
-    kitImage: {
-      filename: "cobolli-munich-kit.jpeg",
-      sourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69eb2d94efc1924cd8115c2d.jpeg",
-    },
-    buildSections: ({ kitImageUrl }) => [
-      {
-        type: "ATHLETE_REVIEW",
-        blocks: [
-          {
-            kind: "text",
-            body:
-              "No match week. Back in Rome with the team. The body needs it after five days in Munich and the back-to-back travel from Monte Carlo.\n\nLight on court, heavy in the gym. Trying to land in Madrid sharp.",
-          },
-        ],
-      },
-      {
-        type: "WEEK_RECAP",
-        blocks: [
-          {
-            kind: "training_update",
-            body:
-              "Three days of clay sessions at home — short, intense. Focused on the second-serve return and the inside-out forehand. Both felt better by Friday.",
-          },
-          {
-            kind: "recovery_travel_update",
-            body:
-              "Daily ice baths and physio. Slept ten hours most nights. Family dinners every evening — that's the real reset.",
-          },
-          {
-            kind: "stats_update",
-            rankingCurrent: "#13",
-            rankingChange: "+3 since Munich final",
-            body:
-              "First time inside the top 15. The Munich final pushed me up — I want to defend the points by going deep in Madrid.",
-          },
-          {
-            kind: "quote",
-            text:
-              "The best thing about this week is that I don't have to win anything. I just have to be ready.",
-            attribution: "Me, to my coach, Tuesday morning",
-          },
-        ],
-      },
-      {
-        type: "COMING_UP",
-        blocks: [
-          {
-            kind: "text",
-            body:
-              "Madrid next. Different altitude, different ball — the conditions reward the heavy hitters. I want to take the lessons from Munich into the Caja Mágica.",
-          },
-          {
-            kind: "schedule_item",
-            dateRange: "Apr 23–24",
-            title: "Final prep in Rome",
-            description: "Sharper sessions. Serve patterns. Travel Friday.",
-          },
-          {
-            kind: "schedule_item",
-            dateRange: "Apr 25",
-            title: "Arrival in Madrid",
-            description: "First practice on the centre court. Get the bounce in the legs.",
-          },
-          {
-            kind: "schedule_item",
-            dateRange: "Apr 27 – May 4",
-            title: "Mutua Madrid Open",
-            description: "Masters 1000. Goal: go further than I ever have at this level.",
-          },
-        ],
-      },
-      {
-        type: "MONETISATION",
-        blocks: [
-          {
-            kind: "athlete_product",
-            id: randomUUID(),
-            title: "My training journal — the one I actually use",
-            body:
-              "After two years of testing notebooks, I finally made my own. 90 days, one page per session.",
-            media: kitImageUrl
-              ? { kind: "image", url: kitImageUrl }
-              : undefined,
-            price: "€24",
-            cta: {
-              label: "Get the journal",
-              url: "https://flaviocobolli.com/shop/journal",
+              label: "Découvrir la tenue",
+              url: "https://psychobunny.com/collections/mens-tennis",
             },
           },
         ],
@@ -587,66 +430,71 @@ const newsletters: NewsletterSeed[] = [
           {
             kind: "prediction",
             id: randomUUID(),
-            prompt: "How far do you think I'll go in Madrid?",
+            prompt:
+              "Monte-Carlo approche, jusqu'où me voyez-vous aller ? Faites votre pronostic pour tenter de gagner ma raquette Tecnifibre TF-40 dédicacée.",
             options: [
-              { label: "R32", isHighlighted: false },
-              { label: "R16", isHighlighted: false },
-              { label: "QF or better", isHighlighted: false },
+              { label: "1er ou 2e tour", isHighlighted: false },
+              { label: "Quart de finale", isHighlighted: false },
+              { label: "Demi-finale", isHighlighted: false },
+              { label: "Finale ou vainqueur", emoji: "🏆", isHighlighted: true },
             ],
           },
           {
             kind: "prize_draw",
             id: randomUUID(),
-            title: "Win a match-worn Munich shirt",
-            body:
-              "One signed shirt from the Munich final. Open to members worldwide.",
-            ctaLabel: "Enter the draw",
-            closesAt: "Apr 30, 2026",
+            title: "Raquette Tecnifibre TF-40 dédicacée",
+            body: "Tirage au sort parmi tous les participants au pronostic.",
+            ctaLabel: "Voter et tenter de gagner",
+            closesAt: "6 Avril 2026",
           },
         ],
       },
     ],
   },
 
-  // ── 3. Iga Świątek — Miami (TOURNAMENT) ────────────────────────────
+  // ── #02 — Miami (TOURNAMENT) ───────────────────────────────────────
   {
-    athleteSlug: "iga-swiatek",
-    editionNumber: 1,
-    editionDate: new Date("2026-03-24"),
+    athleteSlug: "arthur-rinderknech",
+    editionNumber: 2,
+    editionDate: new Date("2026-03-22"),
     editionMode: "TOURNAMENT",
-    title: "Miami: a tough quarter",
+    title: "Ma semaine à Miami",
     slug: "miami-2026",
     tournamentName: "Miami Open",
-    tournamentCategory: "WTA 1000",
+    tournamentCategory: "ATP Masters 1000",
     tournamentLocation: "Miami Gardens, USA",
-    tournamentSurface: "Hard",
-    tournamentStartDate: new Date("2026-03-17"),
+    tournamentSurface: "Dur",
+    tournamentStartDate: new Date("2026-03-18"),
     tournamentEndDate: new Date("2026-03-29"),
-    worldRankSnapshot: 4,
+    worldRankSnapshot: 27,
     countryRankSnapshot: 1,
     hero: {
-      filename: "iga-miami-hero.png",
+      filename: "arthur-miami-hero.png",
       sourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69d037d26169969004e5356d.png",
+        "https://img.mailinblue.com/10839939/images/content_library/original/69ce5838b391da177370f246.png",
     },
     tournamentLogo: {
-      filename: "iga-miami-logo.png",
+      filename: "arthur-miami-logo.png",
       sourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69d037df3444432bc4ac3a6e.png",
+        "https://img.mailinblue.com/10839939/images/content_library/original/69ce583d4eaaa6b90fdc6234.png",
     },
     kitImage: {
-      filename: "iga-miami-kit.png",
+      filename: "arthur-miami-recovery.jpg",
       sourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69d037f05588fb598df7fb04.png",
+        "https://img.mailinblue.com/10839939/images/content_library/original/69ce5867956b428284c0ab9d.jpg",
     },
     buildSections: ({ kitImageUrl, tournamentLogoUrl }) => [
       {
         type: "ATHLETE_REVIEW",
         blocks: [
           {
+            kind: "video",
+            url: "https://www.youtube.com/shorts/QMtJ-tS-C8w",
+          },
+          {
             kind: "text",
             body:
-              "Miami is done — and it hurts. I dominated the first set against Magda, played exactly how I wanted to. Then something shifted. She led 5-2 in the third — I saved two match points, got back to 5-3. But she closed it out. 73 opening-round wins, gone.\n\nClay season starts now — and that's where I feel most like myself.",
+              "Salut ! Miami, c'est fini pour moi. Éliminé par Térence Atmane au 2e tour dans un duel 100% français. Lui a très bien joué. Moi, j'ai pris un coup de fatigue après Indian Wells. Le premier set était serré, j'avais ma chance. Le deuxième m'a échappé. Je rentre, je récupère. Monte-Carlo arrive vite — et c'est là où je veux vraiment faire la différence.",
           },
         ],
       },
@@ -657,39 +505,53 @@ const newsletters: NewsletterSeed[] = [
             kind: "tournament_summary",
             logoUrl: tournamentLogoUrl ?? undefined,
             name: "Miami Open",
-            category: "WTA 1000",
+            category: "ATP Masters 1000",
             location: "Miami Gardens, USA",
-            surface: "Hard",
-            dateRange: "17–29 March 2026",
+            surface: "Dur",
+            dateRange: "18–29 Mars 2026",
           },
-          { kind: "hero_metric", value: "R2", label: "Best result" },
-          { kind: "hero_metric", value: "#2", label: "Seed" },
-          { kind: "hero_metric", value: "0-1", label: "W / L" },
+          { kind: "hero_metric", value: "2e tour", label: "En simple" },
+          { kind: "hero_metric", value: "—", label: "En double" },
+          { kind: "hero_metric", value: "0-1", label: "V / D" },
           {
             kind: "match_card",
-            result: "BYE",
-            roundName: "Round 1",
-            date: "Mar 18",
-            contextNote: "Seed #2",
+            result: "EXEMPT",
+            roundName: "1er Tour",
+            date: "19 Mars",
+            contextNote: "Tête de série #26",
           },
           {
             kind: "match_card",
             result: "L",
-            roundName: "Round 2",
-            opponentName: "M. Linette",
-            opponentRank: "#50",
-            opponentCountry: "POL",
-            score: "6-1 5-7 3-6",
-            date: "Mar 20",
-            contextNote: "All-Polish clash",
+            roundName: "2e Tour",
+            opponentName: "T. Atmane",
+            opponentRank: "#53",
+            opponentCountry: "FRA",
+            score: "6(4)-7 3-6",
+            date: "21 Mars",
+            contextNote: "Duel 100% français",
             commentary:
-              "I led the first set, broke her twice, won 88% of first-serve points. Then I lost the thread completely. When you save match points and still lose, it stings differently.",
+              "Difficile à vivre, ce match. J'avais les jambes après la semaine d'Indian Wells, et Térence a très bien joué. Il n'a rien laissé passer. Le premier set était serré — j'aurais pu le prendre. Dans le deuxième, j'ai perdu en précision au service au mauvais moment. Pas d'excuses : il a été meilleur que moi ce jour-là. Je récupère et je relève la tête pour Monte-Carlo.",
+            highlightUrl:
+              "https://www.atptour.com/en/scores/stats-centre/archive/2026/403/ms057?tab=Stats",
           },
           {
             kind: "media_link",
-            source: "WTA",
-            headline: "Linette ends Świątek's 73-match opening-round streak",
-            url: "https://www.wtatennis.com/news/4472909/linette-ends-swiateks-73-match-opening-win-streak",
+            source: "Eurosport",
+            headline: "Atmane domine Rinderknech dans le duel 100% français",
+            url: "https://www.eurosport.fr/tennis/atp-miami/2026/terence-atmane-arthur-rinderknech_mtc20017139/live.shtml",
+          },
+          {
+            kind: "media_link",
+            source: "Tennis TV",
+            headline: "Replay : Atmane vs Rinderknech — Miami 2026 R2",
+            url: "https://www.tennistv.com/videos/4473962/miami-2026-r2-atmane-rinderknech",
+          },
+          {
+            kind: "media_link",
+            source: "ATP Tour",
+            headline: "Tous les résultats Miami Open 2026",
+            url: "https://www.atptour.com/en/scores/archive/miami/403/2026/results",
           },
         ],
       },
@@ -697,176 +559,48 @@ const newsletters: NewsletterSeed[] = [
         type: "COMING_UP",
         blocks: [
           {
-            kind: "text",
-            body:
-              "Two weeks on hard court, two early exits. Now I go home. The clay season is where I've always found my best tennis, and I need it more than ever right now.",
+            kind: "video",
+            url: "https://www.youtube.com/shorts/QMtJ-tS-C8w",
           },
-          {
-            kind: "schedule_item",
-            dateRange: "Mar 21–23",
-            title: "Flight home to Poland",
-            description: "Family, rest, no racket.",
-          },
-          {
-            kind: "schedule_item",
-            dateRange: "Mar 24–28",
-            title: "Active recovery",
-            description: "Ice baths, physio, sleep. Mental reset with my team.",
-          },
-          {
-            kind: "schedule_item",
-            dateRange: "Apr 14–20",
-            title: "Porsche Grand Prix Stuttgart",
-            description: "First clay tournament of the season. Defending title territory.",
-          },
-        ],
-      },
-      {
-        type: "MONETISATION",
-        blocks: [
-          {
-            kind: "athlete_product",
-            id: randomUUID(),
-            title: "Recovery essentials",
-            body:
-              "After a tough stretch, recovery is part of the job. The bag I travel with — and what's inside it.",
-            media: kitImageUrl
-              ? { kind: "image", url: kitImageUrl }
-              : undefined,
-            cta: { label: "See what's in my bag", url: "https://igaswiatek.com/recovery" },
-          },
-        ],
-      },
-      {
-        type: "FAN_ENGAGEMENT",
-        blocks: [
-          {
-            kind: "poll",
-            id: randomUUID(),
-            question:
-              "Which part of my game should I focus on heading into clay?",
-            options: [
-              { label: "Serve consistency", isHighlighted: false },
-              { label: "Mental resilience in tight sets", isHighlighted: false },
-              { label: "Forehand under pressure", isHighlighted: false },
-              { label: "Just trust yourself", emoji: "🏆", isHighlighted: true },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-
-  // ── 4. Alexander Bublik — Monte Carlo (TOURNAMENT) ─────────────────
-  {
-    athleteSlug: "alexander-bublik",
-    editionNumber: 1,
-    editionDate: new Date("2026-04-13"),
-    editionMode: "TOURNAMENT",
-    title: "Monte Carlo: a quarterfinal to build on",
-    slug: "monte-carlo-2026",
-    tournamentName: "Rolex Monte-Carlo Masters",
-    tournamentCategory: "ATP Masters 1000",
-    tournamentLocation: "Monte Carlo, Monaco",
-    tournamentSurface: "Clay",
-    tournamentStartDate: new Date("2026-04-06"),
-    tournamentEndDate: new Date("2026-04-12"),
-    worldRankSnapshot: 11,
-    countryRankSnapshot: 1,
-    hero: {
-      filename: "bublik-monte-carlo-hero.png",
-      sourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69dc9d29648713cd2e9ca7a5.png",
-    },
-    tournamentLogo: {
-      filename: "bublik-monte-carlo-logo.png",
-      sourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69dc9d2d648713cd2e9ca7a7.png",
-    },
-    kitImage: {
-      filename: "bublik-monte-carlo-kit.jpg",
-      sourceUrl:
-        "https://img.mailinblue.com/10839939/images/content_library/original/69dc9d52648713cd2e9ca7ba.jpg",
-    },
-    buildSections: ({ kitImageUrl, tournamentLogoUrl }) => [
-      {
-        type: "ATHLETE_REVIEW",
-        blocks: [
           {
             kind: "text",
             body:
-              "Hey everyone. Monte Carlo. A year ago I was in qualifying here, losing a third set 6-0. This week I reached the quarterfinal. That's the kind of progress that keeps you going.\n\nTwo clean wins — Monfils, then Lehečka — and then Alcaraz happened. 6-3, 6-0. A bagel in the second. I'll take it.",
-          },
-        ],
-      },
-      {
-        type: "WEEK_RECAP",
-        blocks: [
-          {
-            kind: "tournament_summary",
-            logoUrl: tournamentLogoUrl ?? undefined,
-            name: "Rolex Monte-Carlo Masters",
-            category: "ATP Masters 1000",
-            location: "Monte Carlo, Monaco",
-            surface: "Clay",
-            dateRange: "6–12 April 2026",
-          },
-          { kind: "hero_metric", value: "QF", label: "Best result" },
-          { kind: "hero_metric", value: "3", label: "Matches" },
-          { kind: "hero_metric", value: "2-1", label: "W / L" },
-          {
-            kind: "match_card",
-            result: "BYE",
-            roundName: "Round 1",
-            date: "6 April",
-            contextNote: "Seeded #8",
+              "Rolex Monte-Carlo Masters · 6–13 Avril 2026 · Tête de série #26 · 🟤 Terre battue\n\nDeux semaines à Indian Wells et Miami, c'est physiquement éprouvant. Je rentre à Rennes me reposer. La terre battue arrive vite — je veux y arriver frais et affûté.",
           },
           {
-            kind: "match_card",
-            result: "W",
-            roundName: "Round 2",
-            opponentName: "G. Monfils",
-            opponentCountry: "FRA",
-            score: "6-4 6-4",
-            date: "7 April",
-            commentary:
-              "Ten years ago I was a hitting partner here. At the net after the match Gaël remembered telling me clay would be my main surface — neither of us had forgotten.",
-            highlightUrl:
-              "https://www.atptour.com/en/video/highlights-bublik-dials-in-to-end-monfils-montecarlo-2026-career",
+            kind: "schedule_item",
+            dateRange: "22–23 Mars",
+            title: "Retour à Rennes",
+            description:
+              "Vol Miami → Paris → Rennes. Famille, repos total, pas de raquette.",
           },
           {
-            kind: "match_card",
-            result: "W",
-            roundName: "Round of 16",
-            opponentName: "J. Lehečka",
-            opponentRank: "#13",
-            opponentCountry: "CZE",
-            score: "6-2 7-5",
-            date: "9 April",
-            highlightUrl:
-              "https://www.atptour.com/en/video/highlights-bublik-downs-lehecka-for-maiden-monte-carlo-2026-qf-spot",
+            kind: "schedule_item",
+            dateRange: "24–25 Mars",
+            title: "Récupération active",
+            description:
+              "Bains froids, kiné, sommeil long. Nutrition soignée pour reconstituer les stocks.",
           },
           {
-            kind: "match_card",
-            result: "L",
-            roundName: "Quarterfinal",
-            opponentName: "C. Alcaraz",
-            opponentRank: "#1",
-            opponentCountry: "ESP",
-            score: "3-6 0-6",
-            date: "10 April",
-            highlightUrl:
-              "https://www.atptour.com/en/news/alcaraz-bublik-monte-carlo-2026-friday",
+            kind: "schedule_item",
+            dateRange: "26–28 Mars",
+            title: "Reprise légère",
+            description:
+              "Premiers échanges sur dur à Rennes. Cardio léger. Pas de compétition dans la tête.",
           },
-        ],
-      },
-      {
-        type: "COMING_UP",
-        blocks: [
           {
-            kind: "text",
-            body:
-              "Munich first, then Madrid, then Rome, then Roland Garros. Last year the clay swing was where everything clicked. A QF here is a good start. The serve travels on this surface. Let's keep going.",
+            kind: "schedule_item",
+            dateRange: "29–31 Mars",
+            title: "Transition terre battue",
+            description:
+              "Premiers échanges sur terre. Réajustement des appuis, du timing. Travail spécifique service-retour.",
+          },
+          {
+            kind: "schedule_item",
+            dateRange: "1–5 Avril",
+            title: "Direction Monte-Carlo",
+            description:
+              "Installation sur site. Pratique intensive au Monte-Carlo Country Club. Objectif : arriver à 100%.",
           },
         ],
       },
@@ -876,13 +610,15 @@ const newsletters: NewsletterSeed[] = [
           {
             kind: "kit",
             id: randomUUID(),
-            title: "The kit I wore all week",
+            title: "Mes inconditionnels pour bien récupérer",
+            body:
+              "Après deux semaines intenses, la récupération c'est aussi du travail. Bains froids, sommeil, nutrition — et ma Tecnifibre TF-40 posée dans le coin pour ne pas y penser. On repart bientôt.",
             media: kitImageUrl
               ? { kind: "image", url: kitImageUrl }
               : undefined,
             cta: {
-              label: "Discover the kit",
-              url: "https://www.armani.com/en-wx/ea7/experience/athletes/",
+              label: "Découvre mon programme de récup",
+              url: "https://www.tecnifibre.com",
             },
           },
         ],
@@ -893,13 +629,21 @@ const newsletters: NewsletterSeed[] = [
           {
             kind: "poll",
             id: randomUUID(),
-            question: "What was the highlight of my week in Monte Carlo?",
+            question:
+              "Quelle partie de mon jeu pensez-vous que je devrais travailler avant Monte-Carlo ?",
             options: [
-              { label: "The win vs Monfils", emoji: "🎯", isHighlighted: false },
-              { label: "Beating Lehečka", emoji: "💪", isHighlighted: false },
-              { label: "First Monte Carlo QF", emoji: "🏆", isHighlighted: false },
-              { label: "Surviving clay as me", emoji: "😂", isHighlighted: true },
+              { label: "Coup droit", isHighlighted: false },
+              { label: "Revers", isHighlighted: false },
+              { label: "Volée", isHighlighted: false },
+              { label: "Service", isHighlighted: false },
             ],
+          },
+          {
+            kind: "qa",
+            id: randomUUID(),
+            prompt: "Pose moi une question",
+            reassurance:
+              "Je sélectionnerai 3 questions fans et y répondrai dans la prochaine newsletter.",
           },
         ],
       },
@@ -997,7 +741,18 @@ async function syncNewsletter(
   console.log(`  ✓ newsletter #${created.editionNumber} ${created.slug}`);
 }
 
+async function cleanupRemovedAthletes(keepSlugs: string[]): Promise<void> {
+  const removed = await prisma.athlete.deleteMany({
+    where: { slug: { notIn: keepSlugs } },
+  });
+  if (removed.count > 0) {
+    console.log(`✗ removed ${removed.count} athlete(s) not in seed`);
+  }
+}
+
 async function main() {
+  await cleanupRemovedAthletes(athletes.map((a) => a.slug));
+
   const athleteIdBySlug = new Map<string, string>();
 
   for (const a of athletes) {

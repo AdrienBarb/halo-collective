@@ -27,13 +27,14 @@ export default function MediaBlock({ media }: MediaBlockProps) {
     // still requires the prop, screen readers will skip the element.
     const alt = media.alt?.trim() ?? "";
     return (
-      <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-cream-3">
+      <div className="overflow-hidden rounded-lg bg-cream-3">
         <Image
           src={media.url}
           alt={alt}
-          fill
+          width={820}
+          height={1000}
           sizes="(max-width: 820px) 100vw, 820px"
-          className="object-cover"
+          className="h-auto w-full"
           unoptimized
           referrerPolicy="no-referrer"
         />
