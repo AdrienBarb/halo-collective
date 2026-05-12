@@ -122,104 +122,75 @@ function CoverHero({ src, alt }: { src: string; alt: string }) {
   );
 }
 
-function BrandDivider() {
-  return (
-    <Section style={{ padding: 0, fontSize: 0, lineHeight: 0 }}>
-      <table
-        role="presentation"
-        cellPadding={0}
-        cellSpacing={0}
-        border={0}
-        width="100%"
-        style={{ borderCollapse: "collapse" }}
-      >
-        <tbody>
-          <tr>
-            <td height={4} style={{ backgroundColor: palette.panelDark, fontSize: 0, lineHeight: 0 }}>
-              &nbsp;
-            </td>
-            <td height={4} style={{ backgroundColor: palette.surface, fontSize: 0, lineHeight: 0 }}>
-              &nbsp;
-            </td>
-            <td height={4} style={{ backgroundColor: palette.accent, fontSize: 0, lineHeight: 0 }}>
-              &nbsp;
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </Section>
-  );
-}
-
 function SponsorsStrip({ sponsors, label }: { sponsors: WelcomeSponsor[]; label: string }) {
-  // Interleave logos with hairline separators so a single map produces a row
-  // of <td>s without the React-key-via-Fragment trick.
-  const cells: Array<{ kind: "logo"; sponsor: WelcomeSponsor } | { kind: "sep"; afterId: string }> =
-    [];
-  sponsors.forEach((sponsor, idx) => {
-    const id = sponsor.id ?? `${sponsor.name}-${idx}`;
-    if (idx > 0) cells.push({ kind: "sep", afterId: id });
-    cells.push({ kind: "logo", sponsor });
-  });
-
   return (
     <Section
       style={{
         backgroundColor: CARD_BG,
-        padding: "16px 32px",
+        padding: "24px 24px 28px",
         borderBottom: `1px solid ${HAIRLINE}`,
       }}
     >
-      <Text style={{ ...EYEBROW_LABEL, marginBottom: 12, fontSize: 9 }}>{label}</Text>
+      <Text
+        style={{
+          ...EYEBROW_LABEL,
+          marginBottom: 16,
+          fontSize: 10,
+          letterSpacing: "0.28em",
+          textAlign: "center",
+        }}
+      >
+        {label}
+      </Text>
       <table
         role="presentation"
         cellPadding={0}
-        cellSpacing={0}
+        cellSpacing={8}
         border={0}
-        width="100%"
-        style={{ borderCollapse: "collapse" }}
+        align="center"
+        style={{ borderCollapse: "separate", margin: "0 auto" }}
       >
         <tbody>
           <tr>
-            {cells.map((cell, i) =>
-              cell.kind === "sep" ? (
-                <td
-                  key={`sep-${cell.afterId}`}
-                  width={1}
-                  style={{ backgroundColor: HAIRLINE, fontSize: 0, lineHeight: 0 }}
+            {sponsors.map((sponsor, i) => (
+              <td
+                key={sponsor.id ?? `${sponsor.name}-${i}`}
+                align="center"
+                valign="middle"
+                width={120}
+                style={{
+                  width: 120,
+                  height: 72,
+                  border: `1px solid ${palette.borderSoft}`,
+                  backgroundColor: palette.panelMuted,
+                  borderRadius: 2,
+                  padding: "12px 14px",
+                }}
+              >
+                <Link
+                  href={sponsor.websiteUrl}
+                  target="_blank"
+                  rel="sponsored nofollow noopener noreferrer"
+                  style={{ textDecoration: "none", display: "block" }}
+                  title={sponsor.name}
                 >
-                  &nbsp;
-                </td>
-              ) : (
-                <td
-                  key={cell.sponsor.id ?? `${cell.sponsor.name}-${i}`}
-                  align="center"
-                  valign="middle"
-                  style={{ padding: "4px 8px" }}
-                >
-                  <Link
-                    href={cell.sponsor.websiteUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ textDecoration: "none" }}
-                  >
-                    <Img
-                      src={cell.sponsor.logoUrl}
-                      alt={cell.sponsor.name}
-                      width={70}
-                      height={36}
-                      style={{
-                        maxWidth: 70,
-                        width: "100%",
-                        height: 36,
-                        objectFit: "contain",
-                        display: "block",
-                      }}
-                    />
-                  </Link>
-                </td>
-              ),
-            )}
+                  <Img
+                    src={sponsor.logoUrl}
+                    alt={sponsor.name}
+                    height={40}
+                    style={{
+                      maxWidth: 92,
+                      maxHeight: 40,
+                      width: "auto",
+                      height: "auto",
+                      objectFit: "contain",
+                      display: "block",
+                      margin: "0 auto",
+                    }}
+                  />
+                </Link>
+              </td>
+            ))}
           </tr>
         </tbody>
       </table>
@@ -420,8 +391,6 @@ export const WelcomeEmail = ({
           }}
         >
           {coverImageUrl ? <CoverHero src={coverImageUrl} alt={athleteFirstName} /> : null}
-
-          <BrandDivider />
 
           {sponsorList.length > 0 ? (
             <SponsorsStrip sponsors={sponsorList} label={messages.partnersLabel} />
