@@ -1,0 +1,10 @@
+{
+  "Common": {
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler"
+  },
+  "LanguageSwitcher": {
+    "label": "Langue"
+  }
+}

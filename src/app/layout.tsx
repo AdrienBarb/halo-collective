@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter_Tight, JetBrains_Mono } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import { Toaster } from "react-hot-toast";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import GlobalErrorHandler from "@/components/GlobalErrorHandler";
@@ -41,31 +43,36 @@ export const metadata: Metadata = genPageMetadata({
   url: "/",
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body
         className={`${fraunces.variable} ${interTight.variable} ${jetbrainsMono.variable} antialiased`}
       >
-        <NuqsAdapter>
-          <QueryProviders>
-            <PostHogProvider>
-              <ConfirmProvider>
-                <div className="flex min-h-screen flex-col">
-                  <Navbar />
-                  <main className="flex-1">{children}</main>
-                  <Footer />
-                </div>
-                <Toaster position="bottom-center" />
-                <GlobalErrorHandler />
-              </ConfirmProvider>
-            </PostHogProvider>
-          </QueryProviders>
-        </NuqsAdapter>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <NuqsAdapter>
+            <QueryProviders>
+              <PostHogProvider>
+                <ConfirmProvider>
+                  <div className="flex min-h-screen flex-col">
+                    <Navbar />
+                    <main className="flex-1">{children}</main>
+                    <Footer />
+                  </div>
+                  <Toaster position="bottom-center" />
+                  <GlobalErrorHandler />
+                </ConfirmProvider>
+              </PostHogProvider>
+            </QueryProviders>
+          </NuqsAdapter>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

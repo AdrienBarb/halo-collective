@@ -50,6 +50,7 @@
     "isomorphic-dompurify": "^3.12.0",
     "lucide-react": "^0.577.0",
     "next": "^16.1.6",
+    "next-intl": "^4.11.2",
     "nuqs": "^2.8.9",
     "pg": "^8.20.0",
     "posthog-js": "^1.336.4",
