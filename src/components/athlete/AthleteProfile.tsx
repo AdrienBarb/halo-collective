@@ -391,19 +391,19 @@ function SponsorsStrip({ sponsors }: { sponsors: Sponsor[] }) {
   return (
     <section
       aria-label={t("partners")}
-      className="border-b border-line px-6 py-7 md:py-8"
+      className="border-b border-line px-6 py-5 md:py-8"
     >
       <div className="text-center font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-ink-3">
         {t("partners")}
       </div>
-      <ul className="mt-4 flex flex-wrap items-center justify-center gap-2.5">
+      <ul className="mt-3 flex flex-wrap items-center justify-center gap-2 md:mt-4 md:gap-2.5">
         {sponsors.map((s) => (
           <li key={s.id}>
             <a
               href={s.websiteUrl}
               target="_blank"
               rel="sponsored nofollow noopener noreferrer"
-              className="group flex aspect-[5/3] w-[120px] items-center justify-center rounded-sm border border-line bg-cream p-3 transition-colors duration-200 hover:border-line-2 md:w-[140px] md:p-4"
+              className="group flex aspect-[5/3] w-[80px] items-center justify-center rounded-sm border border-line bg-cream p-2 transition-colors duration-200 hover:border-line-2 md:w-[140px] md:p-4"
               aria-label={s.name}
               title={s.name}
             >

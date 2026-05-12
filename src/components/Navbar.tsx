@@ -12,11 +12,11 @@ export default async function Navbar() {
 
   return (
     <header
-      className="frost-nav sticky top-0 z-50 flex items-center justify-center border-b border-line px-8 py-[18px]"
+      className="frost-nav sticky top-0 z-50 flex items-center justify-between border-b border-line px-4 py-[18px] md:justify-center md:px-8"
       data-screen-label="Landing"
     >
       <Wordmark size="large" href={isLandingHidden() ? null : "/"} />
-      <div className="absolute right-6 top-1/2 -translate-y-1/2">
+      <div className="md:absolute md:right-6 md:top-1/2 md:-translate-y-1/2">
         {user ? (
           <AccountMenu
             email={user.email}
