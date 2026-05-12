@@ -82,6 +82,32 @@ export const optionalTrimmedString = z
     return trimmed === "" ? undefined : trimmed;
   });
 
+/**
+ * Trimmed string with a maximum length, becomes undefined when blank.
+ * Use for athlete-controlled free text that flows to fan-facing surfaces
+ * (email bodies etc.) — unbounded TEXT is an abuse vector.
+ */
+export const boundedTrimmedString = (max: number) =>
+  z
+    .union([z.string(), z.undefined()])
+    .optional()
+    .transform((v, ctx) => {
+      if (v === undefined) return undefined;
+      const trimmed = v.trim();
+      if (trimmed === "") return undefined;
+      if (trimmed.length > max) {
+        ctx.addIssue({
+          code: "too_big",
+          maximum: max,
+          origin: "string",
+          inclusive: true,
+          message: `Must be ${max} characters or fewer`,
+        });
+        return z.NEVER;
+      }
+      return trimmed;
+    });
+
 /** Trimmed string that becomes `null` when blank — for fields meant to be unset. */
 export const clearableTrimmedString = z
   .union([z.string(), z.null(), z.undefined()])
@@ -93,6 +119,41 @@ export const clearableTrimmedString = z
     return trimmed === "" ? null : trimmed;
   });
 
+/**
+ * Clearable trimmed string with a max length. `null` = explicitly unset,
+ * `undefined` = leave unchanged. Same intent as boundedTrimmedString but
+ * for PATCH-style update schemas.
+ */
+export const boundedClearableTrimmedString = (max: number) =>
+  z
+    .union([z.string(), z.null(), z.undefined()])
+    .optional()
+    .transform((v, ctx) => {
+      if (v === null) return null;
+      if (v === undefined) return undefined;
+      const trimmed = v.trim();
+      if (trimmed === "") return null;
+      if (trimmed.length > max) {
+        ctx.addIssue({
+          code: "too_big",
+          maximum: max,
+          origin: "string",
+          inclusive: true,
+          message: `Must be ${max} characters or fewer`,
+        });
+        return z.NEVER;
+      }
+      return trimmed;
+    });
+
+/** Single-line name: trimmed, capped, no control characters (blocks CRLF header injection). */
+export const personNameSchema = z
+  .string()
+  .trim()
+  .min(1, "Required")
+  .max(80, "Must be 80 characters or fewer")
+  .regex(/^[^\r\n\t]+$/, "Must not contain line breaks");
+
 /** Positive int that becomes `null` when blank/cleared. */
 export const clearablePositiveInt = z
   .union([z.coerce.number().int().positive(), z.literal(""), z.null(), z.undefined()])
@@ -100,6 +161,24 @@ export const clearablePositiveInt = z
   .transform((v) =>
     v === "" || v === null ? null : v === undefined ? undefined : v,
   );
+
+/**
+ * Bounded positive int that becomes `null` when blank/cleared. Use for
+ * any value that ships permanently into an email body (rank, titles
+ * count, etc.) — a 5-digit typo cannot be unsent to 10k inboxes.
+ */
+export const clearableBoundedInt = (max: number) =>
+  z
+    .union([
+      z.coerce.number().int().min(1).max(max),
+      z.literal(""),
+      z.null(),
+      z.undefined(),
+    ])
+    .optional()
+    .transform((v) =>
+      v === "" || v === null ? null : v === undefined ? undefined : v,
+    );
 
 /** Date that becomes `null` when blank/cleared. */
 export const clearableDate = z

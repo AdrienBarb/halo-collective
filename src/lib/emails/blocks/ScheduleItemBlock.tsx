@@ -11,8 +11,8 @@ export default function ScheduleItemBlock({ item, isLast }: ScheduleItemBlockPro
   return (
     <Section
       style={{
-        borderTop: `1px solid ${palette.line}`,
-        borderBottom: isLast ? `1px solid ${palette.line}` : undefined,
+        borderTop: `1px solid ${palette.border}`,
+        borderBottom: isLast ? `1px solid ${palette.border}` : undefined,
         padding: "12px 0",
       }}
     >
@@ -28,7 +28,7 @@ export default function ScheduleItemBlock({ item, isLast }: ScheduleItemBlockPro
               <Text
                 style={{
                   margin: 0,
-                  color: palette.accentGold,
+                  color: palette.accent,
                   fontFamily: fonts.mono,
                   fontSize: 10,
                   fontWeight: 700,
@@ -43,7 +43,7 @@ export default function ScheduleItemBlock({ item, isLast }: ScheduleItemBlockPro
               <Text
                 style={{
                   margin: 0,
-                  color: palette.ink,
+                  color: palette.panelDark,
                   fontFamily: fonts.sans,
                   fontSize: 14,
                   fontWeight: 700,
@@ -54,7 +54,7 @@ export default function ScheduleItemBlock({ item, isLast }: ScheduleItemBlockPro
               <Text
                 style={{
                   margin: "4px 0 0",
-                  color: palette.ink3,
+                  color: palette.textMuted,
                   fontFamily: fonts.sans,
                   fontSize: 13,
                   lineHeight: 1.5,

@@ -66,7 +66,7 @@ export default function MediaBlock({
           className="force-dark-bg"
           style={{
             display: "block",
-            backgroundColor: palette.ink,
+            backgroundColor: palette.panelDark,
             borderRadius: 8,
             overflow: "hidden",
             textDecoration: "none",
@@ -77,20 +77,19 @@ export default function MediaBlock({
           {poster ? (
             <Img
               src={poster}
-              alt=""
+              alt={isYouTube ? messages.watchOnYoutube : messages.watch}
               width="536"
               style={{
                 display: "block",
                 width: "100%",
                 height: "auto",
-                objectFit: "cover",
               }}
             />
           ) : null}
           <Text
             style={{
               margin: poster ? "12px 0 0" : 0,
-              color: palette.accentWarm,
+              color: palette.accent,
               fontFamily: fonts.mono,
               fontSize: 13,
               fontWeight: 700,
@@ -112,10 +111,11 @@ export default function MediaBlock({
     <Section style={{ marginBottom: 16 }}>
       <Link
         href={media.url}
+        className="force-light-bg force-light-fg"
         style={{
           display: "block",
-          backgroundColor: palette.cream,
-          border: `1px solid ${palette.line}`,
+          backgroundColor: palette.surface,
+          border: `1px solid ${palette.border}`,
           borderRadius: 8,
           padding: "12px 14px",
           textDecoration: "none",
@@ -135,8 +135,8 @@ export default function MediaBlock({
                     width: 36,
                     height: 36,
                     borderRadius: 18,
-                    backgroundColor: palette.ink,
-                    color: palette.accentWarm,
+                    backgroundColor: palette.panelDark,
+                    color: palette.accent,
                     textAlign: "center",
                     lineHeight: "36px",
                     fontSize: 14,
@@ -151,7 +151,7 @@ export default function MediaBlock({
                   <Text
                     style={{
                       margin: 0,
-                      color: palette.ink,
+                      color: palette.panelDark,
                       fontFamily: fonts.sans,
                       fontSize: 14,
                       fontWeight: 600,
@@ -164,7 +164,7 @@ export default function MediaBlock({
                   <Text
                     style={{
                       margin: "4px 0 0",
-                      color: palette.ink3,
+                      color: palette.textMuted,
                       fontFamily: fonts.mono,
                       fontSize: 10,
                       letterSpacing: "0.18em",

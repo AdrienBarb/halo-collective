@@ -30,7 +30,7 @@ function OptionsPreview({
           key={i}
           style={{
             margin: i === 0 ? 0 : "6px 0 0",
-            color: palette.ink2,
+            color: palette.textBody,
             fontFamily: fonts.sans,
             fontSize: 13,
           }}

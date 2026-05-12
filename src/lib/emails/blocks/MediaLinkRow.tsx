@@ -17,7 +17,7 @@ export default function MediaLinkRow({ link }: MediaLinkRowProps) {
   return (
     <Section
       style={{
-        borderBottom: `1px solid ${palette.line}`,
+        borderBottom: `1px solid ${palette.border}`,
         padding: "12px 0",
       }}
     >
@@ -34,7 +34,7 @@ export default function MediaLinkRow({ link }: MediaLinkRowProps) {
                 <Text
                   style={{
                     margin: 0,
-                    color: palette.ink3,
+                    color: palette.textMuted,
                     fontFamily: fonts.mono,
                     fontSize: 10,
                     letterSpacing: "0.12em",
@@ -46,7 +46,7 @@ export default function MediaLinkRow({ link }: MediaLinkRowProps) {
                 <Text
                   style={{
                     margin: "4px 0 0",
-                    color: palette.ink,
+                    color: palette.panelDark,
                     fontFamily: fonts.sans,
                     fontSize: 14,
                   }}
@@ -65,7 +65,7 @@ export default function MediaLinkRow({ link }: MediaLinkRowProps) {
                 <Text
                   style={{
                     margin: 0,
-                    color: palette.accentGold,
+                    color: palette.accent,
                     fontFamily: fonts.mono,
                     fontSize: 10,
                     fontWeight: 700,

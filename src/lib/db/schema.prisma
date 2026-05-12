@@ -74,6 +74,7 @@ model Athlete {
   countryRank  Int?
   titlesCount  Int      @default(0)
   socialLinks  Json?
+  welcomeMessage String?  @db.VarChar(4000)
   brevoListId  Int?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

@@ -19,7 +19,7 @@ export function EmailParagraphs({
           key={i}
           style={{
             margin: i === 0 ? `${firstMarginTop}px 0 0` : `${gap}px 0 0`,
-            color: palette.ink2,
+            color: palette.textBody,
             fontFamily: fonts.serif,
             fontSize: 15,
             fontStyle: "italic",
@@ -47,8 +47,8 @@ export function EmailCtaButton({
         display: "block",
         width: "100%",
         boxSizing: "border-box",
-        backgroundColor: palette.ink,
-        color: palette.cream,
+        backgroundColor: palette.panelDark,
+        color: palette.surface,
         fontFamily: fonts.mono,
         fontSize: 12,
         fontWeight: 700,
@@ -70,7 +70,7 @@ export function EmailHeading({ children }: { children: ReactNode }) {
       as="h1"
       style={{
         margin: 0,
-        color: palette.ink,
+        color: palette.panelDark,
         fontFamily: fonts.serif,
         fontSize: 30,
         fontWeight: 600,
@@ -88,7 +88,7 @@ export function EmailLead({ children }: { children: ReactNode }) {
     <Text
       style={{
         margin: "16px 0 0",
-        color: palette.ink2,
+        color: palette.textBody,
         fontFamily: fonts.serif,
         fontSize: 17,
         fontStyle: "italic",
@@ -105,7 +105,7 @@ export function EmailBody({ children }: { children: ReactNode }) {
     <Text
       style={{
         margin: "16px 0 0",
-        color: palette.ink2,
+        color: palette.textBody,
         fontSize: 15,
         lineHeight: 1.65,
       }}
@@ -128,8 +128,8 @@ export function EmailButton({
       style={{
         display: "inline-block",
         marginTop: 24,
-        backgroundColor: palette.accentWarm,
-        color: palette.ink,
+        backgroundColor: palette.accent,
+        color: palette.panelDark,
         fontFamily: fonts.mono,
         fontSize: 12,
         fontWeight: 600,

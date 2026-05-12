@@ -10,7 +10,7 @@ export default function QuoteBlock({ block }: QuoteBlockProps) {
   return (
     <Section
       style={{
-        backgroundColor: palette.cream,
+        backgroundColor: palette.surface,
         borderRadius: 6,
         padding: "16px 18px",
         marginTop: 16,
@@ -19,7 +19,7 @@ export default function QuoteBlock({ block }: QuoteBlockProps) {
       <Text
         style={{
           margin: 0,
-          color: palette.ink,
+          color: palette.panelDark,
           fontFamily: fonts.serif,
           fontSize: 17,
           fontStyle: "italic",
@@ -32,7 +32,7 @@ export default function QuoteBlock({ block }: QuoteBlockProps) {
         <Text
           style={{
             margin: "10px 0 0",
-            color: palette.ink3,
+            color: palette.textMuted,
             fontFamily: fonts.mono,
             fontSize: 10,
             letterSpacing: "0.18em",

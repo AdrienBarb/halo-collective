@@ -19,7 +19,7 @@ export default function TournamentSummaryBlock({
   return (
     <Section
       style={{
-        borderBottom: `1px solid ${palette.line}`,
+        borderBottom: `1px solid ${palette.border}`,
         paddingBottom: 16,
         marginBottom: 16,
       }}
@@ -52,7 +52,7 @@ export default function TournamentSummaryBlock({
               <Text
                 style={{
                   margin: 0,
-                  color: palette.ink,
+                  color: palette.panelDark,
                   fontFamily: fonts.sans,
                   fontSize: 16,
                   fontWeight: 700,
@@ -64,7 +64,7 @@ export default function TournamentSummaryBlock({
                 <Text
                   style={{
                     margin: "4px 0 0",
-                    color: palette.ink3,
+                    color: palette.textMuted,
                     fontFamily: fonts.mono,
                     fontSize: 10,
                     letterSpacing: "0.12em",

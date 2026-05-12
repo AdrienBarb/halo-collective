@@ -12,7 +12,7 @@ export default function SocialRecapBlock({ block }: SocialRecapBlockProps) {
       <Text
         style={{
           margin: "0 0 10px",
-          color: palette.ink3,
+          color: palette.textMuted,
           fontFamily: fonts.mono,
           fontSize: 10,
           letterSpacing: "0.18em",
@@ -27,8 +27,8 @@ export default function SocialRecapBlock({ block }: SocialRecapBlockProps) {
           href={post.url}
           style={{
             display: "block",
-            backgroundColor: palette.cream,
-            border: `1px solid ${palette.line}`,
+            backgroundColor: palette.surface,
+            border: `1px solid ${palette.border}`,
             borderRadius: 6,
             padding: "10px 12px",
             marginTop: 8,
@@ -39,7 +39,7 @@ export default function SocialRecapBlock({ block }: SocialRecapBlockProps) {
             <Text
               style={{
                 margin: 0,
-                color: palette.ink,
+                color: palette.panelDark,
                 fontFamily: fonts.sans,
                 fontSize: 14,
               }}
@@ -50,7 +50,7 @@ export default function SocialRecapBlock({ block }: SocialRecapBlockProps) {
           <Text
             style={{
               margin: post.caption ? "4px 0 0" : 0,
-              color: palette.accentGold,
+              color: palette.accent,
               fontFamily: fonts.mono,
               fontSize: 10,
               letterSpacing: "0.12em",

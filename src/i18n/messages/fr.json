@@ -186,18 +186,23 @@
     },
     "Welcome": {
       "preview": "C'est confirmé. Bienvenue dans le cercle de {athleteFirstName}.",
-      "eyebrow": "C'est confirmé",
-      "footerNote": "Vous recevez cet e-mail parce que vous vous êtes abonné·e à la newsletter de {athleteName} sur Halo Collective. Vous pouvez vous désabonner à tout moment depuis le pied de page de n'importe quelle édition.",
-      "heading": "Bienvenue dans le cercle de {athleteFirstName}.",
-      "lead": "{greeting}merci d'avoir rejoint le cercle. Chaque semaine, la prochaine édition de {athleteFirstName} arrivera ici — résultats, coulisses, équipement et tout ce que seuls les initiés voient.",
-      "body": "La première édition que vous recevrez sera la prochaine publiée. En attendant, le catalogue est disponible sur le profil.",
-      "button": "Voir la page de {athleteFirstName}"
+      "greetingHeading": "Bienvenue {fanFirstName} !",
+      "greetingHeadingFallback": "Bienvenue dans le cercle de {athleteFirstName}.",
+      "fallbackBody": "Merci d'avoir rejoint le cercle. La prochaine édition arrivera ici dès que {athleteFirstName} la publiera — en attendant, le catalogue est disponible sur le profil.",
+      "partnersLabel": "Partenaires",
+      "followSocial": "Retrouvez {athleteFirstName} sur les réseaux",
+      "unsubscribeLabel": "Se désabonner",
+      "footerNote": "Vous recevez cet e-mail parce que vous vous êtes abonné·e à la newsletter de {athleteName} sur Halo Collective. Vous pouvez vous désabonner à tout moment."
     },
     "Newsletter": {
       "editionLabel": "Édition n°{n}",
       "footerNote": "Vous recevez cet e-mail parce que vous vous êtes abonné·e à l'édition de {athleteName} sur Halo Collective.",
       "unsubscribe": "Se désabonner",
-      "viewInBrowser": "Voir dans le navigateur →"
+      "viewInBrowser": "Lire dans le navigateur →",
+      "worldAtp": "ATP mondial",
+      "careerTitles": "Titres en carrière",
+      "myPartners": "Mes partenaires",
+      "member": "Membre exclusif"
     },
     "Waitlist": {
       "preview": "Vous êtes sur la liste d'attente !",

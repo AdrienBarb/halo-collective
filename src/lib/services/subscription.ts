@@ -117,12 +117,31 @@ export async function createSubscription(
       athleteFirstName: athlete.firstName,
       athleteLastName: athlete.lastName,
       athleteSlug: athlete.slug,
+      coverImageUrl: athlete.coverImageUrl,
+      socialLinks: athlete.socialLinks,
+      welcomeMessage: athlete.welcomeMessage,
+      sponsors: athlete.sponsors.map((s) => ({
+        id: s.id,
+        name: s.name,
+        logoUrl: s.logoUrl,
+        websiteUrl: s.websiteUrl,
+      })),
       locale: user.locale,
     }).catch((error: unknown) => {
+      // Allowlist the error fields we log — never spread `error` or the
+      // welcomeMessage body, since either could leak athlete content or fan
+      // email into stdout/PostHog.
+      const errInfo =
+        error instanceof Error
+          ? { name: error.name, message: error.message, stack: error.stack }
+          : { message: String(error) };
       console.error(
         JSON.stringify({
           scope: "subscribe.welcome_email_failed",
-          error: String(error),
+          athleteSlug: athlete.slug,
+          userId,
+          subscriptionId,
+          ...errInfo,
         }),
       );
     });

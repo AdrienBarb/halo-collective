@@ -23,7 +23,7 @@ export function MediaLinkGroupHeader() {
     <Text
       style={{
         margin: "0 0 4px",
-        color: palette.ink3,
+        color: palette.textMuted,
         fontFamily: fonts.mono,
         fontSize: 10,
         letterSpacing: "0.18em",

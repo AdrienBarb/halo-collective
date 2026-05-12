@@ -70,6 +70,7 @@ const FIELD_TO_ANCHOR: Record<string, string> = {
   worldRank: "profile",
   countryRank: "profile",
   titlesCount: "profile",
+  welcomeMessage: "profile",
   sponsors: "sponsors",
   socialLinks: "social",
 };
@@ -127,6 +128,7 @@ function toFormValues(
     worldRank: athlete.worldRank ?? undefined,
     countryRank: athlete.countryRank ?? undefined,
     titlesCount: athlete.titlesCount,
+    welcomeMessage: athlete.welcomeMessage ?? undefined,
     socialLinks: {
       instagram: social.instagram,
       x: social.x,
@@ -537,6 +539,25 @@ export default function AthleteForm({
                 )}
               />
             </div>
+
+            <FormField
+              control={form.control}
+              name="welcomeMessage"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                    Welcome email message
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea rows={6} {...field} value={field.value ?? ""} />
+                  </FormControl>
+                  <p className="text-[11px] text-ink-3">
+                    Personal note sent to fans the moment they subscribe. Plain text, blank lines between paragraphs. Leave empty to use the default Halo template.
+                  </p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </SectionCard>
 
           {/* ─── 02 · Sponsors ─── */}

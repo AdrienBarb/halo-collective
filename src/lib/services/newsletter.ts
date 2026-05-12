@@ -439,7 +439,9 @@ export async function cloneFromPreviousEdition(athleteId: string) {
 // ── Brevo publish ─────────────────────────────────────────────────────
 
 type NewsletterWithAthlete = Newsletter & {
-  athlete: Athlete;
+  athlete: Athlete & {
+    sponsors: Array<{ name: string; logoUrl: string; websiteUrl: string }>;
+  };
   sections: NewsletterSection[];
 };
 
@@ -465,7 +467,16 @@ async function loadNewsletterWithAthlete(
   const newsletter = await prisma.newsletter.findUnique({
     where: { id },
     include: {
-      athlete: true,
+      // Sponsors are loaded inline (no separate query) so publish and
+      // archive renders see the same set without a second round-trip.
+      athlete: {
+        include: {
+          sponsors: {
+            orderBy: { order: "asc" },
+            select: { name: true, logoUrl: true, websiteUrl: true },
+          },
+        },
+      },
       sections: { orderBy: { order: "asc" } },
     },
   });
@@ -509,13 +520,17 @@ export interface NewsletterEmailRenderInput {
   slug: string;
   heroImageUrl?: string | null;
   editionNumber: number;
+  editionDate?: Date | string | null;
   editionMode: EditionModeValue;
   tournamentName?: string | null;
+  tournamentLogoUrl?: string | null;
   tournamentCategory?: string | null;
   tournamentLocation?: string | null;
   tournamentSurface?: string | null;
   tournamentStartDate?: Date | string | null;
   tournamentEndDate?: Date | string | null;
+  worldRankSnapshot?: number | null;
+  countryRankSnapshot?: number | null;
   sections: Array<{
     id: string;
     type: SectionTypeValue;
@@ -524,8 +539,31 @@ export interface NewsletterEmailRenderInput {
   }>;
 }
 
+export type AthleteForEmail = Pick<
+  Athlete,
+  | "firstName"
+  | "lastName"
+  | "slug"
+  | "countryCode"
+  | "countryName"
+  | "worldRank"
+  | "titlesCount"
+> & {
+  sponsors: Array<{ name: string; logoUrl: string; websiteUrl: string }>;
+};
+
+/**
+ * Defensive URL guard. The Zod schemas at the publish/admin boundary
+ * reject non-https URLs at write time — this is the runtime backstop
+ * in case a stale row carries a `javascript:` / `data:` href.
+ */
+function safeUrl(url: string | null | undefined): string {
+  if (!url) return "#";
+  return /^https?:\/\//i.test(url) ? url : "#";
+}
+
 async function renderEmailHtml(
-  athlete: Pick<Athlete, "firstName" | "lastName" | "slug">,
+  athlete: AthleteForEmail,
   input: NewsletterEmailRenderInput,
 ): Promise<string> {
   const editionUrl = buildEditionUrl(athlete.slug, input.slug);
@@ -541,12 +579,20 @@ async function renderEmailHtml(
   return render(
     NewsletterEmail({
       title: input.title,
-      heroImageUrl: input.heroImageUrl,
+      heroImageUrl: safeUrl(input.heroImageUrl),
       editionMode: input.editionMode,
       athleteName,
       editionUrl,
       askQuestionUrl,
+      editionNumber: input.editionNumber,
+      editionDate: input.editionDate,
+      countryName: athlete.countryName,
+      // Per-edition snapshot wins when present, falls back to athlete profile.
+      worldRank: input.worldRankSnapshot ?? athlete.worldRank,
+      titlesCount: athlete.titlesCount,
+      sponsors: athlete.sponsors,
       tournamentName: input.tournamentName,
+      tournamentLogoUrl: safeUrl(input.tournamentLogoUrl),
       tournamentCategory: input.tournamentCategory,
       tournamentLocation: input.tournamentLocation,
       tournamentSurface: input.tournamentSurface,
@@ -555,41 +601,67 @@ async function renderEmailHtml(
       sections: input.sections,
       locale,
       messages: {
-        editionLabel,
-        footerNote: t("footerNote", { athleteName }),
-        unsubscribe: t("unsubscribe"),
-        viewInBrowser: t("viewInBrowser"),
+        shell: {
+          editionLabel,
+          footerNote: t("footerNote", { athleteName }),
+          unsubscribe: t("unsubscribe"),
+          viewInBrowser: t("viewInBrowser"),
+        },
+        identity: {
+          worldAtp: t("worldAtp"),
+          careerTitles: t("careerTitles"),
+          myPartners: t("myPartners"),
+          member: t("member"),
+        },
       },
     }),
   );
 }
 
-async function renderNewsletterEmail(
-  newsletter: NewsletterWithAthlete,
-): Promise<string> {
-  return renderEmailHtml(newsletter.athlete, {
+/**
+ * Single mapping from a Newsletter row → render input. Publish and
+ * preview MUST both call this so they cannot drift — the publish path
+ * is what gets sent, the preview is what the admin signed off on, and
+ * any field present in one MUST be present in the other.
+ */
+export function toRenderInput(newsletter: Newsletter): NewsletterEmailRenderInput {
+  return {
     title: newsletter.title,
     slug: newsletter.slug,
     heroImageUrl: newsletter.heroImageUrl,
     editionNumber: newsletter.editionNumber,
+    editionDate: newsletter.editionDate,
     editionMode: newsletter.editionMode as EditionModeValue,
     tournamentName: newsletter.tournamentName,
+    tournamentLogoUrl: newsletter.tournamentLogoUrl,
     tournamentCategory: newsletter.tournamentCategory,
     tournamentLocation: newsletter.tournamentLocation,
     tournamentSurface: newsletter.tournamentSurface,
     tournamentStartDate: newsletter.tournamentStartDate,
     tournamentEndDate: newsletter.tournamentEndDate,
-    sections: newsletter.sections.map((s) => ({
-      id: s.id,
-      type: s.type as SectionTypeValue,
-      order: s.order,
-      blocks: s.blocks,
-    })),
-  });
+    worldRankSnapshot: newsletter.worldRankSnapshot,
+    countryRankSnapshot: newsletter.countryRankSnapshot,
+    // Sections are added by the caller because preview drafts and
+    // persisted rows have different section shapes.
+    sections: [],
+  };
+}
+
+async function renderNewsletterEmail(
+  newsletter: NewsletterWithAthlete,
+): Promise<string> {
+  const input = toRenderInput(newsletter);
+  input.sections = newsletter.sections.map((s) => ({
+    id: s.id,
+    type: s.type as SectionTypeValue,
+    order: s.order,
+    blocks: s.blocks,
+  }));
+  return renderEmailHtml(newsletter.athlete, input);
 }
 
 export async function renderNewsletterPreviewEmail(
-  athlete: Pick<Athlete, "firstName" | "lastName" | "slug">,
+  athlete: AthleteForEmail,
   input: NewsletterEmailRenderInput,
 ): Promise<string> {
   return renderEmailHtml(athlete, input);
@@ -631,12 +703,27 @@ async function markPublished(
       brevoCampaignId: String(campaignId),
     },
     include: {
-      athlete: true,
+      athlete: {
+        include: {
+          sponsors: {
+            orderBy: { order: "asc" },
+            select: { name: true, logoUrl: true, websiteUrl: true },
+          },
+        },
+      },
       sections: { orderBy: { order: "asc" } },
     },
   });
 }
 
+// Re-publishing a previously-sent edition deliberately does NOT
+// re-render — `renderedHtml` is the canonical archive of what Brevo
+// actually shipped. The web reader's "View in browser" link must
+// serve this string verbatim, never re-render from live athlete data
+// (titlesCount may have changed; sponsors may have churned). The
+// editor enforces the other half of the invariant: `updateNewsletter`
+// sets `renderedHtml = null` on any edit, so a stale archive can only
+// exist between an edit and the next republish.
 async function republishWithoutResending(
   id: string,
   previouslyPublishedAt: Date | null,

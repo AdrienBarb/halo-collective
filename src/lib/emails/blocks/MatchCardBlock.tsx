@@ -12,10 +12,10 @@ const RESULT_STYLES: Record<
   MatchCardBlockType["result"],
   { background: string; color: string; letter: string }
 > = {
-  W: { background: palette.accentGold, color: palette.cream, letter: "W" },
-  L: { background: palette.loss, color: palette.cream, letter: "L" },
-  BYE: { background: palette.cream3, color: palette.ink3, letter: "—" },
-  EXEMPT: { background: palette.cream3, color: palette.ink3, letter: "—" },
+  W: { background: palette.accent, color: palette.surface, letter: "W" },
+  L: { background: palette.loss, color: palette.surface, letter: "L" },
+  BYE: { background: palette.panelMuted, color: palette.textMuted, letter: "—" },
+  EXEMPT: { background: palette.panelMuted, color: palette.textMuted, letter: "—" },
 };
 
 export default function MatchCardBlock({ match }: MatchCardBlockProps) {
@@ -31,7 +31,7 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
   return (
     <Section
       style={{
-        borderBottom: `1px solid ${palette.line}`,
+        borderBottom: `1px solid ${palette.border}`,
         padding: "16px 0",
       }}
     >
@@ -74,7 +74,7 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
                       <Text
                         style={{
                           margin: 0,
-                          color: palette.ink,
+                          color: palette.panelDark,
                           fontFamily: fonts.sans,
                           fontSize: 14,
                           fontWeight: 700,
@@ -87,7 +87,7 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
                               <span
                                 style={{
                                   marginLeft: 8,
-                                  color: palette.ink3,
+                                  color: palette.textMuted,
                                   fontWeight: 400,
                                 }}
                               >
@@ -111,7 +111,7 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
                 <Text
                   style={{
                     margin: "6px 0 0",
-                    color: palette.ink2,
+                    color: palette.textBody,
                     fontFamily: fonts.mono,
                     fontSize: 12,
                     fontWeight: 600,
@@ -124,8 +124,8 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
                   style={{
                     margin: "6px 0 0",
                     display: "inline-block",
-                    backgroundColor: palette.cream3,
-                    color: palette.ink3,
+                    backgroundColor: palette.panelMuted,
+                    color: palette.textMuted,
                     fontFamily: fonts.mono,
                     fontSize: 10,
                     fontWeight: 700,
@@ -141,7 +141,7 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
               <Text
                 style={{
                   margin: "6px 0 0",
-                  color: palette.ink3,
+                  color: palette.textMuted,
                   fontFamily: fonts.mono,
                   fontSize: 10,
                   letterSpacing: "0.12em",
@@ -168,8 +168,8 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
                   href={match.highlightUrl}
                   style={{
                     display: "inline-block",
-                    backgroundColor: palette.ink,
-                    color: palette.accentWarm,
+                    backgroundColor: palette.panelDark,
+                    color: palette.accent,
                     fontFamily: fonts.mono,
                     fontSize: 10,
                     fontWeight: 700,
@@ -192,7 +192,7 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
         <Text
           style={{
             margin: "12px 0 0",
-            color: palette.ink2,
+            color: palette.textBody,
             fontFamily: fonts.serif,
             fontSize: 14,
             fontStyle: "italic",

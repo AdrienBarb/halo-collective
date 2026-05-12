@@ -22,7 +22,7 @@ export default function TextUpdateBlock({
       <Text
         style={{
           margin: "0 0 10px",
-          color: palette.ink3,
+          color: palette.textMuted,
           fontFamily: fonts.mono,
           fontSize: 10,
           letterSpacing: "0.18em",

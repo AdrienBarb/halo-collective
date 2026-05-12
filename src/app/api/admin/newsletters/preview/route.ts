@@ -10,7 +10,10 @@ import { errorHandler } from "@/lib/errors/errorHandler";
 import { NotFoundError } from "@/lib/errors/AppError";
 import { getAthleteBySlug } from "@/lib/services/athlete";
 import { prisma } from "@/lib/db/prisma";
-import { renderNewsletterPreviewEmail } from "@/lib/services/newsletter";
+import {
+  renderNewsletterPreviewEmail,
+  toRenderInput,
+} from "@/lib/services/newsletter";
 import {
   editionModeSchema,
   sectionTypeSchema,
@@ -126,25 +129,21 @@ export async function POST(req: NextRequest) {
       sections: sectionRows,
     };
 
-    const emailHtml = await renderNewsletterPreviewEmail(athlete, {
-      title,
-      slug,
-      heroImageUrl: newsletter.heroImageUrl,
-      editionNumber,
-      editionMode,
-      tournamentName: newsletter.tournamentName,
-      tournamentCategory: newsletter.tournamentCategory,
-      tournamentLocation: newsletter.tournamentLocation,
-      tournamentSurface: newsletter.tournamentSurface,
-      tournamentStartDate: newsletter.tournamentStartDate,
-      tournamentEndDate: newsletter.tournamentEndDate,
-      sections: sectionRows.map((s) => ({
-        id: s.id,
-        type: s.type as SectionTypeValue,
-        order: s.order,
-        blocks: s.blocks,
-      })),
-    });
+    // toRenderInput is the single mapping shared with the publish path —
+    // any header field added to one MUST flow through the other so admins
+    // never approve a preview that diverges from what Brevo ships.
+    const input = toRenderInput(newsletter);
+    input.title = title;
+    input.slug = slug;
+    input.editionNumber = editionNumber;
+    input.editionMode = editionMode;
+    input.sections = sectionRows.map((s) => ({
+      id: s.id,
+      type: s.type as SectionTypeValue,
+      order: s.order,
+      blocks: s.blocks,
+    }));
+    const emailHtml = await renderNewsletterPreviewEmail(athlete, input);
 
     return NextResponse.json({ athlete, newsletter, emailHtml });
   } catch (error) {

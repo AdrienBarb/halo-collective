@@ -12,8 +12,34 @@ import {
 
 interface FanEngagementSectionProps {
   blocks: FanEngagementBlock[];
-  /** URL on the web reader where activations are submitted. */
-  ctaUrl?: string;
+  /** Web reader URL for this edition — where polls/quizzes/draws actually live. */
+  editionUrl: string;
+  /** Optional dedicated feedback URL — used only by the Q&A "Ask me anything" CTA. */
+  askQuestionUrl?: string;
+}
+
+// Picks the right destination per engagement block:
+//   - poll / prediction / quiz / prize_draw / survey → the web reader
+//     (these activations need the interactive widget, not a generic form)
+//   - qa                                              → the feedback URL
+//   - challenge                                       → no CTA
+function ctaUrlFor(
+  block: FanEngagementBlock,
+  editionUrl: string,
+  askQuestionUrl: string | undefined,
+): string | undefined {
+  switch (block.kind) {
+    case "qa":
+      return askQuestionUrl ?? editionUrl;
+    case "survey":
+      // Surveys may carry their own externalUrl; that's resolved inside
+      // SurveyBlock. Falling back to editionUrl is correct when they don't.
+      return editionUrl;
+    case "challenge":
+      return undefined;
+    default:
+      return editionUrl;
+  }
 }
 
 function renderBlock(
@@ -40,12 +66,15 @@ function renderBlock(
 
 export default function FanEngagementSection({
   blocks,
-  ctaUrl,
+  editionUrl,
+  askQuestionUrl,
 }: FanEngagementSectionProps) {
   return (
     <Section>
       {blocks.map((block) => (
-        <div key={block.id}>{renderBlock(block, ctaUrl)}</div>
+        <div key={block.id}>
+          {renderBlock(block, ctaUrlFor(block, editionUrl, askQuestionUrl))}
+        </div>
       ))}
     </Section>
   );

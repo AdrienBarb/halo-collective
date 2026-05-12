@@ -186,18 +186,23 @@
     },
     "Welcome": {
       "preview": "You're in. Welcome to {athleteFirstName}'s circle.",
-      "eyebrow": "You're in",
-      "footerNote": "You're receiving this because you subscribed to {athleteName}'s newsletter on Halo Collective. You can unsubscribe at any time from the footer of any edition.",
-      "heading": "Welcome to {athleteFirstName}'s circle.",
-      "lead": "{greeting}thanks for stepping inside. Every week, {athleteFirstName}'s next edition will land here — results, behind the scenes, gear, and the things only the inner circle gets.",
-      "body": "The first edition you'll receive is the next one published. Until then, the back catalog is on the profile.",
-      "button": "Visit {athleteFirstName}'s page"
+      "greetingHeading": "Welcome {fanFirstName}!",
+      "greetingHeadingFallback": "Welcome to {athleteFirstName}'s circle.",
+      "fallbackBody": "Thanks for stepping inside. The next edition will land here the moment {athleteFirstName} publishes it — until then, the back catalogue lives on the profile.",
+      "partnersLabel": "Partners",
+      "followSocial": "Follow {athleteFirstName} on socials",
+      "unsubscribeLabel": "Unsubscribe",
+      "footerNote": "You're receiving this because you subscribed to {athleteName}'s newsletter on Halo Collective. You can unsubscribe at any time."
     },
     "Newsletter": {
       "editionLabel": "Edition #{n}",
       "footerNote": "You're receiving this because you subscribed to {athleteName}'s edition on Halo Collective.",
       "unsubscribe": "Unsubscribe",
-      "viewInBrowser": "View in browser →"
+      "viewInBrowser": "Read in browser →",
+      "worldAtp": "World ATP",
+      "careerTitles": "Career titles",
+      "myPartners": "My partners",
+      "member": "Exclusive member"
     },
     "Waitlist": {
       "preview": "You're on the waitlist!",

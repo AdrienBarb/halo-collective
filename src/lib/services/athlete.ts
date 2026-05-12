@@ -63,6 +63,7 @@ export async function createAthlete(input: CreateAthleteOutput) {
     countryRank,
     titlesCount,
     socialLinks,
+    welcomeMessage,
     sponsors,
   } = input;
   const countryName = resolveCountryName(countryCode);
@@ -86,6 +87,7 @@ export async function createAthlete(input: CreateAthleteOutput) {
           countryRank,
           titlesCount,
           socialLinks: socialLinks as Prisma.InputJsonValue | undefined,
+          welcomeMessage,
           sponsors: sponsors?.length
             ? {
                 create: sponsors.map((s, i) => ({
@@ -128,6 +130,11 @@ export async function updateAthlete(id: string, input: UpdateAthleteOutput) {
     countryRank: input.countryRank,
     titlesCount: input.titlesCount,
   };
+  // `undefined` = leave unchanged, `null` = explicit clear — mirror the
+  // socialLinks pattern below. Plain assignment would clobber stored values.
+  if (input.welcomeMessage !== undefined) {
+    data.welcomeMessage = input.welcomeMessage;
+  }
   if (input.countryCode) {
     data.countryCode = input.countryCode;
     data.countryName = resolveCountryName(input.countryCode);

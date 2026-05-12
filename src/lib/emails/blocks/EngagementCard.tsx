@@ -32,7 +32,7 @@ export default function EngagementCard({
   return (
     <Section
       style={{
-        backgroundColor: palette.cream,
+        backgroundColor: palette.surface,
         borderRadius: 6,
         padding: "18px 18px",
         marginBottom: 24,
@@ -41,7 +41,7 @@ export default function EngagementCard({
       <Text
         style={{
           margin: 0,
-          color: palette.accentGold,
+          color: palette.accent,
           fontFamily: fonts.mono,
           fontSize: 10,
           fontWeight: 700,
@@ -54,7 +54,7 @@ export default function EngagementCard({
       <Text
         style={{
           margin: "10px 0 0",
-          color: palette.ink,
+          color: palette.panelDark,
           fontFamily: fonts.serif,
           fontSize: 17,
           fontStyle: "italic",
@@ -67,7 +67,7 @@ export default function EngagementCard({
         <Text
           style={{
             margin: "10px 0 0",
-            color: palette.ink2,
+            color: palette.textBody,
             fontFamily: fonts.sans,
             fontSize: 14,
             lineHeight: 1.6,
@@ -86,7 +86,7 @@ export default function EngagementCard({
         <Text
           style={{
             margin: "12px 0 0",
-            color: palette.ink3,
+            color: palette.textMuted,
             fontFamily: fonts.mono,
             fontSize: 10,
             letterSpacing: "0.12em",
@@ -100,7 +100,7 @@ export default function EngagementCard({
         <Text
           style={{
             margin: "8px 0 0",
-            color: palette.ink3,
+            color: palette.textMuted,
             fontFamily: fonts.mono,
             fontSize: 10,
             letterSpacing: "0.12em",

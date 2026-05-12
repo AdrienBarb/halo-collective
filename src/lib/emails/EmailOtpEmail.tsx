@@ -29,7 +29,7 @@ export const EmailOtpEmail = ({ otp, messages }: EmailOtpEmailProps) => {
       <Text
         style={{
           margin: "24px 0 0",
-          color: palette.ink,
+          color: palette.panelDark,
           fontFamily: fonts.mono,
           fontSize: 36,
           fontWeight: 600,

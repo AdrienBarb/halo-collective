@@ -36,7 +36,7 @@ export default function MonetisationItemBlock({
   return (
     <Section
       style={{
-        borderBottom: `1px solid ${palette.line}`,
+        borderBottom: `1px solid ${palette.border}`,
         paddingBottom: 24,
         marginBottom: 24,
       }}
@@ -53,7 +53,7 @@ export default function MonetisationItemBlock({
               <Text
                 style={{
                   margin: 0,
-                  color: palette.accentGold,
+                  color: palette.accent,
                   fontFamily: fonts.mono,
                   fontSize: 10,
                   fontWeight: 700,
@@ -76,7 +76,7 @@ export default function MonetisationItemBlock({
                 <Text
                   style={{
                     margin: 0,
-                    color: palette.ink3,
+                    color: palette.textMuted,
                     fontFamily: fonts.mono,
                     fontSize: 10,
                     letterSpacing: "0.12em",
@@ -96,7 +96,7 @@ export default function MonetisationItemBlock({
       <Text
         style={{
           margin: "12px 0 0",
-          color: palette.ink,
+          color: palette.panelDark,
           fontFamily: fonts.sans,
           fontSize: 16,
           fontWeight: 700,

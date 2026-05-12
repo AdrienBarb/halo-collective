@@ -34,14 +34,17 @@ interface SectionRendererProps {
   index: number;
   editionMode: EditionModeValue;
   tournamentName?: string | null;
-  /** URL used by FAN_ENGAGEMENT CTAs — points to the web reader. */
+  /** Web reader URL for this edition — used by vote / prize-draw / quiz / survey CTAs. */
+  editionUrl: string;
+  /** Feedback form URL — used by Q&A "Ask me anything" CTA. */
   askQuestionUrl?: string | null;
 }
 
 function renderBody(
   section: EmailRawSection,
   mode: EditionModeValue,
-  ctaUrl: string | null | undefined,
+  editionUrl: string,
+  askQuestionUrl: string | null | undefined,
 ): React.ReactNode {
   const parsed = safeParseSectionBlocks(section.type, mode, section.blocks);
   if (!parsed.success) return null;
@@ -69,7 +72,8 @@ function renderBody(
       return (
         <FanEngagementSection
           blocks={parsed.data as FanEngagementBlock[]}
-          ctaUrl={ctaUrl ?? undefined}
+          editionUrl={editionUrl}
+          askQuestionUrl={askQuestionUrl ?? undefined}
         />
       );
   }
@@ -80,11 +84,12 @@ export default function SectionRenderer({
   index,
   editionMode,
   tournamentName,
+  editionUrl,
   askQuestionUrl,
 }: SectionRendererProps) {
   if (!isSectionMeaningful(section.type, section.blocks)) return null;
 
-  const body = renderBody(section, editionMode, askQuestionUrl);
+  const body = renderBody(section, editionMode, editionUrl, askQuestionUrl);
   if (body === null) return null;
 
   const labels = getNewsletterLabels();
@@ -93,23 +98,23 @@ export default function SectionRenderer({
   const title = getSectionTitle(section.type, tournamentName);
 
   return (
-    <Section style={{ marginTop: 24 }}>
+    <Section style={{ marginTop: 8 }}>
       <Section
         className="force-dark-bg"
         style={{
-          backgroundColor: palette.ink,
-          padding: "14px 18px",
+          backgroundColor: palette.panelDark,
+          padding: "18px 32px 14px",
         }}
       >
         <Text
           className="force-dark-fg-muted"
           style={{
             margin: 0,
-            color: palette.cream3,
-            fontFamily: fonts.mono,
+            color: palette.textOnDark,
+            fontFamily: fonts.display,
             fontSize: 10,
             fontWeight: 700,
-            letterSpacing: "0.18em",
+            letterSpacing: "0.25em",
             textTransform: "uppercase",
           }}
         >
@@ -119,12 +124,12 @@ export default function SectionRenderer({
           <Text
             className="force-dark-fg"
             style={{
-              margin: "4px 0 0",
-              color: palette.cream,
-              fontFamily: fonts.sans,
-              fontSize: 18,
-              fontWeight: 700,
-              lineHeight: 1.3,
+              margin: "6px 0 0",
+              color: palette.textOnDark,
+              fontFamily: fonts.display,
+              fontSize: 20,
+              fontWeight: 900,
+              lineHeight: 1.2,
             }}
           >
             {title}
@@ -134,8 +139,8 @@ export default function SectionRenderer({
       <Section
         className="force-light-bg"
         style={{
-          backgroundColor: palette.cream2,
-          padding: "20px 18px",
+          backgroundColor: palette.panel,
+          padding: "24px 32px",
         }}
       >
         {body}

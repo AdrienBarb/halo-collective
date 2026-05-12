@@ -1,23 +1,32 @@
-import { Img, Link, Section, Text } from "@react-email/components";
+import { Img, Link, Section } from "@react-email/components";
 import { EmailLayout } from "@/lib/emails/_brand/EmailLayout";
-import { EmailButton, EmailHeading } from "@/lib/emails/_brand/atoms";
-import { palette, fonts } from "@/lib/emails/_brand/theme";
+import { EmailButton } from "@/lib/emails/_brand/atoms";
+import { palette } from "@/lib/emails/_brand/theme";
 import SectionRenderer, {
   type EmailRawSection,
 } from "@/lib/emails/SectionRenderer";
-import { getTournamentLabel } from "@/lib/newsletter/labels";
+import IdentityBlock, {
+  type IdentityBlockSponsor,
+} from "@/lib/emails/blocks/IdentityBlock";
 import type {
   EditionModeValue,
   SectionTypeValue,
 } from "@/lib/schemas/newsletterSection";
 import type { Locale } from "@/i18n/locales";
-import { formatShortDateNoYear } from "@/lib/utils/formatDate";
 
 export interface NewsletterMessages {
-  editionLabel: string;
-  footerNote: string;
-  unsubscribe: string;
-  viewInBrowser: string;
+  shell: {
+    editionLabel: string;
+    footerNote: string;
+    unsubscribe: string;
+    viewInBrowser: string;
+  };
+  identity: {
+    worldAtp: string;
+    careerTitles: string;
+    myPartners: string;
+    member: string;
+  };
 }
 
 interface NewsletterEmailProps {
@@ -27,7 +36,14 @@ interface NewsletterEmailProps {
   athleteName: string;
   editionUrl: string;
   askQuestionUrl?: string | null;
+  editionNumber: number;
+  editionDate?: Date | string | null;
+  countryName?: string | null;
+  worldRank?: number | null;
+  titlesCount?: number | null;
+  sponsors?: IdentityBlockSponsor[];
   tournamentName?: string | null;
+  tournamentLogoUrl?: string | null;
   tournamentCategory?: string | null;
   tournamentLocation?: string | null;
   tournamentSurface?: string | null;
@@ -40,23 +56,6 @@ interface NewsletterEmailProps {
   messages: NewsletterMessages;
 }
 
-function formatDateRange(
-  start: Date | string | null | undefined,
-  end: Date | string | null | undefined,
-  locale: Locale,
-): string | null {
-  const fmt = (d: Date | string | null | undefined): string | null => {
-    if (!d) return null;
-    const date = d instanceof Date ? d : new Date(d);
-    if (Number.isNaN(date.getTime())) return null;
-    return formatShortDateNoYear(date, locale);
-  };
-  const s = fmt(start);
-  const e = fmt(end);
-  if (s && e) return `${s} – ${e}`;
-  return s ?? e ?? null;
-}
-
 export const NewsletterEmail = ({
   title,
   heroImageUrl,
@@ -64,93 +63,73 @@ export const NewsletterEmail = ({
   athleteName,
   editionUrl,
   askQuestionUrl,
+  editionNumber,
+  editionDate,
+  countryName,
+  worldRank,
+  titlesCount,
+  sponsors,
   tournamentName,
-  tournamentCategory,
-  tournamentLocation,
-  tournamentSurface,
-  tournamentStartDate,
-  tournamentEndDate,
+  tournamentLogoUrl,
   sections,
   previewText,
   unsubscribeUrl = "{{ unsubscribe }}",
   locale,
   messages,
 }: NewsletterEmailProps) => {
-  const tournamentLabel = getTournamentLabel(tournamentName);
-  const tournamentMeta = [
-    tournamentCategory,
-    tournamentLocation,
-    tournamentSurface,
-    formatDateRange(tournamentStartDate, tournamentEndDate, locale),
-  ]
-    .filter(Boolean)
-    .join(" · ");
   const orderedSections = [...sections].sort((a, b) => a.order - b.order);
 
   return (
     <EmailLayout
       preview={previewText ?? title}
-      eyebrow={`${athleteName} · ${messages.editionLabel}`}
+      eyebrow={`${athleteName} · ${messages.shell.editionLabel}`}
+      viewInBrowser={{ url: editionUrl, label: messages.shell.viewInBrowser }}
+      bodyPadding="0"
       footerNote={
         <>
-          {messages.footerNote}{" "}
+          {messages.shell.footerNote}{" "}
           <Link
             href={unsubscribeUrl}
-            style={{ color: palette.ink3, textDecoration: "underline" }}
+            style={{ color: palette.textMuted, textDecoration: "underline" }}
           >
-            {messages.unsubscribe}
+            {messages.shell.unsubscribe}
           </Link>
         </>
       }
     >
-      {tournamentLabel ? (
-        <Text
-          style={{
-            margin: "0 0 8px",
-            color: palette.ink3,
-            fontFamily: fonts.mono,
-            fontSize: 10,
-            letterSpacing: "0.22em",
-            textTransform: "uppercase",
-          }}
-        >
-          {tournamentLabel}
-        </Text>
-      ) : null}
-
-      <EmailHeading>{title}</EmailHeading>
-
-      {tournamentMeta ? (
-        <Text
-          style={{
-            margin: "8px 0 0",
-            color: palette.ink3,
-            fontFamily: fonts.mono,
-            fontSize: 11,
-            letterSpacing: "0.16em",
-            textTransform: "uppercase",
-          }}
-        >
-          {tournamentMeta}
-        </Text>
-      ) : null}
-
       {heroImageUrl ? (
-        <Section style={{ marginTop: 20 }}>
+        <Section
+          className="force-light-bg"
+          style={{ padding: 0, fontSize: 0, lineHeight: 0 }}
+        >
           <Img
             src={heroImageUrl}
-            alt={title}
-            width="536"
+            alt={athleteName}
+            width="600"
             style={{
               display: "block",
               width: "100%",
+              maxWidth: 600,
               height: "auto",
-              borderRadius: 8,
-              objectFit: "cover",
             }}
           />
         </Section>
       ) : null}
+
+      <IdentityBlock
+        editionNumber={editionNumber}
+        editionDate={editionDate}
+        subtitle={title}
+        tournamentName={tournamentName}
+        tournamentLogoUrl={tournamentLogoUrl}
+        athleteName={athleteName}
+        countryName={countryName}
+        worldRank={worldRank}
+        titlesCount={titlesCount}
+        sponsors={sponsors}
+        locale={locale}
+        messages={messages.identity}
+      />
 
       {orderedSections.map((section, index) => (
         <SectionRenderer
@@ -159,12 +138,18 @@ export const NewsletterEmail = ({
           index={index}
           editionMode={editionMode}
           tournamentName={tournamentName}
+          editionUrl={editionUrl}
           askQuestionUrl={askQuestionUrl}
         />
       ))}
 
-      <Section style={{ marginTop: 28, textAlign: "center" }}>
-        <EmailButton href={editionUrl}>{messages.viewInBrowser}</EmailButton>
+      <Section
+        className="force-light-bg"
+        style={{ padding: "20px 32px 8px", textAlign: "center" }}
+      >
+        <EmailButton href={editionUrl}>
+          {messages.shell.viewInBrowser}
+        </EmailButton>
       </Section>
     </EmailLayout>
   );
@@ -229,7 +214,14 @@ NewsletterEmail.PreviewProps = {
   athleteName: "Flavio Cobolli",
   editionUrl: "https://halocollective.co/flavio-cobolli?edition=monte-carlo-comeback",
   askQuestionUrl: "https://halocollective.co/athletes/flavio-cobolli/feedback",
+  editionNumber: 1,
+  editionDate: new Date("2026-04-13"),
+  countryName: "Italy",
+  worldRank: 32,
+  titlesCount: 1,
+  sponsors: [],
   tournamentName: "Monte Carlo",
+  tournamentLogoUrl: null,
   tournamentCategory: "ATP Masters 1000",
   tournamentLocation: "Monte Carlo, Monaco",
   tournamentSurface: "Clay",
@@ -239,11 +231,19 @@ NewsletterEmail.PreviewProps = {
   previewText: "The comeback nobody saw",
   locale: "en",
   messages: {
-    editionLabel: "Edition #01",
-    footerNote:
-      "You're receiving this because you subscribed to Flavio Cobolli's edition on Halo Collective.",
-    unsubscribe: "Unsubscribe",
-    viewInBrowser: "View in browser →",
+    shell: {
+      editionLabel: "Edition #01",
+      footerNote:
+        "You're receiving this because you subscribed to Flavio Cobolli's edition on Halo Collective.",
+      unsubscribe: "Unsubscribe",
+      viewInBrowser: "Read in browser →",
+    },
+    identity: {
+      worldAtp: "World ATP",
+      careerTitles: "Career titles",
+      myPartners: "My partners",
+      member: "Exclusive member",
+    },
   },
 } satisfies NewsletterEmailProps;
 

@@ -1,13 +1,18 @@
 import { z } from "zod";
 import { countryCodeSchema } from "@/lib/schemas/country";
 import {
+  boundedClearableTrimmedString,
+  boundedTrimmedString,
   mediaUrl,
   optionalMediaUrl,
   optionalSafeUrl,
   optionalTrimmedString,
+  personNameSchema,
   safeUrl,
   slugSchema,
 } from "@/lib/schemas/common";
+
+const WELCOME_MESSAGE_MAX = 4000;
 
 // Empty string / null must short-circuit BEFORE z.coerce.number() — otherwise
 // `""` coerces to 0 and an empty rank would persist as `0`, sorting that
@@ -45,8 +50,8 @@ export const athleteSponsorsSchema = z.array(athleteSponsorInputSchema).optional
 
 export const createAthleteSchema = z.object({
   slug: slugSchema,
-  firstName: z.string().trim().min(1, "First name is required"),
-  lastName: z.string().trim().min(1, "Last name is required"),
+  firstName: personNameSchema,
+  lastName: personNameSchema,
   sport: z.enum(["TENNIS"]),
   tour: optionalTrimmedString,
   countryCode: countryCodeSchema,
@@ -55,14 +60,15 @@ export const createAthleteSchema = z.object({
   coverImageUrl: optionalMediaUrl,
   worldRank: optionalInt,
   countryRank: optionalInt,
-  titlesCount: z.coerce.number().int().min(0),
+  titlesCount: z.coerce.number().int().min(0).max(999),
   socialLinks: socialLinksSchema,
+  welcomeMessage: boundedTrimmedString(WELCOME_MESSAGE_MAX),
   sponsors: athleteSponsorsSchema,
 });
 
 export const updateAthleteSchema = z.object({
-  firstName: z.string().trim().min(1).optional(),
-  lastName: z.string().trim().min(1).optional(),
+  firstName: personNameSchema.optional(),
+  lastName: personNameSchema.optional(),
   sport: z.enum(["TENNIS"]).optional(),
   tour: optionalTrimmedString,
   countryCode: countryCodeSchema.optional(),
@@ -71,8 +77,9 @@ export const updateAthleteSchema = z.object({
   coverImageUrl: optionalMediaUrl,
   worldRank: optionalInt,
   countryRank: optionalInt,
-  titlesCount: z.coerce.number().int().min(0).optional(),
+  titlesCount: z.coerce.number().int().min(0).max(999).optional(),
   socialLinks: socialLinksSchema,
+  welcomeMessage: boundedClearableTrimmedString(WELCOME_MESSAGE_MAX),
   sponsors: athleteSponsorsSchema,
 });
 

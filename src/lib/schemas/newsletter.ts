@@ -1,8 +1,8 @@
 import { z } from "zod";
 import {
+  clearableBoundedInt,
   clearableDate,
   clearableMediaUrl,
-  clearablePositiveInt,
   clearableTrimmedString,
   optionalMediaUrl,
   slugSchema,
@@ -52,8 +52,11 @@ const headerFields = {
   tournamentSurface: clearableTrimmedString,
   tournamentStartDate: clearableDate,
   tournamentEndDate: clearableDate,
-  worldRankSnapshot: clearablePositiveInt,
-  countryRankSnapshot: clearablePositiveInt,
+  // Capped: anything above MAX_RANK is almost certainly a typo, and
+  // email contents are immutable post-send — a 5-digit rank would
+  // ship permanently to N inboxes.
+  worldRankSnapshot: clearableBoundedInt(10000),
+  countryRankSnapshot: clearableBoundedInt(10000),
 };
 
 export const createNewsletterSchema = z.object({

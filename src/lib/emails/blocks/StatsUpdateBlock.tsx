@@ -15,7 +15,7 @@ export default function StatsUpdateBlock({ block }: StatsUpdateBlockProps) {
       <Text
         style={{
           margin: "0 0 10px",
-          color: palette.ink3,
+          color: palette.textMuted,
           fontFamily: fonts.mono,
           fontSize: 10,
           letterSpacing: "0.18em",
@@ -31,7 +31,7 @@ export default function StatsUpdateBlock({ block }: StatsUpdateBlockProps) {
           cellSpacing={0}
           style={{
             borderCollapse: "collapse",
-            backgroundColor: palette.cream,
+            backgroundColor: palette.surface,
             padding: 0,
             marginBottom: 12,
           }}
@@ -43,7 +43,7 @@ export default function StatsUpdateBlock({ block }: StatsUpdateBlockProps) {
                   <Text
                     style={{
                       margin: 0,
-                      color: palette.ink,
+                      color: palette.panelDark,
                       fontFamily: fonts.mono,
                       fontSize: 22,
                       fontWeight: 700,
@@ -58,7 +58,7 @@ export default function StatsUpdateBlock({ block }: StatsUpdateBlockProps) {
                   <Text
                     style={{
                       margin: 0,
-                      color: palette.ink3,
+                      color: palette.textMuted,
                       fontFamily: fonts.mono,
                       fontSize: 11,
                       letterSpacing: "0.12em",

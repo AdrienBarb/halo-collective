@@ -10,7 +10,7 @@ export default function HeroMetricBlock({ metric }: HeroMetricBlockProps) {
   return (
     <div
       style={{
-        backgroundColor: palette.ink,
+        backgroundColor: palette.panelDark,
         padding: "14px 8px",
         textAlign: "center",
       }}
@@ -18,7 +18,7 @@ export default function HeroMetricBlock({ metric }: HeroMetricBlockProps) {
       <Text
         style={{
           margin: 0,
-          color: palette.cream,
+          color: palette.surface,
           fontFamily: fonts.mono,
           fontSize: 16,
           fontWeight: 700,
@@ -29,7 +29,7 @@ export default function HeroMetricBlock({ metric }: HeroMetricBlockProps) {
       <Text
         style={{
           margin: "4px 0 0",
-          color: palette.cream3,
+          color: palette.panelMuted,
           fontFamily: fonts.mono,
           fontSize: 9,
           letterSpacing: "0.15em",
