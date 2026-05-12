@@ -23,7 +23,7 @@ import type {
   EditionModeValue,
   SectionTypeValue,
 } from "@/lib/schemas/newsletterSection";
-import SubscribeForm from "@/components/athlete/SubscribeForm";
+import SubscribeButton from "@/components/athlete/SubscribeButton";
 import EditionTabsClient, {
   type EditionTab,
 } from "@/components/athlete/EditionTabsClient";
@@ -40,6 +40,7 @@ interface AthleteProfileProps {
   selectedSlug: string | null;
   isSignedIn: boolean;
   isSubscribed: boolean;
+  ipCountryCode: string | null;
   previewMode?: boolean;
 }
 
@@ -80,6 +81,7 @@ export default function AthleteProfile({
   selectedSlug,
   isSignedIn,
   isSubscribed,
+  ipCountryCode,
   previewMode = false,
 }: AthleteProfileProps) {
   const fullName = `${athlete.firstName} ${athlete.lastName}`;
@@ -186,11 +188,12 @@ export default function AthleteProfile({
           </section>
         ) : null}
 
-        <SubscribeForm
+        <SubscribeButton
           athleteSlug={athlete.slug}
           athleteFirstName={athlete.firstName}
           isSignedIn={isSignedIn}
           isSubscribed={isSubscribed}
+          ipCountryCode={ipCountryCode}
         />
 
         <SocialLinksStrip

@@ -4,6 +4,7 @@ import { getAthleteBySlug } from "@/lib/services/athlete";
 import { listPublishedByAthleteId } from "@/lib/services/newsletter";
 import { isSubscribedToAthlete } from "@/lib/services/subscription";
 import { auth } from "@/lib/better-auth/auth";
+import { getCountryFromHeaders } from "@/lib/utils/getCountryFromHeaders";
 import AthleteProfile from "@/components/athlete/AthleteProfile";
 
 export default async function AthleteHomePage({
@@ -14,10 +15,13 @@ export default async function AthleteHomePage({
   const sp = await searchParams;
   const editionParam = typeof sp.edition === "string" ? sp.edition : null;
 
+  const h = await headers();
+  const ipCountryCode = getCountryFromHeaders(h);
+
   // Kick off independent fetches in parallel: athlete lookup + session.
   const [athlete, session] = await Promise.all([
     getAthleteBySlug(athleteSlug),
-    auth.api.getSession({ headers: await headers() }),
+    auth.api.getSession({ headers: h }),
   ]);
   if (!athlete) notFound();
 
@@ -37,6 +41,7 @@ export default async function AthleteHomePage({
       selectedSlug={editionParam}
       isSignedIn={isSignedIn}
       isSubscribed={isSubscribed}
+      ipCountryCode={ipCountryCode}
     />
   );
 }

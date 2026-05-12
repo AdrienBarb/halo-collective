@@ -152,6 +152,7 @@ function WebPreview({ data }: { data: PreviewResponse }) {
       selectedSlug={data.newsletter.slug}
       isSignedIn
       isSubscribed
+      ipCountryCode={null}
       previewMode
     />
   );
