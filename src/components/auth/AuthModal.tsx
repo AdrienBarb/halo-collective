@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -30,6 +30,7 @@ export default function AuthModal({
   redirectAfter,
 }: AuthModalProps) {
   const [mode, setMode] = useState<Mode>(initialMode);
+  const t = useTranslations("Auth.Modal");
 
   function handleOpenChange(next: boolean) {
     if (!next) setMode(initialMode);
@@ -41,10 +42,10 @@ export default function AuthModal({
       <DialogContent className="max-w-md border-line bg-cream-2">
         <DialogHeader>
           <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-accent-gold">
-            {mode === "signup" ? "Create your account" : "Welcome back"}
+            {mode === "signup" ? t("eyebrowSignUp") : t("eyebrowSignIn")}
           </div>
           <DialogTitle className="font-serif text-[24px] font-semibold tracking-[-0.015em] text-ink">
-            {mode === "signup" ? "Join Halo Collective" : "Sign in to Halo"}
+            {mode === "signup" ? t("titleSignUp") : t("titleSignIn")}
           </DialogTitle>
         </DialogHeader>
 

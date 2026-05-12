@@ -102,7 +102,7 @@ export default function AvatarUploader({
             unoptimized
           />
         ) : (
-          <span className={`flex h-full w-full items-center justify-center font-serif ${monogramClassName} font-semibold tracking-[-0.02em] text-cream`}>
+          <span className={`flex h-full w-full items-center justify-center font-sans ${monogramClassName} font-semibold tracking-[-0.02em] text-cream`}>
             {monogram}
           </span>
         )}

@@ -27,7 +27,7 @@ export default async function EditAthletePage({
         >
           ← Athletes
         </Link>
-        <h1 className="mt-2 font-serif text-[28px] font-semibold tracking-[-0.01em] text-ink">
+        <h1 className="mt-2 font-sans text-[28px] font-semibold tracking-[-0.01em] text-ink">
           {athlete.firstName} {athlete.lastName}
         </h1>
       </div>

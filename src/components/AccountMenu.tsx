@@ -1,10 +1,13 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { LogOut, Shield } from "lucide-react";
 import { UserRole } from "@prisma/client";
 import { authClient } from "@/lib/better-auth/auth-client";
+import { syncLocaleFromUser } from "@/lib/actions/syncLocaleFromUser";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,6 +49,14 @@ export default function AccountMenu({
   role,
 }: AccountMenuProps) {
   const router = useRouter();
+  const t = useTranslations("AccountMenu");
+  const synced = useRef(false);
+
+  useEffect(() => {
+    if (synced.current) return;
+    synced.current = true;
+    void syncLocaleFromUser().then(() => router.refresh());
+  }, [router]);
 
   async function onSignOut() {
     await authClient.signOut();
@@ -57,7 +68,7 @@ export default function AccountMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        aria-label="Account"
+        aria-label={t("account")}
         className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-line bg-cream-2 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-ink transition hover:bg-cream-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
       >
         {initials(firstName, lastName, email)}
@@ -78,7 +89,7 @@ export default function AccountMenu({
             <DropdownMenuItem asChild className="cursor-pointer">
               <Link href="/admin">
                 <Shield className="mr-2 h-4 w-4" />
-                Admin
+                {t("admin")}
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -89,7 +100,7 @@ export default function AccountMenu({
           className="cursor-pointer"
         >
           <LogOut className="mr-2 h-4 w-4" />
-          Sign out
+          {t("signOut")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

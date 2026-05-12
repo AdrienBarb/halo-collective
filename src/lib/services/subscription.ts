@@ -58,6 +58,7 @@ export async function createSubscription(
       firstName: true,
       lastName: true,
       countryCode: true,
+      locale: true,
     },
   });
 
@@ -116,6 +117,7 @@ export async function createSubscription(
       athleteFirstName: athlete.firstName,
       athleteLastName: athlete.lastName,
       athleteSlug: athlete.slug,
+      locale: user.locale,
     }).catch((error: unknown) => {
       console.error(
         JSON.stringify({

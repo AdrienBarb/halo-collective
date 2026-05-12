@@ -24,6 +24,7 @@ const previewSchema = z.object({
   newsletterId: z.string().optional(),
   header: z.object({
     title: z.string().optional(),
+    emailSubject: z.string().optional().nullable(),
     slug: z.string().optional(),
     heroImageUrl: z.string().optional().nullable(),
     editionNumber: z.coerce.number().int().positive().optional(),
@@ -103,6 +104,7 @@ export async function POST(req: NextRequest) {
       editionDate: toDate(parsed.header.editionDate),
       editionMode,
       title,
+      emailSubject: parsed.header.emailSubject ?? null,
       slug,
       heroImageUrl: parsed.header.heroImageUrl ?? null,
       tournamentName: parsed.header.tournamentName ?? null,

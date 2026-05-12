@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { format } from "date-fns";
+import { useLocale, useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useQueryState } from "nuqs";
+import { DEFAULT_LOCALE, isLocale } from "@/i18n/locales";
+import { formatShortDateNoYear } from "@/lib/utils/formatDate";
 
 export interface EditionTab {
   id: string;
@@ -42,6 +44,9 @@ export default function EditionTabsClient({
   editions,
   defaultSlug,
 }: EditionTabsClientProps) {
+  const t = useTranslations("Athlete.Editions");
+  const rawLocale = useLocale();
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const [editionParam, setEdition] = useQueryState("edition", {
     shallow: false,
   });
@@ -104,7 +109,7 @@ export default function EditionTabsClient({
       <div className="mb-4 flex items-baseline justify-between">
         <div className="flex items-baseline gap-3">
           <h3 className="font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink">
-            Editions
+            {t("title")}
           </h3>
           <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3">
             {editions.length.toString().padStart(2, "0")}
@@ -116,13 +121,13 @@ export default function EditionTabsClient({
               direction="left"
               onClick={() => scrollByCard(-1)}
               disabled={!canScrollLeft}
-              label="Previous edition"
+              label={t("previous")}
             />
             <ArrowButton
               direction="right"
               onClick={() => scrollByCard(1)}
               disabled={!canScrollRight}
-              label="Next edition"
+              label={t("next")}
             />
           </div>
         ) : null}
@@ -136,7 +141,7 @@ export default function EditionTabsClient({
         {editions.map((edition) => {
           const isActive = edition.slug === selectedSlug;
           const meta = edition.publishedAt
-            ? `#${edition.editionNumber.toString().padStart(2, "0")} · ${format(new Date(edition.publishedAt), "d MMM")}`
+            ? `#${edition.editionNumber.toString().padStart(2, "0")} · ${formatShortDateNoYear(new Date(edition.publishedAt), locale)}`
             : `#${edition.editionNumber.toString().padStart(2, "0")}`;
 
           return (

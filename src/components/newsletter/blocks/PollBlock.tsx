@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { useLocale, useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
 import type { PollBlock as PollBlockType } from "@/lib/schemas/newsletterSection";
 import type { EngagementSnapshot } from "@/lib/services/fanEngagement";
@@ -21,7 +22,9 @@ export default function PollBlock({
   newsletterId,
   previewMode = false,
 }: PollBlockProps) {
-  const labels = getNewsletterLabels();
+  const tErrors = useTranslations("Errors.Generic");
+  const locale = useLocale() as "en" | "fr";
+  const labels = getNewsletterLabels(locale);
   const { useGet, usePost } = useApi();
   const queryClient = useQueryClient();
   const url = `/athletes/${athleteSlug}/newsletters/${newsletterId}/engagement/${block.id}`;
@@ -45,7 +48,7 @@ export default function PollBlock({
     onError: (err: unknown) => {
       const message =
         (err as { response?: { data?: { error?: string } } })?.response?.data
-          ?.error ?? "Something went wrong";
+          ?.error ?? tErrors("somethingWentWrong");
       toast.error(message);
       setPendingIndex(null);
     },
@@ -64,16 +67,15 @@ export default function PollBlock({
   const isClosed = Boolean(data?.isClosed);
   const anyPending = pendingIndex !== null;
 
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
   return (
     <div className="space-y-4">
-      <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-action">
-        {labels.engagementEyebrows.poll}
-      </div>
-      <p className="font-serif text-lg italic leading-snug text-ink">
+      <p className="font-serif text-[18px] font-medium leading-snug tracking-[-0.01em] text-ink">
         {block.question}
       </p>
       {isLoading && !data ? (
-        <div className="h-24 animate-pulse rounded bg-line/30" aria-hidden />
+        <div className="h-24 animate-pulse rounded-xl bg-line/30" aria-hidden />
       ) : (
         <div className="space-y-3">
           <ul className="space-y-2">
@@ -81,16 +83,16 @@ export default function PollBlock({
               const count = counts[i] ?? 0;
               const pct = total > 0 ? Math.round((count / total) * 100) : 0;
               const isSelected = userOptionIndex === i;
-              const isThisPending = pendingIndex === i;
+              const isPicked = selectedIndex === i;
 
               if (hasVoted) {
                 return (
                   <li
                     key={i}
-                    className={`relative overflow-hidden rounded border px-4 py-3 ${
+                    className={`relative overflow-hidden rounded-xl border px-4 py-3 ${
                       isSelected
                         ? "border-action bg-action/5"
-                        : "border-line bg-cream-2"
+                        : "border-line bg-cream"
                     }`}
                   >
                     <div
@@ -101,11 +103,20 @@ export default function PollBlock({
                       style={{ width: `${pct}%` }}
                     />
                     <div className="relative flex items-center justify-between gap-3">
-                      <span className="flex items-center gap-2 text-sm text-ink">
-                        {opt.emoji ? <span aria-hidden>{opt.emoji}</span> : null}
+                      <span className="flex items-center gap-3 text-[14px] text-ink">
+                        {opt.emoji ? (
+                          <span
+                            aria-hidden
+                            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-cream-3 text-[14px]"
+                          >
+                            {opt.emoji}
+                          </span>
+                        ) : null}
                         <span>{opt.label}</span>
                       </span>
-                      <span className="font-mono text-xs text-ink-2">{pct}%</span>
+                      <span className="font-mono text-[11px] font-semibold text-ink-2">
+                        {pct}%
+                      </span>
                     </div>
                   </li>
                 );
@@ -115,27 +126,48 @@ export default function PollBlock({
                 <li key={i}>
                   <button
                     type="button"
-                    onClick={() => vote(i)}
+                    onClick={() => setSelectedIndex(i)}
                     disabled={isClosed || anyPending}
-                    aria-busy={isThisPending}
-                    className={`flex w-full cursor-pointer items-center gap-3 rounded border px-4 py-3 text-left transition hover:border-action disabled:cursor-not-allowed disabled:opacity-60 ${
-                      opt.isHighlighted
+                    aria-pressed={isPicked}
+                    className={`flex w-full cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-left transition hover:border-line-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+                      isPicked
                         ? "border-action bg-action/5"
-                        : "border-line bg-cream-2"
+                        : opt.isHighlighted
+                          ? "border-line-2 bg-cream"
+                          : "border-line bg-cream"
                     }`}
                   >
                     {opt.emoji ? (
-                      <span aria-hidden className="text-base">
+                      <span
+                        aria-hidden
+                        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-cream-3 text-[14px]"
+                      >
                         {opt.emoji}
                       </span>
                     ) : null}
-                    <span className="text-sm text-ink">{opt.label}</span>
+                    <span className="text-[14px] text-ink">{opt.label}</span>
                   </button>
                 </li>
               );
             })}
           </ul>
-          <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-wide text-ink-3">
+
+          {!hasVoted ? (
+            <button
+              type="button"
+              onClick={() => {
+                if (selectedIndex !== null) vote(selectedIndex);
+              }}
+              disabled={isClosed || anyPending || selectedIndex === null}
+              className="block w-full rounded-xl bg-action px-4 py-3.5 font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-cream transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {anyPending
+                ? labels.engagementInteractive.submitting
+                : labels.engagementInteractive.submit}
+            </button>
+          ) : null}
+
+          <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
             <span>
               {labels.engagementInteractive.votesCountTemplate.replace(
                 "{count}",

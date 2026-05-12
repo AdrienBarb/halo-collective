@@ -5,36 +5,48 @@ import {
   EmailHeading,
 } from "@/lib/emails/_brand/atoms";
 
+export interface PasswordResetMessages {
+  preview: string;
+  eyebrow: string;
+  footer: string;
+  heading: string;
+  body: string;
+  button: string;
+}
+
 interface PasswordResetEmailProps {
   resetUrl: string;
-  firstName?: string;
+  messages: PasswordResetMessages;
 }
 
 export const PasswordResetEmail = ({
   resetUrl,
-  firstName,
+  messages,
 }: PasswordResetEmailProps) => {
-  const greeting = firstName ? `${firstName}, ` : "";
-
   return (
     <EmailLayout
-      preview="Reset your Halo password"
-      eyebrow="Password reset"
-      footerNote="If you didn't request a password reset, you can safely ignore this email. The link expires in 1 hour."
+      preview={messages.preview}
+      eyebrow={messages.eyebrow}
+      footerNote={messages.footer}
     >
-      <EmailHeading>Reset your password.</EmailHeading>
-      <EmailBody>
-        {greeting}click the button below to choose a new password for your Halo
-        account. This link expires in 1 hour.
-      </EmailBody>
-      <EmailButton href={resetUrl}>Reset password</EmailButton>
+      <EmailHeading>{messages.heading}</EmailHeading>
+      <EmailBody>{messages.body}</EmailBody>
+      <EmailButton href={resetUrl}>{messages.button}</EmailButton>
     </EmailLayout>
   );
 };
 
 PasswordResetEmail.PreviewProps = {
   resetUrl: "https://halocollective.co/reset-password?token=preview",
-  firstName: "Adrien",
+  messages: {
+    preview: "Reset your Halo password",
+    eyebrow: "Password reset",
+    footer:
+      "If you didn't request a password reset, you can safely ignore this email. The link expires in 1 hour.",
+    heading: "Reset your password.",
+    body: "Adrien, click the button below to choose a new password for your Halo account. This link expires in 1 hour.",
+    button: "Reset password",
+  },
 } satisfies PasswordResetEmailProps;
 
 export default PasswordResetEmail;

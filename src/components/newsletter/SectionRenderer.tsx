@@ -1,3 +1,4 @@
+import { getLocale } from "next-intl/server";
 import {
   isSectionMeaningful,
   safeParseSectionBlocks,
@@ -13,7 +14,9 @@ import {
 import {
   getNewsletterLabels,
   getSectionTitle,
+  type NewsletterLocale,
 } from "@/lib/newsletter/labels";
+import { DEFAULT_LOCALE, isLocale } from "@/i18n/locales";
 import AthleteReviewSection from "./sections/AthleteReviewSection";
 import ComingUpSection from "./sections/ComingUpSection";
 import FanEngagementSection from "./sections/FanEngagementSection";
@@ -101,7 +104,7 @@ function renderBody({
   }
 }
 
-export default function SectionRenderer({
+export default async function SectionRenderer({
   section,
   index,
   editionMode,
@@ -121,24 +124,32 @@ export default function SectionRenderer({
   });
   if (body === null) return null;
 
-  const labels = getNewsletterLabels();
+  const rawLocale = await getLocale();
+  const locale: NewsletterLocale = isLocale(rawLocale)
+    ? rawLocale
+    : DEFAULT_LOCALE;
+  const labels = getNewsletterLabels(locale);
   const eyebrow = labels.sections[section.type].eyebrow;
   const number = (index + 1).toString().padStart(2, "0");
-  const title = getSectionTitle(section.type, tournamentName);
+  const title = getSectionTitle(section.type, tournamentName, locale);
 
   return (
-    <section>
-      <header className="space-y-1 bg-banner px-5 py-4">
-        <div className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-cream/80">
-          {number} &nbsp;|&nbsp; {eyebrow}
+    <section className="overflow-hidden rounded-2xl border border-line bg-cream-2">
+      <header className="relative space-y-3 bg-banner px-6 py-6 md:px-8 md:py-7">
+        <span
+          aria-hidden
+          className="absolute inset-x-0 top-0 h-[3px] bg-accent-gold"
+        />
+        <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-accent-warm">
+          {number} &nbsp;·&nbsp; {eyebrow}
         </div>
         {title ? (
-          <h2 className="text-lg font-bold leading-tight text-cream">
+          <h2 className="font-serif text-[28px] font-medium leading-[1.1] tracking-[-0.02em] text-cream md:text-[32px]">
             {title}
           </h2>
         ) : null}
       </header>
-      <div className="bg-cream-2 px-5 py-6">{body}</div>
+      <div className="px-5 py-6 md:px-6 md:py-7">{body}</div>
     </section>
   );
 }

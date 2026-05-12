@@ -19,6 +19,27 @@ const headerFields = {
     .min(1, "Title is required")
     .max(200, "Title must be 200 characters or fewer")
     .regex(/^[^\r\n\t]+$/, "Title cannot contain line breaks or tabs"),
+  // Optional Brevo subject override — supports merge tags like
+  // `{{ contact.FIRSTNAME }}`, sent to Brevo as-is for interpolation.
+  // Preserve `undefined` (omitted from PATCH) vs `null` (explicit
+  // clear) — `undefined` lets Prisma skip the column on partial update.
+  emailSubject: z
+    .union([z.string(), z.null(), z.undefined()])
+    .optional()
+    .transform((v) => {
+      if (v === undefined) return undefined;
+      if (v === null) return null;
+      const trimmed = v.trim();
+      return trimmed === "" ? null : trimmed;
+    })
+    .refine(
+      (v) => v == null || v.length <= 200,
+      { message: "Email subject must be 200 characters or fewer" },
+    )
+    .refine(
+      (v) => v == null || /^[^\r\n\t]+$/.test(v),
+      { message: "Email subject cannot contain line breaks or tabs" },
+    ),
   slug: slugSchema,
   heroImageUrl: clearableMediaUrl,
   editionNumber: z.coerce.number().int().positive(),
@@ -45,6 +66,7 @@ export const createNewsletterSchema = z.object({
 
 export const updateNewsletterSchema = z.object({
   title: headerFields.title.optional(),
+  emailSubject: headerFields.emailSubject,
   slug: headerFields.slug.optional(),
   heroImageUrl: headerFields.heroImageUrl,
   editionNumber: headerFields.editionNumber.optional(),

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 
 const AuthModal = dynamic(() => import("@/components/auth/AuthModal"), {
@@ -16,6 +17,7 @@ export default function NavbarAuthButton({
   ipCountryCode,
 }: NavbarAuthButtonProps) {
   const router = useRouter();
+  const t = useTranslations("Navbar");
   const [open, setOpen] = useState(false);
 
   function onSuccess() {
@@ -30,7 +32,7 @@ export default function NavbarAuthButton({
         onClick={() => setOpen(true)}
         className="cursor-pointer rounded-md border border-line bg-cream-2 px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-ink transition hover:bg-cream-3"
       >
-        Sign in
+        {t("signIn")}
       </button>
 
       {open ? (

@@ -24,14 +24,14 @@ export default async function NewNewsletterPage() {
         >
           ← Newsletters
         </Link>
-        <h1 className="mt-2 font-serif text-[28px] font-semibold tracking-[-0.01em] text-ink">
+        <h1 className="mt-2 font-sans text-[28px] font-semibold tracking-[-0.01em] text-ink">
           New newsletter
         </h1>
       </div>
 
       {athleteOptions.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-line bg-cream-2 px-6 py-14 text-center">
-          <p className="font-serif text-[20px] text-ink">
+          <p className="text-[20px] text-ink">
             No athletes yet.
           </p>
           <p className="mt-1 text-[13px] text-ink-3">

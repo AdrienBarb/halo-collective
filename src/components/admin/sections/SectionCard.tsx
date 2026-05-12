@@ -36,7 +36,7 @@ export default function SectionCard({
           <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
             {name}
           </div>
-          <p className="mt-1 font-serif text-[15px] italic leading-snug text-ink-2">
+          <p className="mt-1 text-[15px] leading-snug text-ink-2">
             {description}
           </p>
         </div>

@@ -1,14 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/better-auth/auth-client";
+import { syncLocaleFromUser } from "@/lib/actions/syncLocaleFromUser";
 import {
-  signInSchema,
-  signUpSchema,
+  createSignInSchema,
+  createSignUpSchema,
   type SignInInput,
   type SignUpInput,
 } from "@/lib/schemas/auth";
@@ -28,15 +30,7 @@ interface AuthFormProps {
   mode: Mode;
   onSuccess: () => void;
   onModeChange?: (mode: Mode) => void;
-  /**
-   * Google OAuth callback URL — where the user lands after the redirect round
-   * trip. Defaults to the current pathname on the client.
-   */
   redirectAfter?: string;
-  /**
-   * IP-detected country code (uppercase 2-letter) passed in from a server
-   * component. Sent at signup as `countryCode` on the additional fields.
-   */
   ipCountryCode?: string | null;
 }
 
@@ -82,8 +76,13 @@ export default function AuthForm({
   redirectAfter,
   ipCountryCode,
 }: AuthFormProps) {
+  const t = useTranslations("Auth.Form");
+  const tv = useTranslations("Auth.Validation");
   const [submitting, setSubmitting] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+
+  const signInSchema = useMemo(() => createSignInSchema(tv), [tv]);
+  const signUpSchema = useMemo(() => createSignUpSchema(tv), [tv]);
 
   const signinForm = useForm<SignInInput>({
     resolver: zodResolver(signInSchema),
@@ -104,15 +103,15 @@ export default function AuthForm({
         password: values.password,
       });
       if (result.error) {
-        // Generic message to avoid email enumeration via signin errors.
         console.error("signIn.email error:", result.error);
-        toast.error("Invalid email or password");
+        toast.error(t("invalidCredentials"));
         return;
       }
+      await syncLocaleFromUser();
       onSuccess();
     } catch (error) {
       console.error("Sign in failed:", error);
-      toast.error("Something went wrong. Try again.");
+      toast.error(t("somethingWentWrong"));
     } finally {
       setSubmitting(false);
     }
@@ -131,17 +130,15 @@ export default function AuthForm({
         ...(ipCountryCode ? { countryCode: ipCountryCode } : {}),
       });
       if (result.error) {
-        // Generic message to avoid email enumeration via signup errors.
         console.error("signUp.email error:", result.error);
-        toast.error(
-          "Could not create account. Check your details or sign in instead.",
-        );
+        toast.error(t("couldNotCreateAccount"));
         return;
       }
+      await syncLocaleFromUser();
       onSuccess();
     } catch (error) {
       console.error("Sign up failed:", error);
-      toast.error("Something went wrong. Try again.");
+      toast.error(t("somethingWentWrong"));
     } finally {
       setSubmitting(false);
     }
@@ -158,10 +155,9 @@ export default function AuthForm({
         provider: "google",
         callbackURL,
       });
-      // Browser is redirecting — no further work here.
     } catch (error) {
       console.error("Google sign in failed:", error);
-      toast.error("Could not start Google sign-in.");
+      toast.error(t("couldNotStartGoogle"));
       setGoogleLoading(false);
     }
   }
@@ -177,7 +173,7 @@ export default function AuthForm({
         className={googleButtonClass}
       >
         <GoogleIcon />
-        {googleLoading ? "Redirecting…" : "Continue with Google"}
+        {googleLoading ? t("redirecting") : t("continueWithGoogle")}
       </button>
 
       <div className="relative">
@@ -186,7 +182,7 @@ export default function AuthForm({
         </div>
         <div className="relative flex justify-center">
           <span className="bg-cream-2 px-3 font-mono text-[10px] uppercase tracking-[0.22em] text-ink-3">
-            or
+            {t("or")}
           </span>
         </div>
       </div>
@@ -205,12 +201,12 @@ export default function AuthForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
-                      First name
+                      {t("firstName")}
                     </FormLabel>
                     <FormControl>
                       <Input
                         autoComplete="given-name"
-                        placeholder="Elise"
+                        placeholder={t("firstNamePlaceholder")}
                         disabled={busy}
                         {...field}
                       />
@@ -225,12 +221,12 @@ export default function AuthForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
-                      Last name
+                      {t("lastName")}
                     </FormLabel>
                     <FormControl>
                       <Input
                         autoComplete="family-name"
-                        placeholder="Mertens"
+                        placeholder={t("lastNamePlaceholder")}
                         disabled={busy}
                         {...field}
                       />
@@ -247,13 +243,13 @@ export default function AuthForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
-                    Email
+                    {t("email")}
                   </FormLabel>
                   <FormControl>
                     <Input
                       type="email"
                       autoComplete="email"
-                      placeholder="your@email.com"
+                      placeholder={t("emailPlaceholder")}
                       disabled={busy}
                       {...field}
                     />
@@ -269,13 +265,13 @@ export default function AuthForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
-                    Password
+                    {t("password")}
                   </FormLabel>
                   <FormControl>
                     <Input
                       type="password"
                       autoComplete="new-password"
-                      placeholder="At least 8 characters"
+                      placeholder={t("passwordPlaceholderSignUp")}
                       disabled={busy}
                       {...field}
                     />
@@ -286,18 +282,21 @@ export default function AuthForm({
             />
 
             <button type="submit" disabled={busy} className={buttonClass}>
-              {submitting ? "Creating account…" : "Create account"}
+              {submitting ? t("creatingAccount") : t("createAccount")}
             </button>
 
             <p className="text-center text-[12px] text-ink-3">
-              Already have an account?{" "}
-              <button
-                type="button"
-                onClick={() => onModeChange?.("signin")}
-                className="cursor-pointer font-semibold text-ink underline underline-offset-2 hover:text-accent-gold"
-              >
-                Sign in
-              </button>
+              {t.rich("alreadyHaveAccount", {
+                link: (chunks) => (
+                  <button
+                    type="button"
+                    onClick={() => onModeChange?.("signin")}
+                    className="cursor-pointer font-semibold text-ink underline underline-offset-2 hover:text-accent-gold"
+                  >
+                    {chunks}
+                  </button>
+                ),
+              })}
             </p>
           </form>
         </Form>
@@ -314,13 +313,13 @@ export default function AuthForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
-                    Email
+                    {t("email")}
                   </FormLabel>
                   <FormControl>
                     <Input
                       type="email"
                       autoComplete="email"
-                      placeholder="your@email.com"
+                      placeholder={t("emailPlaceholder")}
                       disabled={busy}
                       {...field}
                     />
@@ -336,19 +335,19 @@ export default function AuthForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center justify-between font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
-                    <span>Password</span>
+                    <span>{t("password")}</span>
                     <Link
                       href="/forgot-password"
                       className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3 underline-offset-2 hover:text-ink hover:underline"
                     >
-                      Forgot?
+                      {t("forgot")}
                     </Link>
                   </FormLabel>
                   <FormControl>
                     <Input
                       type="password"
                       autoComplete="current-password"
-                      placeholder="••••••••"
+                      placeholder={t("passwordPlaceholderSignIn")}
                       disabled={busy}
                       {...field}
                     />
@@ -359,18 +358,21 @@ export default function AuthForm({
             />
 
             <button type="submit" disabled={busy} className={buttonClass}>
-              {submitting ? "Signing in…" : "Sign in"}
+              {submitting ? t("signingIn") : t("signIn")}
             </button>
 
             <p className="text-center text-[12px] text-ink-3">
-              New here?{" "}
-              <button
-                type="button"
-                onClick={() => onModeChange?.("signup")}
-                className="cursor-pointer font-semibold text-ink underline underline-offset-2 hover:text-accent-gold"
-              >
-                Create an account
-              </button>
+              {t.rich("newHere", {
+                link: (chunks) => (
+                  <button
+                    type="button"
+                    onClick={() => onModeChange?.("signup")}
+                    className="cursor-pointer font-semibold text-ink underline underline-offset-2 hover:text-accent-gold"
+                  >
+                    {chunks}
+                  </button>
+                ),
+              })}
             </p>
           </form>
         </Form>

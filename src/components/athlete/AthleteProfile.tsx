@@ -1,11 +1,13 @@
 import Image from "next/image";
-import { format } from "date-fns";
+import { getLocale, getTranslations } from "next-intl/server";
 import type {
   Athlete,
   Newsletter,
   NewsletterSection,
   Sponsor,
 } from "@prisma/client";
+import { isLocale, DEFAULT_LOCALE } from "@/i18n/locales";
+import { formatShortDateNoYear } from "@/lib/utils/formatDate";
 import {
   FaInstagram,
   FaXTwitter,
@@ -18,7 +20,6 @@ import { flagFor } from "@/lib/athlete/flag";
 import SectionRenderer, {
   type RawSection,
 } from "@/components/newsletter/SectionRenderer";
-import { getTournamentLabel } from "@/lib/newsletter/labels";
 import type {
   EditionModeValue,
   SectionTypeValue,
@@ -53,15 +54,6 @@ function toRawSection(section: NewsletterSection): RawSection {
   };
 }
 
-function tournamentMetaLine(edition: EditionWithSections): string | null {
-  const parts = [
-    edition.tournamentCategory,
-    edition.tournamentLocation,
-    edition.tournamentSurface,
-  ].filter(Boolean);
-  return parts.length > 0 ? parts.join(" · ") : null;
-}
-
 function toEditionTab(edition: EditionWithSections): EditionTab {
   return {
     id: edition.id,
@@ -75,7 +67,7 @@ function toEditionTab(edition: EditionWithSections): EditionTab {
   };
 }
 
-export default function AthleteProfile({
+export default async function AthleteProfile({
   athlete,
   editions,
   selectedSlug,
@@ -86,6 +78,9 @@ export default function AthleteProfile({
 }: AthleteProfileProps) {
   const fullName = `${athlete.firstName} ${athlete.lastName}`;
   const flag = flagFor(athlete.countryCode);
+  const rawLocale = await getLocale();
+  const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const t = await getTranslations("Athlete.Profile");
 
   const defaultEdition = editions[0] ?? null;
   const selected =
@@ -93,12 +88,11 @@ export default function AthleteProfile({
 
   const issueMeta =
     selected && selected.publishedAt
-      ? `#${selected.editionNumber.toString().padStart(2, "0")} · ${format(
-          selected.publishedAt,
-          "d MMM",
+      ? `#${selected.editionNumber.toString().padStart(2, "0")} · ${formatShortDateNoYear(
+          new Date(selected.publishedAt),
+          locale,
         ).toUpperCase()}`
       : null;
-  const tournamentLabel = getTournamentLabel(selected?.tournamentName);
 
   return (
     <div className="bg-cream">
@@ -107,6 +101,7 @@ export default function AthleteProfile({
           coverUrl={selected?.heroImageUrl ?? athlete.coverImageUrl ?? null}
           flag={flag}
           issueMeta={issueMeta}
+          memberBadge={t("memberBadge")}
         />
 
         <ProfileIdentity
@@ -114,7 +109,6 @@ export default function AthleteProfile({
           firstName={athlete.firstName}
           lastName={athlete.lastName}
           avatarUrl={athlete.avatarUrl}
-          countryCode={athlete.countryCode}
           countryName={athlete.countryName}
           flagEmoji={flag.emoji}
         />
@@ -132,32 +126,8 @@ export default function AthleteProfile({
               defaultSlug={defaultEdition.slug}
             />
 
-            <article className="px-6 py-10 md:py-14">
-              <header>
-                {selected.publishedAt ? (
-                  <time
-                    dateTime={new Date(selected.publishedAt).toISOString()}
-                    className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-ink-3"
-                  >
-                    {format(selected.publishedAt, "MMM d, yyyy")}
-                  </time>
-                ) : null}
-                {tournamentLabel ? (
-                  <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.22em] text-ink-3">
-                    {tournamentLabel}
-                  </div>
-                ) : null}
-                <h2 className="mt-2 font-serif text-[32px] font-semibold leading-[1.08] tracking-[-0.02em] text-ink md:text-[44px]">
-                  {selected.title}
-                </h2>
-                {tournamentMetaLine(selected) ? (
-                  <div className="mt-2 font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3">
-                    {tournamentMetaLine(selected)}
-                  </div>
-                ) : null}
-              </header>
-
-              <div className="mt-8 space-y-2">
+            <article className="bg-cream px-6 py-10 md:py-14">
+              <div className="space-y-5">
                 {selected.sections.map((section, i) => (
                   <SectionRenderer
                     key={section.id}
@@ -179,10 +149,10 @@ export default function AthleteProfile({
           <section className="px-6 py-12 md:py-16">
             <div className="rounded-2xl border border-dashed border-line bg-cream-2 px-6 py-14 text-center">
               <p className="font-serif text-[22px] leading-tight text-ink">
-                No editions yet.
+                {t("noEditionsTitle")}
               </p>
               <p className="mt-2 text-[14px] text-ink-3">
-                Check back soon — the next drop is being put together.
+                {t("noEditionsBody")}
               </p>
             </div>
           </section>
@@ -226,7 +196,7 @@ const SOCIAL_ICONS: {
   { key: "foundation", label: "Foundation", Icon: FaHeart },
 ];
 
-function SocialLinksStrip({
+async function SocialLinksStrip({
   fullName,
   socialLinks,
 }: {
@@ -247,29 +217,34 @@ function SocialLinksStrip({
 
   if (items.length === 0) return null;
 
+  const t = await getTranslations("Athlete.Profile");
+
   return (
     <section
-      aria-label={`Follow ${fullName}`}
+      aria-label={t("follow", { fullName })}
       className="border-t border-line px-6 py-10 md:py-12"
     >
       <div className="text-center font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-ink-3">
-        Follow {fullName}
+        {t("follow", { fullName })}
       </div>
       <ul className="mt-5 flex flex-wrap items-center justify-center gap-3">
-        {items.map(({ key, label, Icon }) => (
-          <li key={key}>
-            <a
-              href={links[key] as string}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`${fullName} on ${label}`}
-              title={label}
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-line bg-cream text-ink transition-colors duration-200 hover:border-line-2 hover:bg-cream-3"
-            >
-              <Icon className="h-[18px] w-[18px]" aria-hidden />
-            </a>
-          </li>
-        ))}
+        {items.map(({ key, label, Icon }) => {
+          const displayLabel = key === "foundation" ? t("foundationLabel") : label;
+          return (
+            <li key={key}>
+              <a
+                href={links[key] as string}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={t("socialAria", { fullName, label: displayLabel })}
+                title={displayLabel}
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-line bg-cream text-ink transition-colors duration-200 hover:border-line-2 hover:bg-cream-3"
+              >
+                <Icon className="h-[18px] w-[18px]" aria-hidden />
+              </a>
+            </li>
+          );
+        })}
       </ul>
     </section>
   );
@@ -279,10 +254,12 @@ function ProfileCover({
   coverUrl,
   flag,
   issueMeta,
+  memberBadge,
 }: {
   coverUrl: string | null;
   flag: ReturnType<typeof flagFor>;
   issueMeta: string | null;
+  memberBadge: string;
 }) {
   return (
     <section className="relative w-full overflow-hidden bg-cream-3">
@@ -308,7 +285,7 @@ function ProfileCover({
           className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.55)_0%,rgba(0,0,0,0.10)_45%,rgba(0,0,0,0.55)_100%)]"
         />
         <div className="absolute left-5 top-5 md:left-8 md:top-8">
-          <FrostedBadge>★ MEMBER</FrostedBadge>
+          <FrostedBadge>{memberBadge}</FrostedBadge>
         </div>
         {issueMeta ? (
           <div className="absolute right-5 top-5 md:right-8 md:top-8">
@@ -343,7 +320,6 @@ function ProfileIdentity({
   firstName: string;
   lastName: string;
   avatarUrl: string | null;
-  countryCode: string;
   countryName: string;
   flagEmoji: string;
 }) {
@@ -409,15 +385,16 @@ function StatsRow({ athlete }: { athlete: Athlete }) {
   );
 }
 
-function SponsorsStrip({ sponsors }: { sponsors: Sponsor[] }) {
+async function SponsorsStrip({ sponsors }: { sponsors: Sponsor[] }) {
   if (sponsors.length === 0) return null;
+  const t = await getTranslations("Athlete.Profile");
   return (
     <section
-      aria-label="Partners"
+      aria-label={t("partners")}
       className="border-b border-line px-6 py-7 md:py-8"
     >
       <div className="text-center font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-ink-3">
-        Partners
+        {t("partners")}
       </div>
       <ul className="mt-4 flex flex-wrap items-center justify-center gap-2.5">
         {sponsors.map((s) => (

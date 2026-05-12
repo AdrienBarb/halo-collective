@@ -6,13 +6,15 @@ interface ScheduleItemBlockProps {
 
 export default function ScheduleItemBlock({ item }: ScheduleItemBlockProps) {
   return (
-    <div className="flex gap-4 border-b border-line py-3 last:border-b-0">
-      <div className="w-24 shrink-0 font-mono text-[10px] uppercase tracking-wide text-action">
+    <div className="flex gap-5 border-b border-line py-4 last:border-b-0">
+      <div className="w-20 shrink-0 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-ink">
         {item.dateRange}
       </div>
       <div className="min-w-0 flex-1">
-        <div className="text-sm font-semibold text-ink">{item.title}</div>
-        <div className="mt-0.5 text-xs text-ink-3">{item.description}</div>
+        <div className="text-[14px] font-semibold text-ink">{item.title}</div>
+        <div className="mt-1 text-[13px] leading-[1.5] text-ink-3">
+          {item.description}
+        </div>
       </div>
     </div>
   );

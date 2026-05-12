@@ -1,13 +1,14 @@
-export default function SubscriptionsLoading() {
+import { getTranslations } from "next-intl/server";
+
+export default async function SubscriptionsLoading() {
+  const t = await getTranslations("Subscriptions");
   return (
     <div className="mx-auto max-w-[1100px] space-y-6 px-5 py-10">
       <div>
         <h1 className="font-serif text-[28px] font-semibold tracking-[-0.01em] text-ink">
-          My subscriptions
+          {t("title")}
         </h1>
-        <p className="mt-1 text-[13px] text-ink-3">
-          The athletes whose newsletter you receive.
-        </p>
+        <p className="mt-1 text-[13px] text-ink-3">{t("subhead")}</p>
       </div>
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 3 }).map((_, i) => (

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { useLocale, useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
 import type { QuizBlock as QuizBlockType } from "@/lib/schemas/newsletterSection";
 import type { EngagementSnapshot } from "@/lib/services/fanEngagement";
@@ -21,7 +22,9 @@ export default function QuizBlock({
   newsletterId,
   previewMode = false,
 }: QuizBlockProps) {
-  const labels = getNewsletterLabels();
+  const tErrors = useTranslations("Errors.Generic");
+  const locale = useLocale() as "en" | "fr";
+  const labels = getNewsletterLabels(locale);
   const { useGet, usePost } = useApi();
   const queryClient = useQueryClient();
   const url = `/athletes/${athleteSlug}/newsletters/${newsletterId}/engagement/${block.id}`;
@@ -45,7 +48,7 @@ export default function QuizBlock({
     onError: (err: unknown) => {
       const message =
         (err as { response?: { data?: { error?: string } } })?.response?.data
-          ?.error ?? "Something went wrong";
+          ?.error ?? tErrors("somethingWentWrong");
       toast.error(message);
       setPendingIndex(null);
     },

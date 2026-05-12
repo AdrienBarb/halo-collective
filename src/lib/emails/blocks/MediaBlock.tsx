@@ -5,11 +5,25 @@ import { parseYouTubeId } from "@/lib/newsletter/youtube";
 import { palette, fonts } from "@/lib/emails/_brand/theme";
 import { EmailParagraphs } from "@/lib/emails/_brand/atoms";
 
-interface MediaBlockProps {
-  media: MediaBlockType;
+export interface MediaBlockEmailMessages {
+  watchOnYoutube: string;
+  watch: string;
 }
 
-export default function MediaBlock({ media }: MediaBlockProps) {
+const DEFAULT_MESSAGES: MediaBlockEmailMessages = {
+  watchOnYoutube: "Watch on YouTube",
+  watch: "Watch",
+};
+
+interface MediaBlockProps {
+  media: MediaBlockType;
+  messages?: MediaBlockEmailMessages;
+}
+
+export default function MediaBlock({
+  media,
+  messages = DEFAULT_MESSAGES,
+}: MediaBlockProps) {
   if (media.kind === "text") {
     return (
       <Section style={{ marginBottom: 16 }}>
@@ -77,7 +91,7 @@ export default function MediaBlock({ media }: MediaBlockProps) {
               textAlign: "center",
             }}
           >
-            ▶ {isYouTube ? "Watch on YouTube" : "Watch"}
+            ▶ {isYouTube ? messages.watchOnYoutube : messages.watch}
           </Text>
         </Link>
       </Section>

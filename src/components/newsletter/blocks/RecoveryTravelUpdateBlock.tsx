@@ -16,7 +16,7 @@ export default function RecoveryTravelUpdateBlock({
         Off-court
       </div>
       {block.media ? <MediaBlock media={block.media} /> : null}
-      <div className="space-y-3 font-serif text-sm italic leading-relaxed text-ink-2">
+      <div className="space-y-3 text-sm leading-relaxed text-ink-2">
         {paragraphs.map((p, i) => (
           <p key={i}>{p}</p>
         ))}

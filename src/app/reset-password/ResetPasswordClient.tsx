@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/better-auth/auth-client";
 import {
-  resetPasswordSchema,
+  createResetPasswordSchema,
   type ResetPasswordInput,
 } from "@/lib/schemas/auth";
 import {
@@ -29,6 +30,13 @@ export default function ResetPasswordClient() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [submitting, setSubmitting] = useState(false);
+  const t = useTranslations("Auth.ResetPassword");
+  const tv = useTranslations("Auth.Validation");
+
+  const resetPasswordSchema = useMemo(
+    () => createResetPasswordSchema(tv),
+    [tv],
+  );
 
   const form = useForm<ResetPasswordInput>({
     resolver: zodResolver(resetPasswordSchema),
@@ -45,14 +53,14 @@ export default function ResetPasswordClient() {
         token,
       });
       if (result.error) {
-        toast.error(result.error.message ?? "Could not reset password");
+        toast.error(result.error.message ?? t("couldNotReset"));
         return;
       }
-      toast.success("Password updated. Sign in with your new password.");
+      toast.success(t("successToast"));
       router.push("/");
     } catch (error) {
       console.error("Reset password failed:", error);
-      toast.error("Something went wrong. Try again.");
+      toast.error(t("somethingWentWrong"));
     } finally {
       setSubmitting(false);
     }
@@ -61,15 +69,15 @@ export default function ResetPasswordClient() {
   if (!token) {
     return (
       <div className="space-y-4 text-center">
-        <p className="font-serif text-[18px] text-ink">Invalid reset link.</p>
+        <p className="font-serif text-[18px] text-ink">{t("invalidTitle")}</p>
         <p className="text-[14px] leading-relaxed text-ink-3">
-          This link is missing its token, or it has already been used.
+          {t("invalidBody")}
         </p>
         <Link
           href="/forgot-password"
           className="inline-block pt-2 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-ink underline-offset-2 hover:underline"
         >
-          Request a new link
+          {t("requestNewLink")}
         </Link>
       </div>
     );
@@ -82,9 +90,7 @@ export default function ResetPasswordClient() {
         className="space-y-5"
         noValidate
       >
-        <p className="text-[14px] leading-relaxed text-ink-3">
-          Choose a new password for your Halo account.
-        </p>
+        <p className="text-[14px] leading-relaxed text-ink-3">{t("lead")}</p>
 
         <FormField
           control={form.control}
@@ -92,13 +98,13 @@ export default function ResetPasswordClient() {
           render={({ field }) => (
             <FormItem>
               <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
-                New password
+                {t("newPassword")}
               </FormLabel>
               <FormControl>
                 <Input
                   type="password"
                   autoComplete="new-password"
-                  placeholder="At least 8 characters"
+                  placeholder={t("newPasswordPlaceholder")}
                   disabled={submitting}
                   {...field}
                 />
@@ -114,13 +120,13 @@ export default function ResetPasswordClient() {
           render={({ field }) => (
             <FormItem>
               <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
-                Confirm password
+                {t("confirmPassword")}
               </FormLabel>
               <FormControl>
                 <Input
                   type="password"
                   autoComplete="new-password"
-                  placeholder="Repeat your password"
+                  placeholder={t("confirmPasswordPlaceholder")}
                   disabled={submitting}
                   {...field}
                 />
@@ -131,7 +137,7 @@ export default function ResetPasswordClient() {
         />
 
         <button type="submit" disabled={submitting} className={buttonClass}>
-          {submitting ? "Updating…" : "Update password"}
+          {submitting ? t("updating") : t("updatePassword")}
         </button>
       </form>
     </Form>

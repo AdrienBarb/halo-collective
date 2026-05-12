@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import type { MediaBlock as MediaBlockType } from "@/lib/schemas/newsletterSection";
 import { splitParagraphs } from "@/lib/newsletter/splitParagraphs";
 import { parseYouTubeId } from "@/lib/newsletter/youtube";
@@ -7,11 +8,12 @@ interface MediaBlockProps {
   media: MediaBlockType;
 }
 
-export default function MediaBlock({ media }: MediaBlockProps) {
+export default async function MediaBlock({ media }: MediaBlockProps) {
+  const t = await getTranslations("Newsletter.Media");
   if (media.kind === "text") {
     const paragraphs = splitParagraphs(media.body);
     return (
-      <div className="space-y-3 font-serif italic leading-relaxed text-ink-2">
+      <div className="space-y-3 leading-relaxed text-ink-2">
         {paragraphs.map((p, i) => (
           <p key={i}>{p}</p>
         ))}
@@ -40,7 +42,7 @@ export default function MediaBlock({ media }: MediaBlockProps) {
 
   if (media.kind === "video") {
     const youtube = parseYouTubeId(media.url);
-    const label = youtube ? "Watch video on YouTube" : "Watch video";
+    const label = youtube ? t("watchOnYoutube") : t("watchVideo");
     return (
       <a
         href={media.url}
@@ -78,9 +80,10 @@ export default function MediaBlock({ media }: MediaBlockProps) {
 
   // audio
   const meta = [media.location, media.durationLabel].filter(Boolean).join(" · ");
-  const audioLabel = media.title
-    ? `Play voice note: ${media.title}`
-    : "Play voice note";
+  const audioLabel = t("playVoiceNote", {
+    hasTitle: media.title ? "yes" : "no",
+    title: media.title ?? "",
+  });
   return (
     <a
       href={media.url}

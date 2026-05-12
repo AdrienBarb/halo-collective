@@ -3,6 +3,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 import useApi from "@/lib/hooks/useApi";
 
@@ -30,6 +31,8 @@ export default function SubscribeButton({
   ipCountryCode,
 }: SubscribeButtonProps) {
   const router = useRouter();
+  const t = useTranslations("Athlete.Subscribe");
+  const tErrors = useTranslations("Errors.Generic");
   const { usePost } = useApi();
 
   const [newsletterConsent, setNewsletterConsent] = useState(true);
@@ -44,7 +47,7 @@ export default function SubscribeButton({
       router.refresh();
     },
     onError: (error: SubscribeError) => {
-      toast.error(error.response?.data?.error ?? "Could not subscribe");
+      toast.error(error.response?.data?.error ?? tErrors("somethingWentWrong"));
     },
   });
 
@@ -54,7 +57,7 @@ export default function SubscribeButton({
 
   function onSubscribeClick() {
     if (!newsletterConsent) {
-      setConsentError("Tick the box to receive the newsletter");
+      setConsentError(t("tickBoxError"));
       return;
     }
     setConsentError(null);
@@ -85,17 +88,16 @@ export default function SubscribeButton({
       <div className="overflow-hidden rounded-2xl border border-line bg-cream-2">
         <div className="bg-ink px-6 py-6 text-center md:px-10 md:py-8">
           <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-accent-gold">
-            Join the newsletter
+            {t("eyebrow")}
           </div>
           <h2 className="mt-2 font-serif text-[28px] font-semibold leading-tight tracking-[-0.015em] text-cream md:text-[34px]">
-            Step inside {athleteFirstName}&apos;s season
+            {t("title", { athleteFirstName })}
           </h2>
         </div>
 
         <div className="px-6 py-8 md:px-10 md:py-10">
           <p className="mb-8 border-l-[3px] border-loss pl-4 font-serif text-[16px] italic leading-relaxed text-ink-2 md:text-[17px]">
-            Every week, {athleteFirstName} shares results, behind the scenes from
-            tournaments, the weekly routine, gear and other exclusive content.
+            {t("lead", { athleteFirstName })}
           </p>
 
           <div className="space-y-3">
@@ -115,12 +117,10 @@ export default function SubscribeButton({
               />
               <div>
                 <div className="font-serif text-[16px] font-semibold text-ink">
-                  {athleteFirstName}&apos;s Newsletter
+                  {t("newsletterHeading", { athleteFirstName })}
                 </div>
                 <p className="mt-1 text-[13px] leading-relaxed text-ink-3">
-                  I agree to receive {athleteFirstName}&apos;s emails: results,
-                  behind the scenes, weekly routine, gear, and exclusive
-                  content.
+                  {t("newsletterConsent", { athleteFirstName })}
                 </p>
               </div>
             </label>
@@ -138,11 +138,10 @@ export default function SubscribeButton({
               />
               <div>
                 <div className="font-serif text-[16px] font-semibold text-ink">
-                  Partner offers
+                  {t("partnerOffersHeading")}
                 </div>
                 <p className="mt-1 text-[13px] leading-relaxed text-ink-3">
-                  I agree to receive, from time to time, offers, news and
-                  benefits from {athleteFirstName}&apos;s selected partners.
+                  {t("partnerOffersConsent", { athleteFirstName })}
                 </p>
               </div>
             </label>
@@ -155,8 +154,7 @@ export default function SubscribeButton({
           ) : null}
 
           <p className="mt-6 text-center text-[12px] leading-relaxed text-ink-3">
-            By subscribing you agree to receive the communications you have
-            chosen. You can unsubscribe at any time in one click.
+            {t("finePrint")}
           </p>
 
           <button
@@ -165,12 +163,12 @@ export default function SubscribeButton({
             disabled={submitting}
             className="mt-4 w-full cursor-pointer rounded-md bg-accent-warm py-4 font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink transition hover:bg-accent-gold disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {submitting ? "Subscribing…" : "Subscribe to the newsletter →"}
+            {submitting ? t("subscribing") : t("subscribeCta")}
           </button>
 
           {!isSignedIn ? (
             <p className="mt-4 text-center text-[12px] text-ink-3">
-              You&apos;ll first be asked to create an account or sign in.
+              {t("authPrompt")}
             </p>
           ) : null}
         </div>

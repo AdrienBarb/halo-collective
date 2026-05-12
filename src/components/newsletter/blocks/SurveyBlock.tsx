@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { useLocale, useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
 import type { SurveyBlock as SurveyBlockType } from "@/lib/schemas/newsletterSection";
 import type { EngagementSnapshot } from "@/lib/services/fanEngagement";
@@ -26,7 +27,9 @@ export default function SurveyBlock({
   newsletterId,
   previewMode = false,
 }: SurveyBlockProps) {
-  const labels = getNewsletterLabels();
+  const tErrors = useTranslations("Errors.Generic");
+  const locale = useLocale() as "en" | "fr";
+  const labels = getNewsletterLabels(locale);
   const paragraphs = splitParagraphs(block.body);
   const externalUrl = block.externalUrl;
 
@@ -53,7 +56,7 @@ export default function SurveyBlock({
     onError: (err: unknown) => {
       const message =
         (err as { response?: { data?: { error?: string } } })?.response?.data
-          ?.error ?? "Something went wrong";
+          ?.error ?? tErrors("somethingWentWrong");
       toast.error(message);
     },
   });

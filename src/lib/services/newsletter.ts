@@ -20,7 +20,9 @@ import { createCampaign, sendCampaignNow } from "@/lib/brevo/campaigns";
 import { getRequiredEnv } from "@/lib/utils/env";
 import config from "@/lib/config";
 import { render } from "@react-email/render";
+import { getTranslations } from "next-intl/server";
 import { NewsletterEmail } from "@/lib/emails/NewsletterEmail";
+import { DEFAULT_LOCALE } from "@/i18n/locales";
 
 // Cap slug-collision retries at a small number. The original 50× was
 // excessive; if we collide ~5 times the slug strategy is wrong and we
@@ -102,6 +104,7 @@ function buildSectionRows(
 
 interface HeaderFields {
   title?: string;
+  emailSubject?: string | null;
   heroImageUrl?: string | null;
   editionDate?: Date | null;
   editionMode?: EditionModeValue;
@@ -123,6 +126,7 @@ function buildHeaderData(
 ): HeaderFields {
   return {
     title: input.title,
+    emailSubject: input.emailSubject,
     heroImageUrl: input.heroImageUrl,
     editionDate: input.editionDate,
     editionMode: input.editionMode,
@@ -219,6 +223,7 @@ export async function createNewsletter(input: CreateNewsletterOutput) {
           slug,
           editionNumber,
           title,
+          emailSubject: input.emailSubject,
           editionMode,
           heroImageUrl: input.heroImageUrl,
           editionDate: input.editionDate,
@@ -385,6 +390,7 @@ export async function cloneFromPreviousEdition(athleteId: string) {
           slug,
           editionNumber: nextEditionNumber,
           title: previous.title,
+          emailSubject: previous.emailSubject,
           editionMode,
           heroImageUrl: previous.heroImageUrl,
           editionDate: null,
@@ -525,11 +531,17 @@ async function renderEmailHtml(
   const editionUrl = buildEditionUrl(athlete.slug, input.slug);
   const askQuestionUrl = buildAskQuestionUrl(athlete.slug);
   const athleteName = `${athlete.firstName} ${athlete.lastName}`;
+  // TODO: per-recipient locale requires splitting Brevo lists by language.
+  // v1 sends every recipient the EN edition wrapper; athlete content remains as-authored.
+  const locale = DEFAULT_LOCALE;
+  const t = await getTranslations({ locale, namespace: "Emails.Newsletter" });
+  const editionLabel = t("editionLabel", {
+    n: input.editionNumber.toString().padStart(2, "0"),
+  });
   return render(
     NewsletterEmail({
       title: input.title,
       heroImageUrl: input.heroImageUrl,
-      editionNumber: input.editionNumber,
       editionMode: input.editionMode,
       athleteName,
       editionUrl,
@@ -541,6 +553,13 @@ async function renderEmailHtml(
       tournamentStartDate: input.tournamentStartDate,
       tournamentEndDate: input.tournamentEndDate,
       sections: input.sections,
+      locale,
+      messages: {
+        editionLabel,
+        footerNote: t("footerNote", { athleteName }),
+        unsubscribe: t("unsubscribe"),
+        viewInBrowser: t("viewInBrowser"),
+      },
     }),
   );
 }
@@ -666,9 +685,10 @@ export async function publishNewsletter(id: string) {
   await claimForSending(id, renderedHtml);
   logBrevo("claimed", { newsletterId: id });
 
-  // Defense-in-depth: schema already rejects CRLF in title, but strip
-  // any survivors before handing the string to Brevo as `subject`.
-  const subject = newsletter.title.replace(/[\r\n\t]+/g, " ").slice(0, 200);
+  // Defense-in-depth: schema already rejects CRLF, but strip survivors
+  // before handing the string to Brevo as `subject`.
+  const rawSubject = newsletter.emailSubject ?? newsletter.title;
+  const subject = rawSubject.replace(/[\r\n\t]+/g, " ").slice(0, 200);
   const campaignId = await createCampaign({
     name: `${athleteName} — Edition #${newsletter.editionNumber} (${newsletter.slug})`,
     subject,

@@ -10,11 +10,19 @@ import type {
   EditionModeValue,
   SectionTypeValue,
 } from "@/lib/schemas/newsletterSection";
+import type { Locale } from "@/i18n/locales";
+import { formatShortDateNoYear } from "@/lib/utils/formatDate";
+
+export interface NewsletterMessages {
+  editionLabel: string;
+  footerNote: string;
+  unsubscribe: string;
+  viewInBrowser: string;
+}
 
 interface NewsletterEmailProps {
   title: string;
   heroImageUrl?: string | null;
-  editionNumber: number;
   editionMode: EditionModeValue;
   athleteName: string;
   editionUrl: string;
@@ -28,17 +36,20 @@ interface NewsletterEmailProps {
   sections: EmailRawSection[];
   previewText?: string;
   unsubscribeUrl?: string;
+  locale: Locale;
+  messages: NewsletterMessages;
 }
 
 function formatDateRange(
   start: Date | string | null | undefined,
   end: Date | string | null | undefined,
+  locale: Locale,
 ): string | null {
   const fmt = (d: Date | string | null | undefined): string | null => {
     if (!d) return null;
     const date = d instanceof Date ? d : new Date(d);
     if (Number.isNaN(date.getTime())) return null;
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    return formatShortDateNoYear(date, locale);
   };
   const s = fmt(start);
   const e = fmt(end);
@@ -49,7 +60,6 @@ function formatDateRange(
 export const NewsletterEmail = ({
   title,
   heroImageUrl,
-  editionNumber,
   editionMode,
   athleteName,
   editionUrl,
@@ -63,14 +73,15 @@ export const NewsletterEmail = ({
   sections,
   previewText,
   unsubscribeUrl = "{{ unsubscribe }}",
+  locale,
+  messages,
 }: NewsletterEmailProps) => {
-  const editionLabel = `Edition #${editionNumber.toString().padStart(2, "0")}`;
   const tournamentLabel = getTournamentLabel(tournamentName);
   const tournamentMeta = [
     tournamentCategory,
     tournamentLocation,
     tournamentSurface,
-    formatDateRange(tournamentStartDate, tournamentEndDate),
+    formatDateRange(tournamentStartDate, tournamentEndDate, locale),
   ]
     .filter(Boolean)
     .join(" · ");
@@ -79,16 +90,15 @@ export const NewsletterEmail = ({
   return (
     <EmailLayout
       preview={previewText ?? title}
-      eyebrow={`${athleteName} · ${editionLabel}`}
+      eyebrow={`${athleteName} · ${messages.editionLabel}`}
       footerNote={
         <>
-          You&apos;re receiving this because you subscribed to{" "}
-          {athleteName}&apos;s edition on Halo Collective.{" "}
+          {messages.footerNote}{" "}
           <Link
             href={unsubscribeUrl}
             style={{ color: palette.ink3, textDecoration: "underline" }}
           >
-            Unsubscribe
+            {messages.unsubscribe}
           </Link>
         </>
       }
@@ -154,7 +164,7 @@ export const NewsletterEmail = ({
       ))}
 
       <Section style={{ marginTop: 28, textAlign: "center" }}>
-        <EmailButton href={editionUrl}>View in browser →</EmailButton>
+        <EmailButton href={editionUrl}>{messages.viewInBrowser}</EmailButton>
       </Section>
     </EmailLayout>
   );
@@ -215,7 +225,6 @@ const samplePreviewSections: EmailRawSection[] = [
 NewsletterEmail.PreviewProps = {
   title: "Monte Carlo: the comeback nobody saw",
   heroImageUrl: null,
-  editionNumber: 1,
   editionMode: "TOURNAMENT" as EditionModeValue,
   athleteName: "Flavio Cobolli",
   editionUrl: "https://halocollective.co/flavio-cobolli?edition=monte-carlo-comeback",
@@ -228,6 +237,14 @@ NewsletterEmail.PreviewProps = {
   tournamentEndDate: null,
   sections: samplePreviewSections,
   previewText: "The comeback nobody saw",
+  locale: "en",
+  messages: {
+    editionLabel: "Edition #01",
+    footerNote:
+      "You're receiving this because you subscribed to Flavio Cobolli's edition on Halo Collective.",
+    unsubscribe: "Unsubscribe",
+    viewInBrowser: "View in browser →",
+  },
 } satisfies NewsletterEmailProps;
 
 export default NewsletterEmail;

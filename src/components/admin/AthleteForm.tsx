@@ -548,7 +548,7 @@ export default function AthleteForm({
           >
             {sponsors.fields.length === 0 ? (
               <div className="rounded-sm border border-dashed border-line bg-cream px-6 py-10 text-center">
-                <p className="font-serif text-[15px] italic text-ink-2">
+                <p className="text-[15px] text-ink-2">
                   No sponsors yet — add the first one below.
                 </p>
               </div>

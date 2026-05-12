@@ -1,46 +1,66 @@
 import { z } from "zod";
 
-const passwordSchema = z
-  .string()
-  .min(8, "Password must be at least 8 characters")
-  .max(128, "Password is too long");
+export type AuthTranslate = (key: string) => string;
 
-const emailSchema = z
-  .string()
-  .trim()
-  .toLowerCase()
-  .email("Invalid email address")
-  .max(254);
+function buildPasswordSchema(t: AuthTranslate) {
+  return z
+    .string()
+    .min(8, t("passwordMin"))
+    .max(128, t("passwordMax"));
+}
 
-const nameSchema = z.string().trim().min(1, "Required").max(80);
+function buildEmailSchema(t: AuthTranslate) {
+  return z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email(t("invalidEmail"))
+    .max(254);
+}
 
-export const signInSchema = z.object({
-  email: emailSchema,
-  password: z.string().min(1, "Password is required").max(128),
-});
+function buildNameSchema(t: AuthTranslate) {
+  return z.string().trim().min(1, t("required")).max(80);
+}
 
-export const signUpSchema = z.object({
-  firstName: nameSchema,
-  lastName: nameSchema,
-  email: emailSchema,
-  password: passwordSchema,
-});
-
-export const forgotPasswordSchema = z.object({
-  email: emailSchema,
-});
-
-export const resetPasswordSchema = z
-  .object({
-    password: passwordSchema,
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
+export function createSignInSchema(t: AuthTranslate) {
+  return z.object({
+    email: buildEmailSchema(t),
+    password: z.string().min(1, t("passwordRequired")).max(128),
   });
+}
 
-export type SignInInput = z.input<typeof signInSchema>;
-export type SignUpInput = z.input<typeof signUpSchema>;
-export type ForgotPasswordInput = z.input<typeof forgotPasswordSchema>;
-export type ResetPasswordInput = z.input<typeof resetPasswordSchema>;
+export function createSignUpSchema(t: AuthTranslate) {
+  return z.object({
+    firstName: buildNameSchema(t),
+    lastName: buildNameSchema(t),
+    email: buildEmailSchema(t),
+    password: buildPasswordSchema(t),
+  });
+}
+
+export function createForgotPasswordSchema(t: AuthTranslate) {
+  return z.object({
+    email: buildEmailSchema(t),
+  });
+}
+
+export function createResetPasswordSchema(t: AuthTranslate) {
+  return z
+    .object({
+      password: buildPasswordSchema(t),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t("passwordsDontMatch"),
+      path: ["confirmPassword"],
+    });
+}
+
+export type SignInInput = z.input<ReturnType<typeof createSignInSchema>>;
+export type SignUpInput = z.input<ReturnType<typeof createSignUpSchema>>;
+export type ForgotPasswordInput = z.input<
+  ReturnType<typeof createForgotPasswordSchema>
+>;
+export type ResetPasswordInput = z.input<
+  ReturnType<typeof createResetPasswordSchema>
+>;

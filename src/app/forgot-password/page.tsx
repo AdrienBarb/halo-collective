@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { authClient } from "@/lib/better-auth/auth-client";
 import {
-  forgotPasswordSchema,
+  createForgotPasswordSchema,
   type ForgotPasswordInput,
 } from "@/lib/schemas/auth";
 import {
@@ -23,8 +24,15 @@ const buttonClass =
   "w-full cursor-pointer rounded-md bg-accent-warm py-3 font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink transition hover:bg-accent-gold disabled:cursor-not-allowed disabled:opacity-60";
 
 export default function ForgotPasswordPage() {
+  const t = useTranslations("Auth.ForgotPassword");
+  const tv = useTranslations("Auth.Validation");
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
+
+  const forgotPasswordSchema = useMemo(
+    () => createForgotPasswordSchema(tv),
+    [tv],
+  );
 
   const form = useForm<ForgotPasswordInput>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -43,13 +51,11 @@ export default function ForgotPasswordPage() {
         redirectTo: `${baseURL}/reset-password`,
       });
       if (result.error) {
-        // Surface generic message — never confirm whether the email exists.
         console.error("requestPasswordReset error:", result.error);
       }
       setSent(true);
     } catch (error) {
       console.error("Forgot password failed:", error);
-      // Still show the success card to prevent enumeration.
       setSent(true);
     } finally {
       setSubmitting(false);
@@ -62,10 +68,10 @@ export default function ForgotPasswordPage() {
         <div className="overflow-hidden rounded-2xl border border-line bg-cream-2">
           <div className="bg-ink px-6 py-6 text-center md:px-10 md:py-8">
             <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-accent-gold">
-              Password reset
+              {t("eyebrow")}
             </div>
             <h1 className="mt-2 font-serif text-[28px] font-semibold leading-tight tracking-[-0.015em] text-cream md:text-[32px]">
-              Forgot your password?
+              {t("title")}
             </h1>
           </div>
 
@@ -73,17 +79,16 @@ export default function ForgotPasswordPage() {
             {sent ? (
               <div className="space-y-4 text-center">
                 <p className="font-serif text-[18px] text-ink">
-                  Check your inbox.
+                  {t("checkInboxTitle")}
                 </p>
                 <p className="text-[14px] leading-relaxed text-ink-3">
-                  If an account exists for that email, we just sent a link to
-                  reset your password. The link expires in 1 hour.
+                  {t("checkInboxBody")}
                 </p>
                 <Link
                   href="/"
                   className="inline-block pt-2 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-ink underline-offset-2 hover:underline"
                 >
-                  Back to Halo
+                  {t("backToHalo")}
                 </Link>
               </div>
             ) : (
@@ -94,8 +99,7 @@ export default function ForgotPasswordPage() {
                   noValidate
                 >
                   <p className="text-[14px] leading-relaxed text-ink-3">
-                    Enter your email and we&apos;ll send you a link to set a new
-                    password.
+                    {t("explainer")}
                   </p>
 
                   <FormField
@@ -104,13 +108,13 @@ export default function ForgotPasswordPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
-                          Email
+                          {t("email")}
                         </FormLabel>
                         <FormControl>
                           <Input
                             type="email"
                             autoComplete="email"
-                            placeholder="your@email.com"
+                            placeholder={t("emailPlaceholder")}
                             disabled={submitting}
                             {...field}
                           />
@@ -125,16 +129,16 @@ export default function ForgotPasswordPage() {
                     disabled={submitting}
                     className={buttonClass}
                   >
-                    {submitting ? "Sending…" : "Send reset link"}
+                    {submitting ? t("sending") : t("sendResetLink")}
                   </button>
 
                   <p className="text-center text-[12px] text-ink-3">
-                    Remembered it?{" "}
+                    {t("remembered")}{" "}
                     <Link
                       href="/"
                       className="font-semibold text-ink underline underline-offset-2 hover:text-accent-gold"
                     >
-                      Back to Halo
+                      {t("backToHalo")}
                     </Link>
                   </p>
                 </form>

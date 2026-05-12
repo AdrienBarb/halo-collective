@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/db/prisma";
 import { render } from "@react-email/render";
 import { WaitlistConfirmationEmail } from "@/lib/emails/WaitlistConfirmationEmail";
@@ -6,6 +7,7 @@ import { resendClient } from "@/lib/resend/resendClient";
 import { errorHandler } from "@/lib/errors/errorHandler";
 import { waitlistSchema } from "@/lib/schemas/common";
 import config from "@/lib/config";
+import { DEFAULT_LOCALE } from "@/i18n/locales";
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,10 +37,22 @@ export async function POST(request: NextRequest) {
 
     if (config.features.waitlist?.confirmationEmail !== false) {
       try {
+        const t = await getTranslations({
+          locale: DEFAULT_LOCALE,
+          namespace: "Emails.Waitlist",
+        });
         const emailHtml = await render(
           WaitlistConfirmationEmail({
-            email: waitlistEntry.email,
-            position: waitlistEntry.position!,
+            messages: {
+              preview: t("preview"),
+              heading: t("heading"),
+              body: t("body", { projectName: config.project.name }),
+              position: t("position", {
+                position: waitlistEntry.position!.toString(),
+              }),
+              emailLine: t("emailLine", { email: waitlistEntry.email }),
+              footer: t("footer"),
+            },
           })
         );
 

@@ -18,6 +18,7 @@ model User {
   countryCode   String?
   phone         String?
   role          UserRole  @default(USER)
+  locale        String    @default("en")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @default(now()) @updatedAt
   sessions      Session[]
@@ -107,6 +108,7 @@ model Newsletter {
   editionDate         DateTime?
   editionMode         EditionMode      @default(WEEKLY)
   title               String
+  emailSubject        String?
   slug                String
   heroImageUrl        String?
   tournamentName      String?

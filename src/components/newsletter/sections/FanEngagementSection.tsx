@@ -56,10 +56,14 @@ export default function FanEngagementSection({
 
   return (
     <div className="space-y-8">
-      {blocks.map((block) => (
+      {blocks.map((block, i) => (
         <div
           key={block.id}
-          className="border-b border-line pb-6 last:border-b-0 last:pb-0"
+          className={
+            i < blocks.length - 1
+              ? "border-b border-line pb-6"
+              : undefined
+          }
         >
           {renderBlock(block, common)}
         </div>

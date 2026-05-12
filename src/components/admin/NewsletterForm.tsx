@@ -144,6 +144,7 @@ export default function NewsletterForm({
     resolver: zodResolver(newsletterFormSchema),
     defaultValues: {
       title: initialData?.title ?? "",
+      emailSubject: initialData?.emailSubject ?? "",
       slug: initialData?.slug ?? "",
       heroImageUrl: initialData?.heroImageUrl ?? undefined,
       editionNumber: initialData?.editionNumber ?? 1,
@@ -305,6 +306,7 @@ export default function NewsletterForm({
       toast.success("Newsletter saved");
       form.reset({
         title: data.title,
+        emailSubject: data.emailSubject ?? "",
         slug: data.slug,
         heroImageUrl: data.heroImageUrl ?? undefined,
         editionNumber: data.editionNumber,
@@ -416,7 +418,7 @@ export default function NewsletterForm({
                 <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
                   Athlete
                 </div>
-                <p className="mt-1 font-serif text-[13px] italic leading-snug text-ink-2">
+                <p className="mt-1 text-[13px] leading-snug text-ink-2">
                   Choose the athlete this edition belongs to.
                 </p>
                 <div className="mt-4">
@@ -450,7 +452,7 @@ export default function NewsletterForm({
                   <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
                     Prefill from source
                   </div>
-                  <p className="mt-1 font-serif text-[13px] italic leading-snug text-ink-2">
+                  <p className="mt-1 text-[13px] leading-snug text-ink-2">
                     Generate a draft from any source material (HTML, brief,
                     transcript). Media URLs are skipped — re-upload after.
                   </p>
@@ -510,7 +512,7 @@ export default function NewsletterForm({
                   <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
                     Edition
                   </div>
-                  <p className="mt-1 font-serif text-[15px] italic leading-snug text-ink-2">
+                  <p className="mt-1 text-[15px] leading-snug text-ink-2">
                     The basics of this issue — what it&apos;s called, when it
                     ships, the cover image, and the edition mode.
                   </p>
@@ -603,8 +605,36 @@ export default function NewsletterForm({
                         />
                       </FormControl>
                       <p className="text-[11px] text-ink-3">
-                        Used as the email subject line and the issue&apos;s
-                        display title on the web.
+                        Used as the web title and as the default email
+                        subject. To personalize the subject with the
+                        fan&apos;s first name, fill in <strong>Email
+                        subject</strong> below.
+                      </p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="emailSubject"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                        Email subject
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          value={field.value ?? ""}
+                          placeholder={'{{ contact.FIRSTNAME | default: "Hey" }}, voici ma dernière newsletter'}
+                        />
+                      </FormControl>
+                      <p className="text-[11px] text-ink-3">
+                        Optional. Overrides the email subject only; the
+                        web title is unchanged. Supports Brevo merge tags
+                        — see the placeholder for an example with a
+                        fallback.
                       </p>
                       <FormMessage />
                     </FormItem>
@@ -705,7 +735,7 @@ export default function NewsletterForm({
                   <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
                     Tournament
                   </div>
-                  <p className="mt-1 font-serif text-[15px] italic leading-snug text-ink-2">
+                  <p className="mt-1 text-[15px] leading-snug text-ink-2">
                     Context for the week. Required when this is a TOURNAMENT
                     edition; optional for WEEKLY editions.
                   </p>

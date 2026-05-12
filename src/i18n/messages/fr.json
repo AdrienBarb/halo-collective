@@ -6,5 +6,210 @@
   },
   "LanguageSwitcher": {
     "label": "Langue"
+  },
+  "Footer": {
+    "copyright": "© {year} · Tous droits réservés"
+  },
+  "Landing": {
+    "eyebrow": "Entrez dans le fan club privé des athlètes",
+    "headline": "L'histoire de l'intérieur, racontée par l'athlète.",
+    "subhead": "Débriefs de matchs sans filtre. Le matériel, le calendrier, les victoires et les défaites — réservés aux membres, entre chaque match.",
+    "rosterHeading": "Le Roster",
+    "rosterCount": "{count} Athlètes"
+  },
+  "Navbar": {
+    "signIn": "Connexion"
+  },
+  "AccountMenu": {
+    "account": "Compte",
+    "admin": "Admin",
+    "signOut": "Se déconnecter"
+  },
+  "Errors": {
+    "Toast": {
+      "sessionExpired": "Session expirée. Veuillez vous reconnecter.",
+      "forbidden": "Vous n'avez pas l'autorisation d'accéder à cette ressource.",
+      "invalidRequest": "Requête invalide. Vérifiez votre saisie.",
+      "serverError": "Erreur serveur. Réessayez plus tard."
+    },
+    "Generic": {
+      "somethingWentWrong": "Une erreur est survenue"
+    }
+  },
+  "Auth": {
+    "Validation": {
+      "passwordMin": "Le mot de passe doit contenir au moins 8 caractères",
+      "passwordMax": "Le mot de passe est trop long",
+      "invalidEmail": "Adresse e-mail invalide",
+      "required": "Requis",
+      "passwordRequired": "Le mot de passe est requis",
+      "passwordsDontMatch": "Les mots de passe ne correspondent pas"
+    },
+    "Form": {
+      "firstName": "Prénom",
+      "firstNamePlaceholder": "Élise",
+      "lastName": "Nom",
+      "lastNamePlaceholder": "Mertens",
+      "email": "E-mail",
+      "emailPlaceholder": "vous@email.com",
+      "password": "Mot de passe",
+      "passwordPlaceholderSignUp": "8 caractères minimum",
+      "passwordPlaceholderSignIn": "••••••••",
+      "forgot": "Oublié ?",
+      "or": "ou",
+      "continueWithGoogle": "Continuer avec Google",
+      "redirecting": "Redirection…",
+      "createAccount": "Créer un compte",
+      "creatingAccount": "Création du compte…",
+      "signIn": "Se connecter",
+      "signingIn": "Connexion…",
+      "alreadyHaveAccount": "Déjà un compte ? <link>Se connecter</link>",
+      "newHere": "Nouveau ici ? <link>Créer un compte</link>",
+      "invalidCredentials": "E-mail ou mot de passe incorrect",
+      "somethingWentWrong": "Une erreur est survenue. Réessayez.",
+      "couldNotCreateAccount": "Impossible de créer le compte. Vérifiez vos informations ou connectez-vous.",
+      "couldNotStartGoogle": "Impossible de démarrer la connexion Google."
+    },
+    "Modal": {
+      "eyebrowSignUp": "Créez votre compte",
+      "eyebrowSignIn": "Bon retour",
+      "titleSignUp": "Rejoignez Halo Collective",
+      "titleSignIn": "Connexion à Halo"
+    },
+    "ForgotPassword": {
+      "eyebrow": "Réinitialisation",
+      "title": "Mot de passe oublié ?",
+      "checkInboxTitle": "Vérifiez votre boîte mail.",
+      "checkInboxBody": "Si un compte existe pour cet e-mail, nous venons de vous envoyer un lien pour réinitialiser votre mot de passe. Le lien expire dans 1 heure.",
+      "backToHalo": "Retour à Halo",
+      "explainer": "Saisissez votre e-mail et nous vous enverrons un lien pour définir un nouveau mot de passe.",
+      "email": "E-mail",
+      "emailPlaceholder": "vous@email.com",
+      "sending": "Envoi…",
+      "sendResetLink": "Envoyer le lien",
+      "remembered": "Vous vous en souvenez ?"
+    },
+    "ResetPassword": {
+      "eyebrow": "Réinitialisation",
+      "title": "Choisissez un nouveau mot de passe",
+      "loading": "Chargement…",
+      "couldNotReset": "Impossible de réinitialiser le mot de passe",
+      "successToast": "Mot de passe mis à jour. Connectez-vous avec le nouveau.",
+      "somethingWentWrong": "Une erreur est survenue. Réessayez.",
+      "invalidTitle": "Lien de réinitialisation invalide.",
+      "invalidBody": "Ce lien n'a pas de jeton ou a déjà été utilisé.",
+      "requestNewLink": "Demander un nouveau lien",
+      "lead": "Choisissez un nouveau mot de passe pour votre compte Halo.",
+      "newPassword": "Nouveau mot de passe",
+      "newPasswordPlaceholder": "8 caractères minimum",
+      "confirmPassword": "Confirmer le mot de passe",
+      "confirmPasswordPlaceholder": "Répétez votre mot de passe",
+      "updating": "Mise à jour…",
+      "updatePassword": "Mettre à jour"
+    }
+  },
+  "Athlete": {
+    "Profile": {
+      "follow": "Suivre {fullName}",
+      "socialAria": "{fullName} sur {label}",
+      "memberBadge": "★ MEMBRE",
+      "noEditionsTitle": "Pas encore d'édition.",
+      "noEditionsBody": "Revenez bientôt — la prochaine édition est en préparation.",
+      "partners": "Partenaires",
+      "foundationLabel": "Fondation"
+    },
+    "Editions": {
+      "title": "Éditions",
+      "previous": "Édition précédente",
+      "next": "Édition suivante"
+    },
+    "Subscribe": {
+      "tickBoxError": "Cochez la case pour recevoir la newsletter",
+      "eyebrow": "Rejoindre la newsletter",
+      "title": "Entrez dans la saison de {athleteFirstName}",
+      "lead": "Chaque semaine, {athleteFirstName} partage ses résultats, les coulisses des tournois, sa routine hebdomadaire, son équipement et d'autres contenus exclusifs.",
+      "newsletterHeading": "La newsletter de {athleteFirstName}",
+      "newsletterConsent": "J'accepte de recevoir les e-mails de {athleteFirstName} : résultats, coulisses, routine hebdomadaire, équipement et contenu exclusif.",
+      "partnerOffersHeading": "Offres partenaires",
+      "partnerOffersConsent": "J'accepte de recevoir, occasionnellement, les offres, actualités et avantages des partenaires sélectionnés par {athleteFirstName}.",
+      "finePrint": "En vous inscrivant, vous acceptez de recevoir les communications choisies. Vous pouvez vous désabonner à tout moment en un clic.",
+      "subscribing": "Inscription…",
+      "subscribeCta": "S'abonner à la newsletter →",
+      "authPrompt": "Vous devrez d'abord créer un compte ou vous connecter."
+    }
+  },
+  "Subscriptions": {
+    "title": "Mes abonnements",
+    "subhead": "Les athlètes dont vous recevez la newsletter.",
+    "emptyTitle": "Vous ne suivez encore aucun athlète.",
+    "emptyBody": "Découvrez le roster et abonnez-vous à votre premier athlète.",
+    "emptyCta": "Voir les athlètes",
+    "Error": {
+      "title": "Mes abonnements",
+      "errorTitle": "Impossible de charger vos abonnements.",
+      "errorBody": "Une erreur est survenue. Réessayez dans un instant.",
+      "tryAgain": "Réessayer"
+    }
+  },
+  "Checkout": {
+    "Success": {
+      "title": "Paiement réussi !",
+      "body": "Merci pour votre achat. Votre abonnement est maintenant actif.",
+      "receiptNote": "Vous recevrez sous peu un e-mail de confirmation avec votre reçu et les détails de votre compte.",
+      "dashboardCta": "Accéder au tableau de bord",
+      "plansCta": "Voir les offres"
+    }
+  },
+  "Newsletter": {
+    "Media": {
+      "watchOnYoutube": "Regarder la vidéo sur YouTube",
+      "watchVideo": "Regarder la vidéo",
+      "playVoiceNote": "{hasTitle, select, yes {Écouter le message vocal : {title}} other {Écouter le message vocal}}"
+    }
+  },
+  "Emails": {
+    "OTP": {
+      "preview": "Votre code de connexion Halo",
+      "eyebrow": "Connexion",
+      "footer": "Si vous n'avez pas demandé ce code, ignorez cet e-mail. Le code expire dans 5 minutes.",
+      "heading": "Votre code de connexion.",
+      "lead": "Saisissez ce code pour vous connecter à votre compte :",
+      "expiry": "Ce code expire dans 5 minutes."
+    },
+    "PasswordReset": {
+      "preview": "Réinitialiser votre mot de passe Halo",
+      "eyebrow": "Réinitialisation",
+      "footer": "Si vous n'avez pas demandé de réinitialisation, vous pouvez ignorer cet e-mail. Le lien expire dans 1 heure.",
+      "heading": "Réinitialisez votre mot de passe.",
+      "body": "{greeting}cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe pour votre compte Halo. Ce lien expire dans 1 heure.",
+      "button": "Réinitialiser le mot de passe"
+    },
+    "Welcome": {
+      "preview": "C'est confirmé. Bienvenue dans le cercle de {athleteFirstName}.",
+      "eyebrow": "C'est confirmé",
+      "footerNote": "Vous recevez cet e-mail parce que vous vous êtes abonné·e à la newsletter de {athleteName} sur Halo Collective. Vous pouvez vous désabonner à tout moment depuis le pied de page de n'importe quelle édition.",
+      "heading": "Bienvenue dans le cercle de {athleteFirstName}.",
+      "lead": "{greeting}merci d'avoir rejoint le cercle. Chaque semaine, la prochaine édition de {athleteFirstName} arrivera ici — résultats, coulisses, équipement et tout ce que seuls les initiés voient.",
+      "body": "La première édition que vous recevrez sera la prochaine publiée. En attendant, le catalogue est disponible sur le profil.",
+      "button": "Voir la page de {athleteFirstName}"
+    },
+    "Newsletter": {
+      "editionLabel": "Édition n°{n}",
+      "footerNote": "Vous recevez cet e-mail parce que vous vous êtes abonné·e à l'édition de {athleteName} sur Halo Collective.",
+      "unsubscribe": "Se désabonner",
+      "viewInBrowser": "Voir dans le navigateur →"
+    },
+    "Waitlist": {
+      "preview": "Vous êtes sur la liste d'attente !",
+      "heading": "Vous êtes sur la liste d'attente !",
+      "body": "Merci d'avoir rejoint la liste d'attente de {projectName}. Nous vous préviendrons dès le lancement.",
+      "position": "Votre position : n°{position}",
+      "emailLine": "E-mail : {email}",
+      "footer": "Nous vous enverrons un e-mail dès que ce sera votre tour d'accéder à la plateforme."
+    },
+    "Media": {
+      "watchOnYoutube": "Regarder sur YouTube",
+      "watch": "Regarder"
+    }
   }
 }

@@ -20,7 +20,7 @@ export default async function AdminNewslettersPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="font-serif text-[28px] font-semibold tracking-[-0.01em] text-ink">
+        <h1 className="font-sans text-[28px] font-semibold tracking-[-0.01em] text-ink">
           Newsletters
         </h1>
         <Button asChild>
@@ -30,7 +30,7 @@ export default async function AdminNewslettersPage() {
 
       {newsletters.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-line bg-cream-2 px-6 py-14 text-center">
-          <p className="font-serif text-[20px] text-ink">No newsletters yet.</p>
+          <p className="text-[20px] text-ink">No newsletters yet.</p>
           <p className="mt-1 text-[13px] text-ink-3">
             Create your first one to get started.
           </p>

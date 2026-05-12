@@ -65,7 +65,7 @@ export default async function EditNewsletterPage({
           </div>
         </div>
 
-        <h1 className="mt-5 font-serif text-[40px] font-semibold leading-[1.05] tracking-[-0.015em] text-ink md:text-[52px]">
+        <h1 className="mt-5 font-sans text-[40px] font-semibold leading-[1.05] tracking-[-0.015em] text-ink md:text-[52px]">
           {newsletter.title}
         </h1>
       </header>

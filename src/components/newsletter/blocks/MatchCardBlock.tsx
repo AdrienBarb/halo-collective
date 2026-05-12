@@ -1,92 +1,95 @@
+import { getLocale } from "next-intl/server";
 import type { MatchCardBlock as MatchCardBlockType } from "@/lib/schemas/newsletterSection";
-import { getNewsletterLabels } from "@/lib/newsletter/labels";
+import {
+  getNewsletterLabels,
+  type NewsletterLocale,
+} from "@/lib/newsletter/labels";
 import { parseYouTubeId } from "@/lib/newsletter/youtube";
+import { DEFAULT_LOCALE, isLocale } from "@/i18n/locales";
 
 interface MatchCardBlockProps {
   match: MatchCardBlockType;
 }
 
-const RESULT_STYLES: Record<MatchCardBlockType["result"], string> = {
+const BADGE_STYLES: Record<MatchCardBlockType["result"], string> = {
   W: "bg-win text-cream",
   L: "bg-loss text-cream",
   BYE: "bg-cream-3 text-ink-3",
   EXEMPT: "bg-cream-3 text-ink-3",
 };
 
-export default function MatchCardBlock({ match }: MatchCardBlockProps) {
+export default async function MatchCardBlock({ match }: MatchCardBlockProps) {
   const showOpponent =
     match.opponentName && match.result !== "BYE" && match.result !== "EXEMPT";
-  const labels = getNewsletterLabels();
+  const rawLocale = await getLocale();
+  const locale: NewsletterLocale = isLocale(rawLocale)
+    ? rawLocale
+    : DEFAULT_LOCALE;
+  const labels = getNewsletterLabels(locale);
   const isYouTube = parseYouTubeId(match.highlightUrl) !== null;
   const highlightsLabel = isYouTube
     ? labels.ctas.watchOnYoutube
     : labels.ctas.highlights;
 
+  const metaRight = [match.roundName, match.date].filter(Boolean).join(" · ");
+  const headline = showOpponent ? match.opponentName : match.result;
+  const subline = showOpponent
+    ? match.opponentRank
+      ? `${match.opponentRank}${match.opponentCountry ? ` · ${match.opponentCountry}` : ""}`
+      : match.contextNote ?? null
+    : match.contextNote ?? null;
+
   return (
-    <article className="border-b border-line py-4 last:border-b-0">
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0 flex-1 space-y-1">
-          <div className="flex items-center gap-2">
-            <span
-              className={`inline-flex h-5 w-5 items-center justify-center rounded-full font-mono text-[10px] font-bold ${RESULT_STYLES[match.result]}`}
-            >
-              {match.result === "EXEMPT" ? "—" : match.result.charAt(0)}
+    <article className="rounded-xl border border-line bg-cream px-4 py-4">
+      <div className="flex items-center justify-between gap-3">
+        <span
+          className={`inline-flex h-6 min-w-[28px] items-center justify-center rounded-md px-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.12em] ${BADGE_STYLES[match.result]}`}
+        >
+          {match.result === "EXEMPT" ? "—" : match.result}
+        </span>
+        {metaRight ? (
+          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+            {metaRight}
+          </span>
+        ) : null}
+      </div>
+
+      <div className="mt-3 flex items-baseline gap-2">
+        <span className="text-[14px] font-semibold text-ink">{headline}</span>
+        {subline ? (
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+            {subline}
+          </span>
+        ) : null}
+      </div>
+
+      {match.score ? (
+        <div className="mt-1 font-serif text-[32px] font-medium leading-[1.05] tracking-[-0.015em] text-ink">
+          {match.score.split(/\s+/).map((set, i) => (
+            <span key={i} className="mr-4 inline-block">
+              {set}
             </span>
-            {showOpponent ? (
-              <span className="text-sm font-bold text-ink">
-                vs {match.opponentName}
-                {match.opponentRank ? (
-                  <span className="ml-2 font-normal text-ink-3">
-                    {match.opponentRank}
-                    {match.opponentCountry ? ` ${match.opponentCountry}` : ""}
-                  </span>
-                ) : null}
-              </span>
-            ) : (
-              <span className="text-sm font-bold text-ink">{match.roundName}</span>
-            )}
-          </div>
-
-          {match.score ? (
-            <div className="font-mono text-xs text-ink-2">
-              {match.score.split(/\s+/).map((set, i) => (
-                <span key={i} className="mr-2 font-semibold">
-                  {set}
-                </span>
-              ))}
-            </div>
-          ) : match.result === "BYE" || match.result === "EXEMPT" ? (
-            <div>
-              <span className="inline-block bg-cream-3 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide text-ink-3">
-                {match.result}
-              </span>
-            </div>
-          ) : null}
-
-          <div className="font-mono text-[10px] uppercase tracking-wide text-ink-3">
-            {showOpponent ? match.roundName : null}
-            {showOpponent && match.date ? " · " : null}
-            {match.date}
-            {match.contextNote ? ` · ${match.contextNote}` : null}
-          </div>
+          ))}
         </div>
+      ) : null}
 
-        {match.highlightUrl ? (
+      {match.commentary ? (
+        <p className="mt-3 text-[13px] leading-[1.55] text-ink-2">
+          {match.commentary}
+        </p>
+      ) : null}
+
+      {match.highlightUrl ? (
+        <div className="mt-4">
           <a
             href={match.highlightUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex shrink-0 items-center gap-1.5 rounded bg-action px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-cream"
+            className="inline-flex items-center gap-1.5 rounded-md bg-action px-3 py-1.5 font-mono text-[11px] font-bold uppercase tracking-[0.1em] text-cream"
           >
-            ▶ {highlightsLabel}
+            ▶ {highlightsLabel} →
           </a>
-        ) : null}
-      </div>
-
-      {match.commentary ? (
-        <p className="mt-3 font-serif text-sm italic leading-relaxed text-ink-2">
-          {match.commentary}
-        </p>
+        </div>
       ) : null}
     </article>
   );

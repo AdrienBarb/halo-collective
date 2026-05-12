@@ -13,7 +13,7 @@ export default function NewAthletePage() {
         >
           ← Athletes
         </Link>
-        <h1 className="mt-2 font-serif text-[28px] font-semibold tracking-[-0.01em] text-ink">
+        <h1 className="mt-2 font-sans text-[28px] font-semibold tracking-[-0.01em] text-ink">
           New athlete
         </h1>
       </div>

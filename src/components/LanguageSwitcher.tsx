@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Languages } from "lucide-react";
+import { Check } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -15,11 +15,12 @@ import {
 import {
   DEFAULT_LOCALE,
   isLocale,
+  LOCALE_FLAGS,
   LOCALE_LABELS,
   LOCALES,
   type Locale,
 } from "@/i18n/locales";
-import { setLocaleCookie } from "@/i18n/setLocaleCookie";
+import { setLocale } from "@/lib/actions/setLocale";
 
 export function LanguageSwitcher() {
   const router = useRouter();
@@ -27,9 +28,9 @@ export function LanguageSwitcher() {
   const currentLocale: Locale = isLocale(raw) ? raw : DEFAULT_LOCALE;
   const t = useTranslations("LanguageSwitcher");
 
-  const handleSelect = (next: Locale) => {
+  const handleSelect = async (next: Locale) => {
     if (next === currentLocale) return;
-    setLocaleCookie(next);
+    await setLocale(next);
     router.refresh();
   };
 
@@ -42,7 +43,9 @@ export function LanguageSwitcher() {
           aria-label={t("label")}
           className="gap-2"
         >
-          <Languages className="h-4 w-4" />
+          <span className="text-base leading-none">
+            {LOCALE_FLAGS[currentLocale]}
+          </span>
           <span className="font-mono text-xs uppercase tracking-wider">
             {currentLocale}
           </span>
@@ -57,9 +60,14 @@ export function LanguageSwitcher() {
             <DropdownMenuItem
               key={locale}
               onSelect={() => handleSelect(locale)}
-              className="justify-between"
+              className="justify-between gap-3"
             >
-              <span>{LOCALE_LABELS[locale]}</span>
+              <span className="flex items-center gap-2">
+                <span className="text-base leading-none">
+                  {LOCALE_FLAGS[locale]}
+                </span>
+                <span>{LOCALE_LABELS[locale]}</span>
+              </span>
               {isActive ? (
                 <Check className="h-4 w-4 text-muted-foreground" />
               ) : null}

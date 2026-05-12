@@ -6,5 +6,210 @@
   },
   "LanguageSwitcher": {
     "label": "Language"
+  },
+  "Footer": {
+    "copyright": "© {year} · All Rights Reserved"
+  },
+  "Landing": {
+    "eyebrow": "Enter the private athlete fan club",
+    "headline": "The inside story, direct from the athlete.",
+    "subhead": "Honest match debriefs. The gear, the schedule, the wins and the losses — unfiltered, member-only, delivered between matches.",
+    "rosterHeading": "The Roster",
+    "rosterCount": "{count} Athletes"
+  },
+  "Navbar": {
+    "signIn": "Sign in"
+  },
+  "AccountMenu": {
+    "account": "Account",
+    "admin": "Admin",
+    "signOut": "Sign out"
+  },
+  "Errors": {
+    "Toast": {
+      "sessionExpired": "Session expired. Please sign in again.",
+      "forbidden": "You don't have permission to access this resource.",
+      "invalidRequest": "Invalid request. Please check your input.",
+      "serverError": "Server error. Please try again later."
+    },
+    "Generic": {
+      "somethingWentWrong": "Something went wrong"
+    }
+  },
+  "Auth": {
+    "Validation": {
+      "passwordMin": "Password must be at least 8 characters",
+      "passwordMax": "Password is too long",
+      "invalidEmail": "Invalid email address",
+      "required": "Required",
+      "passwordRequired": "Password is required",
+      "passwordsDontMatch": "Passwords do not match"
+    },
+    "Form": {
+      "firstName": "First name",
+      "firstNamePlaceholder": "Elise",
+      "lastName": "Last name",
+      "lastNamePlaceholder": "Mertens",
+      "email": "Email",
+      "emailPlaceholder": "your@email.com",
+      "password": "Password",
+      "passwordPlaceholderSignUp": "At least 8 characters",
+      "passwordPlaceholderSignIn": "••••••••",
+      "forgot": "Forgot?",
+      "or": "or",
+      "continueWithGoogle": "Continue with Google",
+      "redirecting": "Redirecting…",
+      "createAccount": "Create account",
+      "creatingAccount": "Creating account…",
+      "signIn": "Sign in",
+      "signingIn": "Signing in…",
+      "alreadyHaveAccount": "Already have an account? <link>Sign in</link>",
+      "newHere": "New here? <link>Create an account</link>",
+      "invalidCredentials": "Invalid email or password",
+      "somethingWentWrong": "Something went wrong. Try again.",
+      "couldNotCreateAccount": "Could not create account. Check your details or sign in instead.",
+      "couldNotStartGoogle": "Could not start Google sign-in."
+    },
+    "Modal": {
+      "eyebrowSignUp": "Create your account",
+      "eyebrowSignIn": "Welcome back",
+      "titleSignUp": "Join Halo Collective",
+      "titleSignIn": "Sign in to Halo"
+    },
+    "ForgotPassword": {
+      "eyebrow": "Password reset",
+      "title": "Forgot your password?",
+      "checkInboxTitle": "Check your inbox.",
+      "checkInboxBody": "If an account exists for that email, we just sent a link to reset your password. The link expires in 1 hour.",
+      "backToHalo": "Back to Halo",
+      "explainer": "Enter your email and we'll send you a link to set a new password.",
+      "email": "Email",
+      "emailPlaceholder": "your@email.com",
+      "sending": "Sending…",
+      "sendResetLink": "Send reset link",
+      "remembered": "Remembered it?"
+    },
+    "ResetPassword": {
+      "eyebrow": "Password reset",
+      "title": "Choose a new password",
+      "loading": "Loading…",
+      "couldNotReset": "Could not reset password",
+      "successToast": "Password updated. Sign in with your new password.",
+      "somethingWentWrong": "Something went wrong. Try again.",
+      "invalidTitle": "Invalid reset link.",
+      "invalidBody": "This link is missing its token, or it has already been used.",
+      "requestNewLink": "Request a new link",
+      "lead": "Choose a new password for your Halo account.",
+      "newPassword": "New password",
+      "newPasswordPlaceholder": "At least 8 characters",
+      "confirmPassword": "Confirm password",
+      "confirmPasswordPlaceholder": "Repeat your password",
+      "updating": "Updating…",
+      "updatePassword": "Update password"
+    }
+  },
+  "Athlete": {
+    "Profile": {
+      "follow": "Follow {fullName}",
+      "socialAria": "{fullName} on {label}",
+      "memberBadge": "★ MEMBER",
+      "noEditionsTitle": "No editions yet.",
+      "noEditionsBody": "Check back soon — the next drop is being put together.",
+      "partners": "Partners",
+      "foundationLabel": "Foundation"
+    },
+    "Editions": {
+      "title": "Editions",
+      "previous": "Previous edition",
+      "next": "Next edition"
+    },
+    "Subscribe": {
+      "tickBoxError": "Tick the box to receive the newsletter",
+      "eyebrow": "Join the newsletter",
+      "title": "Step inside {athleteFirstName}'s season",
+      "lead": "Every week, {athleteFirstName} shares results, behind the scenes from tournaments, the weekly routine, gear and other exclusive content.",
+      "newsletterHeading": "{athleteFirstName}'s Newsletter",
+      "newsletterConsent": "I agree to receive {athleteFirstName}'s emails: results, behind the scenes, weekly routine, gear, and exclusive content.",
+      "partnerOffersHeading": "Partner offers",
+      "partnerOffersConsent": "I agree to receive, from time to time, offers, news and benefits from {athleteFirstName}'s selected partners.",
+      "finePrint": "By subscribing you agree to receive the communications you have chosen. You can unsubscribe at any time in one click.",
+      "subscribing": "Subscribing…",
+      "subscribeCta": "Subscribe to the newsletter →",
+      "authPrompt": "You'll first be asked to create an account or sign in."
+    }
+  },
+  "Subscriptions": {
+    "title": "My subscriptions",
+    "subhead": "The athletes whose newsletter you receive.",
+    "emptyTitle": "You're not following any athlete yet.",
+    "emptyBody": "Discover the roster and subscribe to your first athlete.",
+    "emptyCta": "See athletes",
+    "Error": {
+      "title": "My subscriptions",
+      "errorTitle": "Could not load your subscriptions.",
+      "errorBody": "Something went wrong. Try again in a moment.",
+      "tryAgain": "Try again"
+    }
+  },
+  "Checkout": {
+    "Success": {
+      "title": "Payment Successful!",
+      "body": "Thank you for your purchase. Your subscription is now active.",
+      "receiptNote": "You should receive a confirmation email shortly with your receipt and account details.",
+      "dashboardCta": "Go to Dashboard",
+      "plansCta": "View Plans"
+    }
+  },
+  "Newsletter": {
+    "Media": {
+      "watchOnYoutube": "Watch video on YouTube",
+      "watchVideo": "Watch video",
+      "playVoiceNote": "{hasTitle, select, yes {Play voice note: {title}} other {Play voice note}}"
+    }
+  },
+  "Emails": {
+    "OTP": {
+      "preview": "Your Halo sign-in code",
+      "eyebrow": "Sign in",
+      "footer": "If you didn't request this code, ignore this email. The code expires in 5 minutes.",
+      "heading": "Your sign-in code.",
+      "lead": "Enter this code to sign in to your account:",
+      "expiry": "This code expires in 5 minutes."
+    },
+    "PasswordReset": {
+      "preview": "Reset your Halo password",
+      "eyebrow": "Password reset",
+      "footer": "If you didn't request a password reset, you can safely ignore this email. The link expires in 1 hour.",
+      "heading": "Reset your password.",
+      "body": "{greeting}click the button below to choose a new password for your Halo account. This link expires in 1 hour.",
+      "button": "Reset password"
+    },
+    "Welcome": {
+      "preview": "You're in. Welcome to {athleteFirstName}'s circle.",
+      "eyebrow": "You're in",
+      "footerNote": "You're receiving this because you subscribed to {athleteName}'s newsletter on Halo Collective. You can unsubscribe at any time from the footer of any edition.",
+      "heading": "Welcome to {athleteFirstName}'s circle.",
+      "lead": "{greeting}thanks for stepping inside. Every week, {athleteFirstName}'s next edition will land here — results, behind the scenes, gear, and the things only the inner circle gets.",
+      "body": "The first edition you'll receive is the next one published. Until then, the back catalog is on the profile.",
+      "button": "Visit {athleteFirstName}'s page"
+    },
+    "Newsletter": {
+      "editionLabel": "Edition #{n}",
+      "footerNote": "You're receiving this because you subscribed to {athleteName}'s edition on Halo Collective.",
+      "unsubscribe": "Unsubscribe",
+      "viewInBrowser": "View in browser →"
+    },
+    "Waitlist": {
+      "preview": "You're on the waitlist!",
+      "heading": "You're on the waitlist!",
+      "body": "Thanks for joining the waitlist for {projectName}. We'll notify you as soon as we launch.",
+      "position": "Your position: #{position}",
+      "emailLine": "Email: {email}",
+      "footer": "We'll send you an email when it's your turn to access the platform."
+    },
+    "Media": {
+      "watchOnYoutube": "Watch on YouTube",
+      "watch": "Watch"
+    }
   }
 }

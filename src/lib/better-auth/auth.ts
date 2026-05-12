@@ -20,10 +20,18 @@ export const auth = betterAuth({
     resetPasswordTokenExpiresIn: 3600,
     sendResetPassword: async ({ user, url }) => {
       // Fire-and-forget per Better Auth docs (avoids timing attacks).
-      void sendPasswordResetEmail({
-        email: user.email,
-        resetUrl: url,
-      }).catch((error: unknown) => {
+      void (async () => {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { locale: true, firstName: true },
+        });
+        await sendPasswordResetEmail({
+          email: user.email,
+          resetUrl: url,
+          firstName: dbUser?.firstName ?? undefined,
+          locale: dbUser?.locale,
+        });
+      })().catch((error: unknown) => {
         console.error(
           JSON.stringify({
             scope: "auth.send_reset_password_failed",
@@ -54,6 +62,7 @@ export const auth = betterAuth({
       countryCode: { type: "string", required: false, input: true },
       phone: { type: "string", required: false, input: true },
       role: { type: "string", required: false, input: false, defaultValue: "USER" },
+      locale: { type: "string", required: false, input: false, defaultValue: "en" },
     },
   },
   baseURL,

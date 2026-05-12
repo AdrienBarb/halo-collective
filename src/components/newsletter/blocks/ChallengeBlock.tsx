@@ -1,6 +1,7 @@
 "use client";
 
 import toast from "react-hot-toast";
+import { useLocale, useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
 import type { ChallengeBlock as ChallengeBlockType } from "@/lib/schemas/newsletterSection";
 import type { EngagementSnapshot } from "@/lib/services/fanEngagement";
@@ -22,7 +23,9 @@ export default function ChallengeBlock({
   newsletterId,
   previewMode = false,
 }: ChallengeBlockProps) {
-  const labels = getNewsletterLabels();
+  const tErrors = useTranslations("Errors.Generic");
+  const locale = useLocale() as "en" | "fr";
+  const labels = getNewsletterLabels(locale);
   const paragraphs = splitParagraphs(block.brief);
   const { useGet, usePost } = useApi();
   const queryClient = useQueryClient();
@@ -45,7 +48,7 @@ export default function ChallengeBlock({
     onError: (err: unknown) => {
       const message =
         (err as { response?: { data?: { error?: string } } })?.response?.data
-          ?.error ?? "Something went wrong";
+          ?.error ?? tErrors("somethingWentWrong");
       toast.error(message);
     },
   });

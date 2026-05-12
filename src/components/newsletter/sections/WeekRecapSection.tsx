@@ -84,7 +84,7 @@ export default function WeekRecapSection({ blocks }: WeekRecapSectionProps) {
       {groups.map((group, gi) => {
         if (group[0].kind === "hero_metric") {
           return (
-            <div key={gi} className="flex gap-1">
+            <div key={gi} className="flex gap-2">
               {group.map((metric, mi) => (
                 <HeroMetricBlock
                   key={mi}
@@ -96,12 +96,13 @@ export default function WeekRecapSection({ blocks }: WeekRecapSectionProps) {
         }
         if (group[0].kind === "media_link") {
           return (
-            <div key={gi} className="space-y-2">
-              <MediaLinkGroupHeader />
-              <div>
+            <div key={gi} className="space-y-3">
+              <MediaLinkGroupHeader count={group.length} />
+              <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {group.map((link, li) => (
                   <MediaLinkRow
                     key={li}
+                    asCard
                     link={link as Extract<WeekRecapBlock, { kind: "media_link" }>}
                   />
                 ))}

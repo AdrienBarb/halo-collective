@@ -1,67 +1,40 @@
 import type { MonetisationBlock } from "@/lib/schemas/newsletterSection";
-import { splitParagraphs } from "@/lib/newsletter/splitParagraphs";
-import { getNewsletterLabels } from "@/lib/newsletter/labels";
-import MediaBlock from "@/components/newsletter/blocks/MediaBlock";
 
 interface MonetisationItemBlockProps {
   block: MonetisationBlock;
-}
-
-function kindExtra(block: MonetisationBlock): string | null {
-  switch (block.kind) {
-    case "kit":
-    case "athlete_product":
-      return block.price ?? null;
-    case "partner_content":
-      return block.partnerName ?? null;
-    case "donation":
-      return block.goalLabel ?? null;
-    case "fan_experience":
-      return block.dateLabel ?? null;
-    default:
-      return null;
-  }
+  /** 1-based row number shown as the "01 / 02" badge. */
+  index: number;
 }
 
 export default function MonetisationItemBlock({
   block,
+  index,
 }: MonetisationItemBlockProps) {
-  const labels = getNewsletterLabels();
-  const eyebrow = labels.monetisationEyebrows[block.kind];
-  const extra = kindExtra(block);
-  const paragraphs = splitParagraphs(block.body);
+  const numberLabel = index.toString().padStart(2, "0");
 
   return (
-    <article className="space-y-3 border-b border-line pb-5 last:border-b-0 last:pb-0">
-      <div className="flex items-baseline justify-between gap-3">
-        <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-action">
-          {eyebrow}
-        </div>
-        {extra ? (
-          <div className="font-mono text-[10px] uppercase tracking-wide text-ink-3">
-            {extra}
-          </div>
-        ) : null}
-      </div>
-      {block.media ? <MediaBlock media={block.media} /> : null}
-      <div>
-        <h4 className="text-base font-bold text-ink">{block.title}</h4>
-        {paragraphs.length > 0 ? (
-          <div className="mt-2 space-y-2 text-sm text-ink-2">
-            {paragraphs.map((p, i) => (
-              <p key={i}>{p}</p>
-            ))}
-          </div>
+    <li className="flex items-start gap-4 border-b border-line py-4 last:border-b-0">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-line bg-cream font-mono text-[11px] font-bold tracking-[0.08em] text-ink">
+        {numberLabel}
+      </span>
+      <div className="min-w-0 flex-1">
+        <h4 className="text-[14px] font-semibold leading-snug text-ink">
+          {block.title}
+        </h4>
+        {block.body ? (
+          <p className="mt-1 text-[13px] leading-[1.5] text-ink-3">
+            {block.body}
+          </p>
         ) : null}
       </div>
       <a
         href={block.cta.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex w-full items-center justify-center rounded bg-action px-4 py-3 text-sm font-bold uppercase tracking-wide text-cream transition hover:opacity-90"
+        className="shrink-0 self-center font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-action transition-opacity hover:opacity-80"
       >
-        {block.cta.label}
+        {block.cta.label} →
       </a>
-    </article>
+    </li>
   );
 }
