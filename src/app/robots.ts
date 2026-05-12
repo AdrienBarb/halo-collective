@@ -2,12 +2,17 @@ import { MetadataRoute } from "next";
 import { siteMetadata } from "@/data/siteMetadata";
 
 export default function robots(): MetadataRoute.Robots {
+  const isProd = process.env.NEXT_PUBLIC_APP_ENV === "production";
+
   return {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/blog", "/blog/*", "/pricing"],
+        allow: isProd
+          ? ["/blog", "/blog/*", "/pricing"]
+          : ["/", "/blog", "/blog/*", "/pricing"],
         disallow: [
+          ...(isProd ? ["/"] : []),
           "/api/",
           "/d/",
           "/dashboard/",

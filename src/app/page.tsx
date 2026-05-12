@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import RosterCard from "@/components/RosterCard";
 import { listAllAthletes } from "@/lib/services/athlete";
@@ -5,6 +6,8 @@ import { listAllAthletes } from "@/lib/services/athlete";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
+  if (process.env.NEXT_PUBLIC_APP_ENV === "production") notFound();
+
   const athletes = await listAllAthletes();
   const count = athletes.length.toString().padStart(2, "0");
   const t = await getTranslations("Landing");

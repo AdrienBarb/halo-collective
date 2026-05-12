@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
+import { isLandingHidden } from "@/lib/utils/isLandingHidden";
 
 export default async function CheckoutSuccessPage() {
   const t = await getTranslations("Checkout.Success");
@@ -16,9 +17,11 @@ export default async function CheckoutSuccessPage() {
         <div className="space-y-4">
           <p className="text-muted-foreground">{t("receiptNote")}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild>
-              <Link href="/">{t("dashboardCta")}</Link>
-            </Button>
+            {isLandingHidden() ? null : (
+              <Button asChild>
+                <Link href="/">{t("dashboardCta")}</Link>
+              </Button>
+            )}
             <Button variant="outline" asChild>
               <Link href="/pricing">{t("plansCta")}</Link>
             </Button>

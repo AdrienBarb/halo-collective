@@ -7,6 +7,7 @@ import { auth } from "@/lib/better-auth/auth";
 import { listSubscriptionsByUser } from "@/lib/services/subscription";
 import RosterCard from "@/components/RosterCard";
 import { Button } from "@/components/ui/button";
+import { isLandingHidden } from "@/lib/utils/isLandingHidden";
 
 export const dynamic = "force-dynamic";
 
@@ -35,9 +36,11 @@ export default async function SubscriptionsPage() {
         <div className="rounded-2xl border border-dashed border-line bg-cream-2 px-6 py-14 text-center">
           <p className="font-serif text-[20px] text-ink">{t("emptyTitle")}</p>
           <p className="mt-1 text-[13px] text-ink-3">{t("emptyBody")}</p>
-          <Button asChild className="mt-5">
-            <Link href="/">{t("emptyCta")}</Link>
-          </Button>
+          {isLandingHidden() ? null : (
+            <Button asChild className="mt-5">
+              <Link href="/">{t("emptyCta")}</Link>
+            </Button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">

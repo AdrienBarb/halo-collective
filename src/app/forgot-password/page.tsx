@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { isLandingHidden } from "@/lib/utils/isLandingHidden";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
@@ -84,12 +85,14 @@ export default function ForgotPasswordPage() {
                 <p className="text-[14px] leading-relaxed text-ink-3">
                   {t("checkInboxBody")}
                 </p>
-                <Link
-                  href="/"
-                  className="inline-block pt-2 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-ink underline-offset-2 hover:underline"
-                >
-                  {t("backToHalo")}
-                </Link>
+                {isLandingHidden() ? null : (
+                  <Link
+                    href="/"
+                    className="inline-block pt-2 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-ink underline-offset-2 hover:underline"
+                  >
+                    {t("backToHalo")}
+                  </Link>
+                )}
               </div>
             ) : (
               <Form {...form}>
@@ -132,15 +135,17 @@ export default function ForgotPasswordPage() {
                     {submitting ? t("sending") : t("sendResetLink")}
                   </button>
 
-                  <p className="text-center text-[12px] text-ink-3">
-                    {t("remembered")}{" "}
-                    <Link
-                      href="/"
-                      className="font-semibold text-ink underline underline-offset-2 hover:text-accent-gold"
-                    >
-                      {t("backToHalo")}
-                    </Link>
-                  </p>
+                  {isLandingHidden() ? null : (
+                    <p className="text-center text-[12px] text-ink-3">
+                      {t("remembered")}{" "}
+                      <Link
+                        href="/"
+                        className="font-semibold text-ink underline underline-offset-2 hover:text-accent-gold"
+                      >
+                        {t("backToHalo")}
+                      </Link>
+                    </p>
+                  )}
                 </form>
               </Form>
             )}

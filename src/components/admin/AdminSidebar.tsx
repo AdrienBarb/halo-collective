@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { isLandingHidden } from "@/lib/utils/isLandingHidden";
 
 const NAV_ITEMS = [
   { href: "/admin/athletes", label: "Athletes" },
@@ -47,16 +48,18 @@ export default function AdminSidebar() {
         </ul>
       </nav>
 
-      <div className="border-t border-line px-6 py-4">
-        <Link
-          href="/"
-          target="_blank"
-          rel="noreferrer"
-          className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-3 transition-colors hover:text-ink"
-        >
-          View site ↗
-        </Link>
-      </div>
+      {isLandingHidden() ? null : (
+        <div className="border-t border-line px-6 py-4">
+          <Link
+            href="/"
+            target="_blank"
+            rel="noreferrer"
+            className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-3 transition-colors hover:text-ink"
+          >
+            View site ↗
+          </Link>
+        </div>
+      )}
     </aside>
   );
 }

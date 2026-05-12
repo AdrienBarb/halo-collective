@@ -6,15 +6,20 @@ export const revalidate = 60;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = siteMetadata.siteUrl;
+  const isProd = process.env.NEXT_PUBLIC_APP_ENV === "production";
 
-  // Landing page
+  // Landing page — hidden in production.
   const staticPages: MetadataRoute.Sitemap = [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 1,
-    },
+    ...(isProd
+      ? []
+      : [
+          {
+            url: baseUrl,
+            lastModified: new Date(),
+            changeFrequency: "weekly" as const,
+            priority: 1,
+          },
+        ]),
     {
       url: `${baseUrl}/pricing`,
       lastModified: new Date(),
