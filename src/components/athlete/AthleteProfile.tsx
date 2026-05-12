@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { getLocale, getTranslations } from "next-intl/server";
+import { useLocale, useTranslations } from "next-intl";
 import type {
   Athlete,
   Newsletter,
@@ -67,7 +67,7 @@ function toEditionTab(edition: EditionWithSections): EditionTab {
   };
 }
 
-export default async function AthleteProfile({
+export default function AthleteProfile({
   athlete,
   editions,
   selectedSlug,
@@ -78,9 +78,9 @@ export default async function AthleteProfile({
 }: AthleteProfileProps) {
   const fullName = `${athlete.firstName} ${athlete.lastName}`;
   const flag = flagFor(athlete.countryCode);
-  const rawLocale = await getLocale();
+  const rawLocale = useLocale();
   const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
-  const t = await getTranslations("Athlete.Profile");
+  const t = useTranslations("Athlete.Profile");
 
   const defaultEdition = editions[0] ?? null;
   const selected =
@@ -196,13 +196,15 @@ const SOCIAL_ICONS: {
   { key: "foundation", label: "Foundation", Icon: FaHeart },
 ];
 
-async function SocialLinksStrip({
+function SocialLinksStrip({
   fullName,
   socialLinks,
 }: {
   fullName: string;
   socialLinks: Athlete["socialLinks"];
 }) {
+  const t = useTranslations("Athlete.Profile");
+
   const links =
     socialLinks && typeof socialLinks === "object" && !Array.isArray(socialLinks)
       ? (socialLinks as Record<string, string | null | undefined>)
@@ -216,8 +218,6 @@ async function SocialLinksStrip({
   });
 
   if (items.length === 0) return null;
-
-  const t = await getTranslations("Athlete.Profile");
 
   return (
     <section
@@ -385,9 +385,9 @@ function StatsRow({ athlete }: { athlete: Athlete }) {
   );
 }
 
-async function SponsorsStrip({ sponsors }: { sponsors: Sponsor[] }) {
+function SponsorsStrip({ sponsors }: { sponsors: Sponsor[] }) {
+  const t = useTranslations("Athlete.Profile");
   if (sponsors.length === 0) return null;
-  const t = await getTranslations("Athlete.Profile");
   return (
     <section
       aria-label={t("partners")}

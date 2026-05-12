@@ -9,7 +9,7 @@ export default function MediaRecapBlock({ block }: MediaRecapBlockProps) {
   return (
     <div className="space-y-3">
       <MediaLinkGroupHeader count={block.links.length} />
-      <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="-mr-5 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 pr-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {block.links.map((link, i) => (
           <MediaLinkRow key={i} link={link} asCard />
         ))}

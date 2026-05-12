@@ -1,4 +1,4 @@
-import { getLocale } from "next-intl/server";
+import { useLocale } from "next-intl";
 import type { MatchCardBlock as MatchCardBlockType } from "@/lib/schemas/newsletterSection";
 import {
   getNewsletterLabels,
@@ -18,10 +18,10 @@ const BADGE_STYLES: Record<MatchCardBlockType["result"], string> = {
   EXEMPT: "bg-cream-3 text-ink-3",
 };
 
-export default async function MatchCardBlock({ match }: MatchCardBlockProps) {
+export default function MatchCardBlock({ match }: MatchCardBlockProps) {
   const showOpponent =
     match.opponentName && match.result !== "BYE" && match.result !== "EXEMPT";
-  const rawLocale = await getLocale();
+  const rawLocale = useLocale();
   const locale: NewsletterLocale = isLocale(rawLocale)
     ? rawLocale
     : DEFAULT_LOCALE;

@@ -107,6 +107,12 @@ function toDateInput(date: Date | string | null | undefined): string | undefined
   return d.toISOString().slice(0, 10);
 }
 
+// Brevo merge tags exposed in the Email subject editor. Keys map to the
+// `attributes` we upsert on Brevo contacts (see services/subscription.ts).
+const EMAIL_SUBJECT_MERGE_TAGS: ReadonlyArray<{ label: string; value: string }> = [
+  { label: "First name (Hey fallback)", value: '{{ contact.FIRSTNAME | default: "Hey" }}' },
+];
+
 // Build the per-section block map, falling back to an empty list for
 // any section the database hasn't seen yet.
 function buildSectionBlocksMap(
@@ -207,6 +213,8 @@ export default function NewsletterForm({
   // current values instead of a stale render snapshot. Without this, a
   // future memoization of `useApi.usePost` could silently skip the
   // confirm dialog and overwrite unsaved edits.
+  const emailSubjectInputRef = useRef<HTMLInputElement | null>(null);
+
   const sectionsRef = useRef(sections);
   useEffect(() => {
     sectionsRef.current = sections;
@@ -618,27 +626,73 @@ export default function NewsletterForm({
                 <FormField
                   control={form.control}
                   name="emailSubject"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
-                        Email subject
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          placeholder={'{{ contact.FIRSTNAME | default: "Hey" }}, voici ma dernière newsletter'}
-                        />
-                      </FormControl>
-                      <p className="text-[11px] text-ink-3">
-                        Optional. Overrides the email subject only; the
-                        web title is unchanged. Supports Brevo merge tags
-                        — see the placeholder for an example with a
-                        fallback.
-                      </p>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field }) => {
+                    function insertMergeTag(tag: string) {
+                      const el = emailSubjectInputRef.current;
+                      const current = field.value ?? "";
+                      // No DOM ref yet (shouldn't happen post-mount) — append at end.
+                      if (!el) {
+                        form.setValue("emailSubject", `${current}${tag}`, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+                        return;
+                      }
+                      const start = el.selectionStart ?? current.length;
+                      const end = el.selectionEnd ?? current.length;
+                      const next = `${current.slice(0, start)}${tag}${current.slice(end)}`;
+                      form.setValue("emailSubject", next, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      });
+                      // Place cursor right after the inserted tag on next tick,
+                      // once RHF has flushed the new value into the DOM.
+                      requestAnimationFrame(() => {
+                        const cursor = start + tag.length;
+                        el.focus();
+                        el.setSelectionRange(cursor, cursor);
+                      });
+                    }
+                    return (
+                      <FormItem>
+                        <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                          Email subject
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            ref={(el) => {
+                              field.ref(el);
+                              emailSubjectInputRef.current = el;
+                            }}
+                            value={field.value ?? ""}
+                            placeholder={'{{ contact.FIRSTNAME | default: "Hey" }}, voici ma dernière newsletter'}
+                          />
+                        </FormControl>
+                        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+                            Insert:
+                          </span>
+                          {EMAIL_SUBJECT_MERGE_TAGS.map((tag) => (
+                            <button
+                              key={tag.value}
+                              type="button"
+                              onClick={() => insertMergeTag(tag.value)}
+                              className="rounded-full border border-line bg-cream-2 px-2.5 py-0.5 text-[11px] text-ink transition-colors hover:bg-cream hover:border-ink-3"
+                            >
+                              + {tag.label}
+                            </button>
+                          ))}
+                        </div>
+                        <p className="text-[11px] text-ink-3">
+                          Optional. Overrides the email subject only; the
+                          web title is unchanged. Brevo replaces merge
+                          tags with each fan&apos;s data at send time.
+                        </p>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-[2fr_1fr_1fr]">

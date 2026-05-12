@@ -1,4 +1,4 @@
-import { getLocale } from "next-intl/server";
+import { useLocale } from "next-intl";
 import {
   isSectionMeaningful,
   safeParseSectionBlocks,
@@ -104,7 +104,7 @@ function renderBody({
   }
 }
 
-export default async function SectionRenderer({
+export default function SectionRenderer({
   section,
   index,
   editionMode,
@@ -113,6 +113,8 @@ export default async function SectionRenderer({
   newsletterId,
   previewMode = false,
 }: SectionRendererProps) {
+  const rawLocale = useLocale();
+
   if (!isSectionMeaningful(section.type, section.blocks)) return null;
 
   const body = renderBody({
@@ -124,7 +126,6 @@ export default async function SectionRenderer({
   });
   if (body === null) return null;
 
-  const rawLocale = await getLocale();
   const locale: NewsletterLocale = isLocale(rawLocale)
     ? rawLocale
     : DEFAULT_LOCALE;

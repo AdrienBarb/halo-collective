@@ -98,7 +98,7 @@ export default function WeekRecapSection({ blocks }: WeekRecapSectionProps) {
           return (
             <div key={gi} className="space-y-3">
               <MediaLinkGroupHeader count={group.length} />
-              <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="-mr-5 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 pr-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {group.map((link, li) => (
                   <MediaLinkRow
                     key={li}

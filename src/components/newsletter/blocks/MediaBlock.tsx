@@ -1,15 +1,16 @@
 import Image from "next/image";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import type { MediaBlock as MediaBlockType } from "@/lib/schemas/newsletterSection";
 import { splitParagraphs } from "@/lib/newsletter/splitParagraphs";
 import { parseYouTubeId } from "@/lib/newsletter/youtube";
+import YouTubeEmbed from "@/components/newsletter/blocks/YouTubeEmbed";
 
 interface MediaBlockProps {
   media: MediaBlockType;
 }
 
-export default async function MediaBlock({ media }: MediaBlockProps) {
-  const t = await getTranslations("Newsletter.Media");
+export default function MediaBlock({ media }: MediaBlockProps) {
+  const t = useTranslations("Newsletter.Media");
   if (media.kind === "text") {
     const paragraphs = splitParagraphs(media.body);
     return (
@@ -41,40 +42,27 @@ export default async function MediaBlock({ media }: MediaBlockProps) {
   }
 
   if (media.kind === "video") {
-    const youtube = parseYouTubeId(media.url);
-    const label = youtube ? t("watchOnYoutube") : t("watchVideo");
+    const youtubeId = parseYouTubeId(media.url);
+    if (youtubeId) {
+      return (
+        <YouTubeEmbed
+          videoId={youtubeId}
+          thumbnailUrl={media.thumbnailUrl}
+          label={t("watchOnYoutube")}
+        />
+      );
+    }
+
     return (
-      <a
-        href={media.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={label}
-        referrerPolicy="no-referrer"
-        className="relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-lg bg-ink"
-      >
-        {media.thumbnailUrl ? (
-          <Image
-            src={media.thumbnailUrl}
-            alt=""
-            fill
-            sizes="(max-width: 820px) 100vw, 820px"
-            className="object-cover"
-            unoptimized
-            referrerPolicy="no-referrer"
-          />
-        ) : null}
-        <span
-          aria-hidden="true"
-          className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-action text-2xl text-cream shadow-lg"
-        >
-          ▶
-        </span>
-        {youtube ? (
-          <span className="absolute bottom-3 right-3 z-10 rounded bg-ink/80 px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wide text-cream">
-            YouTube
-          </span>
-        ) : null}
-      </a>
+      <video
+        src={media.url}
+        controls
+        playsInline
+        poster={media.thumbnailUrl ?? undefined}
+        preload="metadata"
+        className="aspect-video w-full overflow-hidden rounded-lg bg-ink"
+        aria-label={t("watchVideo")}
+      />
     );
   }
 

@@ -1,4 +1,4 @@
-import { getLocale } from "next-intl/server";
+import { useLocale } from "next-intl";
 import {
   getNewsletterLabels,
   type NewsletterLocale,
@@ -16,11 +16,11 @@ interface MediaLinkRowProps {
   asCard?: boolean;
 }
 
-export default async function MediaLinkRow({
+export default function MediaLinkRow({
   link,
   asCard = false,
 }: MediaLinkRowProps) {
-  const rawLocale = await getLocale();
+  const rawLocale = useLocale();
   const locale: NewsletterLocale = isLocale(rawLocale)
     ? rawLocale
     : DEFAULT_LOCALE;
