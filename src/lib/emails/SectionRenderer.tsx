@@ -95,12 +95,14 @@ export default function SectionRenderer({
   return (
     <Section style={{ marginTop: 24 }}>
       <Section
+        className="force-dark-bg"
         style={{
           backgroundColor: palette.ink,
           padding: "14px 18px",
         }}
       >
         <Text
+          className="force-dark-fg-muted"
           style={{
             margin: 0,
             color: palette.cream3,
@@ -115,6 +117,7 @@ export default function SectionRenderer({
         </Text>
         {title ? (
           <Text
+            className="force-dark-fg"
             style={{
               margin: "4px 0 0",
               color: palette.cream,
@@ -129,6 +132,7 @@ export default function SectionRenderer({
         ) : null}
       </Section>
       <Section
+        className="force-light-bg"
         style={{
           backgroundColor: palette.cream2,
           padding: "20px 18px",

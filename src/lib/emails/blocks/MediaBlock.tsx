@@ -51,24 +51,32 @@ export default function MediaBlock({
   }
 
   if (media.kind === "video") {
-    const isYouTube = parseYouTubeId(media.url) !== null;
+    const youtubeId = parseYouTubeId(media.url);
+    const isYouTube = youtubeId !== null;
+    // Derive a YouTube poster when the editor didn't set one explicitly.
+    // hqdefault (480x360) is the safest size — exists for every video and
+    // sits well in the 536px email width.
+    const poster =
+      media.thumbnailUrl ??
+      (youtubeId ? `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg` : null);
     return (
       <Section style={{ marginBottom: 16 }}>
         <Link
           href={media.url}
+          className="force-dark-bg"
           style={{
             display: "block",
             backgroundColor: palette.ink,
             borderRadius: 8,
             overflow: "hidden",
             textDecoration: "none",
-            padding: media.thumbnailUrl ? 0 : "32px 16px",
+            padding: poster ? 0 : "32px 16px",
             textAlign: "center",
           }}
         >
-          {media.thumbnailUrl ? (
+          {poster ? (
             <Img
-              src={media.thumbnailUrl}
+              src={poster}
               alt=""
               width="536"
               style={{
@@ -81,7 +89,7 @@ export default function MediaBlock({
           ) : null}
           <Text
             style={{
-              margin: media.thumbnailUrl ? "12px 0 0" : 0,
+              margin: poster ? "12px 0 0" : 0,
               color: palette.accentWarm,
               fontFamily: fonts.mono,
               fontSize: 13,
