@@ -1,15 +1,23 @@
-type FlagInfo = { emoji: string; stripe: readonly string[] };
+import { findCountry } from "@/lib/data/countries";
 
-const FLAGS: Record<string, FlagInfo> = {
-  POL: { emoji: "🇵🇱", stripe: ["#ffffff", "#b8001f"] },
-  KAZ: { emoji: "🇰🇿", stripe: ["#009dbf", "#f5c500"] },
-  ITA: { emoji: "🇮🇹", stripe: ["#009246", "#ffffff", "#ce2b37"] },
-  FRA: { emoji: "🇫🇷", stripe: ["#002395", "#ffffff", "#ed2939"] },
-  BEL: { emoji: "🇧🇪", stripe: ["#000000", "#ffd100", "#ef3340"] },
-};
+type FlagInfo = { emoji: string; stripe: readonly string[] };
 
 const FALLBACK: FlagInfo = { emoji: "🏳️", stripe: ["#75674e"] };
 
+function emojiFromIso2(iso2: string): string {
+  if (iso2.length !== 2) return FALLBACK.emoji;
+  const base = 0x1f1e6 - "A".charCodeAt(0);
+  return String.fromCodePoint(
+    base + iso2.charCodeAt(0),
+    base + iso2.charCodeAt(1),
+  );
+}
+
 export function flagFor(countryCode: string): FlagInfo {
-  return FLAGS[countryCode.toUpperCase()] ?? FALLBACK;
+  const country = findCountry(countryCode);
+  if (!country) return FALLBACK;
+  return {
+    emoji: emojiFromIso2(country.iso2),
+    stripe: country.stripe,
+  };
 }

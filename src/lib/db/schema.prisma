@@ -68,6 +68,7 @@ model Athlete {
   countryName  String
   bio          String?
   avatarUrl    String?
+  coverImageUrl String?
   worldRank    Int?
   countryRank  Int?
   titlesCount  Int      @default(0)

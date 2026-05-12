@@ -2,6 +2,7 @@ import { z } from "zod";
 import { countryCodeSchema } from "@/lib/schemas/country";
 import {
   mediaUrl,
+  optionalMediaUrl,
   optionalSafeUrl,
   optionalTrimmedString,
   safeUrl,
@@ -51,6 +52,7 @@ export const createAthleteSchema = z.object({
   countryCode: countryCodeSchema,
   bio: optionalTrimmedString,
   avatarUrl: optionalSafeUrl,
+  coverImageUrl: optionalMediaUrl,
   worldRank: optionalInt,
   countryRank: optionalInt,
   titlesCount: z.coerce.number().int().min(0),
@@ -66,6 +68,7 @@ export const updateAthleteSchema = z.object({
   countryCode: countryCodeSchema.optional(),
   bio: optionalTrimmedString,
   avatarUrl: optionalSafeUrl,
+  coverImageUrl: optionalMediaUrl,
   worldRank: optionalInt,
   countryRank: optionalInt,
   titlesCount: z.coerce.number().int().min(0).optional(),

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import useApi from "@/lib/hooks/useApi";
+import { useConfirm } from "@/components/providers/ConfirmProvider";
 
 interface PublishToggleProps {
   newsletterId: string;
@@ -15,6 +16,7 @@ export default function PublishToggle({
 }: PublishToggleProps) {
   const router = useRouter();
   const { usePost } = useApi();
+  const confirm = useConfirm();
 
   const publish = usePost(`/admin/newsletters/${newsletterId}/publish`, {
     onSuccess: () => {
@@ -76,10 +78,20 @@ export default function PublishToggle({
     <button
       type="button"
       onClick={() => {
-        const confirmed = window.confirm(
-          "Move this published edition back to draft? It will disappear from the live site.",
-        );
-        if (confirmed) unpublish.mutate({});
+        confirm({
+          title: "Unpublish this edition?",
+          description:
+            "Move this published edition back to draft? It will disappear from the live site.",
+          confirmText: "Unpublish",
+          variant: "destructive",
+          onConfirm: async () => {
+            try {
+              await unpublish.mutateAsync({});
+            } catch {
+              // Error is already surfaced via the mutation's onError toast.
+            }
+          },
+        });
       }}
       disabled={unpublish.isPending}
       className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-line bg-cream-2 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-2 transition-colors duration-200 ease-out hover:border-ink hover:text-ink disabled:cursor-not-allowed disabled:opacity-60"

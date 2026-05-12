@@ -8,14 +8,19 @@ interface LogoUploaderProps {
   value?: string | null;
   onChange: (url: string) => void;
   size?: number;
+  endpoint?: string;
+  accept?: string;
 }
 
-const ACCEPT = "image/jpeg,image/png,image/webp,image/avif,image/svg+xml";
+const DEFAULT_ACCEPT = "image/jpeg,image/png,image/webp,image/avif";
+const DEFAULT_ENDPOINT = "/api/admin/upload";
 
 export default function LogoUploader({
   value,
   onChange,
   size = 56,
+  endpoint = DEFAULT_ENDPOINT,
+  accept = DEFAULT_ACCEPT,
 }: LogoUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -26,7 +31,7 @@ export default function LogoUploader({
       try {
         const formData = new FormData();
         formData.append("file", file);
-        const res = await fetch("/api/admin/upload", {
+        const res = await fetch(endpoint, {
           method: "POST",
           body: formData,
         });
@@ -46,7 +51,7 @@ export default function LogoUploader({
         if (inputRef.current) inputRef.current.value = "";
       }
     },
-    [onChange],
+    [onChange, endpoint],
   );
 
   return (
@@ -96,7 +101,7 @@ export default function LogoUploader({
       <input
         ref={inputRef}
         type="file"
-        accept={ACCEPT}
+        accept={accept}
         className="hidden"
         onChange={(e) => {
           const file = e.target.files?.[0];

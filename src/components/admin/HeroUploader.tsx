@@ -11,6 +11,8 @@ interface HeroUploaderProps {
   emptyTitle?: string;
   /** Helper line shown below. Defaults to a click-or-drop hint. */
   emptyHelp?: string;
+  /** Tailwind aspect-ratio override. Defaults to `aspect-[16/9]`. */
+  aspectClassName?: string;
 }
 
 const ACCEPT = "image/jpeg,image/png,image/webp,image/avif";
@@ -21,6 +23,7 @@ export default function HeroUploader({
   onChange,
   emptyTitle = "Issue cover image",
   emptyHelp = "Click or drop · 16:9 · used on web + email",
+  aspectClassName = "aspect-[16/9]",
 }: HeroUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -75,7 +78,7 @@ export default function HeroUploader({
         disabled={isUploading}
         aria-label={value ? "Replace cover" : "Upload cover"}
         className={[
-          "group relative aspect-[16/9] w-full cursor-pointer overflow-hidden rounded-2xl",
+          `group relative ${aspectClassName} w-full cursor-pointer overflow-hidden rounded-2xl`,
           "border border-line",
           "transition-[transform,box-shadow] duration-200 ease-out",
           "hover:[box-shadow:0_10px_28px_rgba(0,0,0,0.10)]",

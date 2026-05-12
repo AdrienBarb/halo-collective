@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut, Newspaper, Shield } from "lucide-react";
+import { LogOut, Shield } from "lucide-react";
 import { UserRole } from "@prisma/client";
 import { authClient } from "@/lib/better-auth/auth-client";
 import {
@@ -84,13 +84,6 @@ export default function AccountMenu({
             <DropdownMenuSeparator />
           </>
         ) : null}
-        <DropdownMenuItem asChild className="cursor-pointer">
-          <Link href="/subscriptions">
-            <Newspaper className="mr-2 h-4 w-4" />
-            My subscriptions
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuItem
           onSelect={() => void onSignOut()}
           className="cursor-pointer"

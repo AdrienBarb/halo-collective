@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 type WordmarkProps = {
-  href?: string;
+  href?: string | null;
   size?: "default" | "large";
   className?: string;
 };
@@ -14,12 +14,8 @@ export default function Wordmark({
   const haloSize = size === "large" ? "text-[22px]" : "text-[18px]";
   const collectiveSize = size === "large" ? "text-[11px]" : "text-[10px]";
 
-  return (
-    <Link
-      href={href}
-      aria-label="Halo Collective home"
-      className={`inline-flex items-baseline gap-1.5 ${className}`}
-    >
+  const content = (
+    <>
       <span
         className={`font-serif italic font-semibold ${haloSize} tracking-[-0.02em] text-ink`}
       >
@@ -30,6 +26,27 @@ export default function Wordmark({
       >
         COLLECTIVE
       </span>
+    </>
+  );
+
+  if (!href) {
+    return (
+      <span
+        aria-label="Halo Collective"
+        className={`inline-flex items-baseline gap-1.5 ${className}`}
+      >
+        {content}
+      </span>
+    );
+  }
+
+  return (
+    <Link
+      href={href}
+      aria-label="Halo Collective home"
+      className={`inline-flex items-baseline gap-1.5 ${className}`}
+    >
+      {content}
     </Link>
   );
 }

@@ -8,6 +8,10 @@ interface AvatarUploaderProps {
   value?: string | null;
   onChange: (url: string) => void;
   initials?: string;
+  /** Tailwind size override. Defaults to `h-[160px] w-[160px]`. */
+  sizeClassName?: string;
+  /** Monogram text size override. Defaults to `text-[56px]`. */
+  monogramClassName?: string;
 }
 
 const ACCEPT = "image/jpeg,image/png,image/webp,image/avif";
@@ -17,6 +21,8 @@ export default function AvatarUploader({
   value,
   onChange,
   initials,
+  sizeClassName = "h-[160px] w-[160px]",
+  monogramClassName = "text-[56px]",
 }: AvatarUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -73,7 +79,7 @@ export default function AvatarUploader({
         disabled={isUploading}
         aria-label={value ? "Replace avatar" : "Upload avatar"}
         className={[
-          "group relative h-[160px] w-[160px] cursor-pointer overflow-hidden rounded-full",
+          `group relative ${sizeClassName} cursor-pointer overflow-hidden rounded-full`,
           "border-[4px] border-cream-2",
           "shadow-[0_10px_28px_rgba(0,0,0,0.22)]",
           "transition-[transform,box-shadow] duration-200 ease-out",
@@ -96,7 +102,7 @@ export default function AvatarUploader({
             unoptimized
           />
         ) : (
-          <span className="flex h-full w-full items-center justify-center font-serif text-[56px] font-semibold tracking-[-0.02em] text-cream">
+          <span className={`flex h-full w-full items-center justify-center font-serif ${monogramClassName} font-semibold tracking-[-0.02em] text-cream`}>
             {monogram}
           </span>
         )}

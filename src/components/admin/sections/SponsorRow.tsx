@@ -12,6 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import LogoUploader from "@/components/admin/LogoUploader";
+import { useConfirm } from "@/components/providers/ConfirmProvider";
 import type { CreateAthleteInput } from "@/lib/schemas/athlete";
 
 interface SponsorRowProps {
@@ -32,13 +33,19 @@ export default function SponsorRow({
   canMoveDown,
 }: SponsorRowProps) {
   const form = useFormContext<CreateAthleteInput>();
+  const confirm = useConfirm();
   const name = form.watch(`sponsors.${index}.name` as const);
 
-  function handleRemove() {
+  async function handleRemove() {
     const label = name?.trim() || "this sponsor";
-    if (confirm(`Remove ${label}?`)) {
-      onRemove();
-    }
+    const ok = await confirm({
+      title: `Remove ${label}?`,
+      description:
+        "The sponsor's logo and website link will be removed from this athlete's profile.",
+      confirmText: "Remove",
+      variant: "destructive",
+    });
+    if (ok) onRemove();
   }
 
   return (
@@ -53,6 +60,8 @@ export default function SponsorRow({
                 value={field.value || null}
                 onChange={(url) => field.onChange(url)}
                 size={64}
+                endpoint="/api/admin/vectorize-logo"
+                accept="image/png,image/jpeg,image/webp"
               />
             </FormControl>
             <FormMessage />

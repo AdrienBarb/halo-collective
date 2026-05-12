@@ -36,6 +36,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import AvatarUploader from "@/components/admin/AvatarUploader";
+import HeroUploader from "@/components/admin/HeroUploader";
 import SectionCard from "@/components/admin/sections/SectionCard";
 import SponsorRow from "@/components/admin/sections/SponsorRow";
 import { COUNTRIES } from "@/lib/data/countries";
@@ -57,6 +58,7 @@ function toSlug(value: string): string {
 // Maps form field names to the section anchor that should scroll into view
 // when a validation error fires. Mirrors NewsletterForm's SECTION_ANCHORS pattern.
 const FIELD_TO_ANCHOR: Record<string, string> = {
+  coverImageUrl: "identity",
   avatarUrl: "identity",
   firstName: "identity",
   lastName: "identity",
@@ -121,6 +123,7 @@ function toFormValues(
     countryCode: athlete.countryCode,
     bio: athlete.bio ?? undefined,
     avatarUrl: athlete.avatarUrl ?? undefined,
+    coverImageUrl: athlete.coverImageUrl ?? undefined,
     worldRank: athlete.worldRank ?? undefined,
     countryRank: athlete.countryRank ?? undefined,
     titlesCount: athlete.titlesCount,
@@ -242,22 +245,47 @@ export default function AthleteForm({
             name="Identity"
             description="Who the athlete is — the surface a fan recognizes before anything else."
           >
-            <FormField
-              control={form.control}
-              name="avatarUrl"
-              render={({ field }) => (
-                <FormItem className="flex flex-col items-center">
-                  <FormControl>
-                    <AvatarUploader
-                      value={field.value}
-                      onChange={(url) => field.onChange(url || undefined)}
-                      initials={initials}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="relative pb-[80px] md:pb-[100px]">
+              <FormField
+                control={form.control}
+                name="coverImageUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <HeroUploader
+                        value={field.value}
+                        onChange={(url) => field.onChange(url || undefined)}
+                        emptyTitle="Profile cover"
+                        emptyHelp="Click or drop · 21:9 · shown on the profile when no newsletter"
+                        aspectClassName="aspect-[16/10] md:aspect-[21/9]"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-0">
+                <FormField
+                  control={form.control}
+                  name="avatarUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <AvatarUploader
+                          value={field.value}
+                          onChange={(url) => field.onChange(url || undefined)}
+                          initials={initials}
+                          sizeClassName="h-[160px] w-[160px] md:h-[200px] md:w-[200px]"
+                          monogramClassName="text-[56px] md:text-[72px]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
@@ -380,7 +408,7 @@ export default function AthleteForm({
                           <SelectValue placeholder="Select a country" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="max-h-[min(300px,60vh)]">
                         {COUNTRIES.map((c) => (
                           <SelectItem key={c.code} value={c.code}>
                             {c.name}

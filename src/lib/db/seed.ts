@@ -1,6 +1,8 @@
 import "dotenv/config";
 import { randomUUID } from "node:crypto";
 import { Buffer } from "node:buffer";
+import { readFile } from "node:fs/promises";
+import { extname, join } from "node:path";
 import { NewsletterStatus, Sport, type Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
 import { supabaseStorage } from "@/lib/storage/client";
@@ -34,9 +36,40 @@ async function ensureMediaBucket(): Promise<void> {
   bucketEnsured = true;
 }
 
+const LOCAL_CONTENT_TYPES: Record<string, string> = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  avif: "image/avif",
+};
+
+async function loadSeedAssetBytes(
+  source: string,
+): Promise<{ buffer: Buffer; contentType: string }> {
+  // Local path under public/ — kept for first-party brand assets shipped in the repo.
+  if (source.startsWith("/")) {
+    const fullPath = join(process.cwd(), "public", source);
+    const buffer = await readFile(fullPath);
+    const ext = extname(source).slice(1).toLowerCase();
+    const contentType =
+      LOCAL_CONTENT_TYPES[ext] ?? "application/octet-stream";
+    return { buffer, contentType };
+  }
+
+  const res = await fetch(source);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch asset ${source}: ${res.status}`);
+  }
+  return {
+    buffer: Buffer.from(await res.arrayBuffer()),
+    contentType: res.headers.get("content-type") ?? "application/octet-stream",
+  };
+}
+
 async function ensureSeedAsset(
   filename: string,
-  sourceUrl: string,
+  source: string,
 ): Promise<string> {
   const cached = assetUrlCache.get(filename);
   if (cached) return cached;
@@ -56,12 +89,7 @@ async function ensureSeedAsset(
     return publicUrl;
   }
 
-  const res = await fetch(sourceUrl);
-  if (!res.ok) {
-    throw new Error(`Failed to fetch asset ${sourceUrl}: ${res.status}`);
-  }
-  const contentType = res.headers.get("content-type") ?? "application/octet-stream";
-  const buffer = Buffer.from(await res.arrayBuffer());
+  const { buffer, contentType } = await loadSeedAssetBytes(source);
 
   const { error } = await bucket.upload(objectPath, buffer, {
     contentType,
@@ -85,6 +113,8 @@ type SocialLinks = {
   foundation?: string;
 };
 
+type AssetRef = { filename: string; sourceUrl: string };
+
 type AthleteSeed = {
   slug: string;
   firstName: string;
@@ -97,7 +127,7 @@ type AthleteSeed = {
   countryRank: number;
   titlesCount: number;
   bio: string;
-  avatarUrl: string | null;
+  avatar: AssetRef | null;
   socialLinks: SocialLinks;
 };
 
@@ -114,7 +144,10 @@ const athletes: AthleteSeed[] = [
     countryRank: 1,
     titlesCount: 22,
     bio: "Polish tennis player and former world No. 1, multi-Slam champion.",
-    avatarUrl: "/brand/heroes/iga-swiatek.jpg",
+    avatar: {
+      filename: "athlete-iga-swiatek-avatar.jpg",
+      sourceUrl: "/brand/heroes/iga-swiatek.jpg",
+    },
     socialLinks: {
       instagram: "https://www.instagram.com/iga.swiatek/",
       facebook: "https://www.facebook.com/IgaSwiatek/",
@@ -135,7 +168,10 @@ const athletes: AthleteSeed[] = [
     countryRank: 1,
     titlesCount: 9,
     bio: "Kazakh tennis player known for his creative, unpredictable game.",
-    avatarUrl: "/brand/heroes/alexander-bublik.jpg",
+    avatar: {
+      filename: "athlete-alexander-bublik-avatar.jpg",
+      sourceUrl: "/brand/heroes/alexander-bublik.jpg",
+    },
     socialLinks: { instagram: "https://www.instagram.com/bublik/" },
   },
   {
@@ -150,7 +186,10 @@ const athletes: AthleteSeed[] = [
     countryRank: 3,
     titlesCount: 1,
     bio: "Italian tennis player on the ATP tour, breakthrough season in 2025.",
-    avatarUrl: "/brand/portraits/flavio-cobolli.jpg",
+    avatar: {
+      filename: "athlete-flavio-cobolli-avatar.jpg",
+      sourceUrl: "/brand/portraits/flavio-cobolli.jpg",
+    },
     socialLinks: {
       instagram: "https://www.instagram.com/flavio_cobbo/",
       x: "https://x.com/cobollifla",
@@ -227,8 +266,6 @@ const sponsorsByAthlete: Record<string, SponsorSeed[]> = {
 };
 
 // ── Newsletter seeds (block-shaped) ──────────────────────────────────
-
-type AssetRef = { filename: string; sourceUrl: string };
 
 type NewsletterSeed = {
   athleteSlug: string;
@@ -873,9 +910,13 @@ const newsletters: NewsletterSeed[] = [
 // ── Orchestration ────────────────────────────────────────────────────
 
 async function syncAthlete(seed: AthleteSeed): Promise<string> {
-  const { socialLinks, ...rest } = seed;
+  const { socialLinks, avatar, ...rest } = seed;
+  const avatarUrl = avatar
+    ? await ensureSeedAsset(avatar.filename, avatar.sourceUrl)
+    : null;
   const data = {
     ...rest,
+    avatarUrl,
     socialLinks: socialLinks as Prisma.InputJsonValue,
   };
   const result = await prisma.athlete.upsert({

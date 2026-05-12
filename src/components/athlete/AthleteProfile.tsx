@@ -6,6 +6,14 @@ import type {
   NewsletterSection,
   Sponsor,
 } from "@prisma/client";
+import {
+  FaInstagram,
+  FaXTwitter,
+  FaTiktok,
+  FaFacebook,
+  FaLinkedin,
+  FaHeart,
+} from "react-icons/fa6";
 import { flagFor } from "@/lib/athlete/flag";
 import SectionRenderer, {
   type RawSection,
@@ -94,7 +102,7 @@ export default function AthleteProfile({
     <div className="bg-cream">
       <div className="mx-auto max-w-[820px] border-x border-line bg-cream-2">
         <ProfileCover
-          coverUrl={selected?.heroImageUrl ?? null}
+          coverUrl={selected?.heroImageUrl ?? athlete.coverImageUrl ?? null}
           flag={flag}
           issueMeta={issueMeta}
         />
@@ -108,6 +116,8 @@ export default function AthleteProfile({
           countryName={athlete.countryName}
           flagEmoji={flag.emoji}
         />
+
+        {athlete.bio ? <ProfileBio bio={athlete.bio} /> : null}
 
         <StatsRow athlete={athlete} />
 
@@ -182,8 +192,83 @@ export default function AthleteProfile({
           isSignedIn={isSignedIn}
           isSubscribed={isSubscribed}
         />
+
+        <SocialLinksStrip
+          fullName={fullName}
+          socialLinks={athlete.socialLinks}
+        />
       </div>
     </div>
+  );
+}
+
+type SocialKey =
+  | "instagram"
+  | "x"
+  | "tiktok"
+  | "facebook"
+  | "linkedin"
+  | "foundation";
+
+const SOCIAL_ICONS: {
+  key: SocialKey;
+  label: string;
+  Icon: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
+}[] = [
+  { key: "instagram", label: "Instagram", Icon: FaInstagram },
+  { key: "tiktok", label: "TikTok", Icon: FaTiktok },
+  { key: "x", label: "X", Icon: FaXTwitter },
+  { key: "facebook", label: "Facebook", Icon: FaFacebook },
+  { key: "linkedin", label: "LinkedIn", Icon: FaLinkedin },
+  { key: "foundation", label: "Foundation", Icon: FaHeart },
+];
+
+function SocialLinksStrip({
+  fullName,
+  socialLinks,
+}: {
+  fullName: string;
+  socialLinks: Athlete["socialLinks"];
+}) {
+  const links =
+    socialLinks && typeof socialLinks === "object" && !Array.isArray(socialLinks)
+      ? (socialLinks as Record<string, string | null | undefined>)
+      : null;
+
+  if (!links) return null;
+
+  const items = SOCIAL_ICONS.filter(({ key }) => {
+    const url = links[key];
+    return typeof url === "string" && url.trim().length > 0;
+  });
+
+  if (items.length === 0) return null;
+
+  return (
+    <section
+      aria-label={`Follow ${fullName}`}
+      className="border-t border-line px-6 py-10 md:py-12"
+    >
+      <div className="text-center font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-ink-3">
+        Follow {fullName}
+      </div>
+      <ul className="mt-5 flex flex-wrap items-center justify-center gap-3">
+        {items.map(({ key, label, Icon }) => (
+          <li key={key}>
+            <a
+              href={links[key] as string}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${fullName} on ${label}`}
+              title={label}
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-line bg-cream text-ink transition-colors duration-200 hover:border-line-2 hover:bg-cream-3"
+            >
+              <Icon className="h-[18px] w-[18px]" aria-hidden />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
@@ -294,6 +379,14 @@ function ProfileIdentity({
   );
 }
 
+function ProfileBio({ bio }: { bio: string }) {
+  return (
+    <p className="mx-auto mt-5 max-w-[560px] px-6 text-center font-serif text-[17px] leading-[1.55] text-ink-2 md:text-[18px]">
+      {bio}
+    </p>
+  );
+}
+
 function StatsRow({ athlete }: { athlete: Athlete }) {
   return (
     <dl className="mt-6 grid grid-cols-3 border-y border-line">
@@ -317,29 +410,31 @@ function SponsorsStrip({ sponsors }: { sponsors: Sponsor[] }) {
   if (sponsors.length === 0) return null;
   return (
     <section
-      aria-label="Sponsors"
-      className="border-b border-line px-6 py-5"
+      aria-label="Partners"
+      className="border-b border-line px-6 py-7 md:py-8"
     >
-      <div className="text-center font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
+      <div className="text-center font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-ink-3">
         Partners
       </div>
-      <ul className="mt-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-5">
+      <ul className="mt-4 flex flex-wrap items-center justify-center gap-2.5">
         {sponsors.map((s) => (
           <li key={s.id}>
             <a
               href={s.websiteUrl}
               target="_blank"
-              rel="noopener noreferrer sponsored"
-              className="block opacity-80 transition-opacity hover:opacity-100"
+              rel="sponsored nofollow noopener noreferrer"
+              className="group flex aspect-[5/3] w-[120px] items-center justify-center rounded-sm border border-line bg-cream p-3 transition-colors duration-200 hover:border-line-2 md:w-[140px] md:p-4"
               aria-label={s.name}
+              title={s.name}
             >
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={s.logoUrl}
                 alt={s.name}
-                width={120}
-                height={40}
-                className="h-8 w-auto object-contain md:h-9"
-                unoptimized
+                loading="lazy"
+                decoding="async"
+                referrerPolicy="origin"
+                className="h-full w-full object-contain opacity-85 mix-blend-multiply transition-opacity duration-200 group-hover:opacity-100"
               />
             </a>
           </li>

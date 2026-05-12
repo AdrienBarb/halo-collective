@@ -12,6 +12,9 @@ type UploadInput = {
 };
 
 function assertSafeSegment(segment: string, label: string): void {
+  if (segment === "." || segment === "..") {
+    throw new Error(`Invalid ${label}: traversal segment`);
+  }
   if (!SAFE_PATH_SEGMENT.test(segment)) {
     throw new Error(`Invalid ${label}: must match ${SAFE_PATH_SEGMENT}`);
   }

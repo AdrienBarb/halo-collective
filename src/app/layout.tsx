@@ -4,6 +4,7 @@ import { Toaster } from "react-hot-toast";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import GlobalErrorHandler from "@/components/GlobalErrorHandler";
 import { QueryProviders } from "@/components/providers/QueryProviders";
+import { ConfirmProvider } from "@/components/providers/ConfirmProvider";
 import { PostHogProvider } from "@/components/tracking/PostHogProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -53,13 +54,15 @@ export default function RootLayout({
         <NuqsAdapter>
           <QueryProviders>
             <PostHogProvider>
-              <div className="flex min-h-screen flex-col">
-                <Navbar />
-                <main className="flex-1">{children}</main>
-                <Footer />
-              </div>
-              <Toaster position="bottom-center" />
-              <GlobalErrorHandler />
+              <ConfirmProvider>
+                <div className="flex min-h-screen flex-col">
+                  <Navbar />
+                  <main className="flex-1">{children}</main>
+                  <Footer />
+                </div>
+                <Toaster position="bottom-center" />
+                <GlobalErrorHandler />
+              </ConfirmProvider>
             </PostHogProvider>
           </QueryProviders>
         </NuqsAdapter>
