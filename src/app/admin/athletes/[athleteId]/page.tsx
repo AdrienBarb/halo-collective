@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getAthleteById } from "@/lib/services/athlete";
 import { listByAthleteId as listSponsorsByAthleteId } from "@/lib/services/sponsor";
 import AthleteForm from "@/components/admin/AthleteForm";
+import AthleteShareLinks from "@/components/admin/AthleteShareLinks";
 
 export const dynamic = "force-dynamic";
 
@@ -20,16 +21,19 @@ export default async function EditAthletePage({
 
   return (
     <div className="space-y-10">
-      <div>
-        <Link
-          href="/admin/athletes"
-          className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3 hover:text-ink"
-        >
-          ← Athletes
-        </Link>
-        <h1 className="mt-2 font-sans text-[28px] font-semibold tracking-[-0.01em] text-ink">
-          {athlete.firstName} {athlete.lastName}
-        </h1>
+      <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+        <div>
+          <Link
+            href="/admin/athletes"
+            className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3 hover:text-ink"
+          >
+            ← Athletes
+          </Link>
+          <h1 className="mt-2 font-sans text-[28px] font-semibold tracking-[-0.01em] text-ink">
+            {athlete.firstName} {athlete.lastName}
+          </h1>
+        </div>
+        <AthleteShareLinks athleteSlug={athlete.slug} />
       </div>
 
       <section>
