@@ -35,15 +35,13 @@ export default function NavbarAuthButton({
         {t("signIn")}
       </button>
 
-      {open ? (
-        <AuthModal
-          open={open}
-          onOpenChange={setOpen}
-          initialMode="signin"
-          onSuccess={onSuccess}
-          ipCountryCode={ipCountryCode}
-        />
-      ) : null}
+      <AuthModal
+        open={open}
+        onOpenChange={setOpen}
+        initialMode="signin"
+        onSuccess={onSuccess}
+        ipCountryCode={ipCountryCode}
+      />
     </>
   );
 }

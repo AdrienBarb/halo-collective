@@ -6,6 +6,19 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const isDev = process.env.NODE_ENV !== "production";
 
 const nextConfig: NextConfig = {
+  // Google One Tap (GSI) needs the Referer header to validate origins
+  // against Authorized JavaScript origins. The default Next.js policy
+  // strips it cross-origin, causing "origin not allowed" errors.
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "Referrer-Policy", value: "no-referrer-when-downgrade" },
+        ],
+      },
+    ];
+  },
   // Image optimization for external sources
   images: {
     remotePatterns: [

@@ -65,7 +65,6 @@ export default function SubscribeButton({
     if (isSignedIn) {
       subscribe.mutate({
         partnerOffersConsent,
-        source: "athlete-page",
       });
       return;
     }
@@ -174,15 +173,13 @@ export default function SubscribeButton({
         </div>
       </div>
 
-      {authOpen ? (
-        <AuthModal
-          open={authOpen}
-          onOpenChange={setAuthOpen}
-          initialMode="signup"
-          onSuccess={onAuthSuccess}
-          ipCountryCode={ipCountryCode}
-        />
-      ) : null}
+      <AuthModal
+        open={authOpen}
+        onOpenChange={setAuthOpen}
+        initialMode="signup"
+        onSuccess={onAuthSuccess}
+        ipCountryCode={ipCountryCode}
+      />
     </section>
   );
 }

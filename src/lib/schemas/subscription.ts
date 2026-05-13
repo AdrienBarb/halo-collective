@@ -2,15 +2,6 @@ import { z } from "zod";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { countryCodeSchema } from "@/lib/schemas/country";
 
-const SUBSCRIBE_SOURCES = [
-  "athlete-page",
-  "ig-bio",
-  "tiktok-bio",
-  "qr",
-  "manual",
-  "share",
-] as const;
-
 const phoneSchema = z
   .string()
   .trim()
@@ -21,7 +12,6 @@ const phoneSchema = z
 
 export const subscribeAuthSchema = z.object({
   partnerOffersConsent: z.boolean().default(false),
-  source: z.enum(SUBSCRIBE_SOURCES).optional(),
   // Optional profile patch — for callers that want to backfill missing user
   // fields at subscribe time (e.g. an admin import path).
   firstName: z.string().trim().min(1).max(80).optional(),
