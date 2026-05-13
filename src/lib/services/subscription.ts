@@ -1,9 +1,12 @@
+import { after } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { ensureAthleteList } from "@/lib/brevo/lists";
 import { upsertContact } from "@/lib/brevo/contacts";
 import { getAthleteBySlug } from "@/lib/services/athlete";
 import { sendWelcomeEmail } from "@/lib/resend/sendWelcomeEmail";
 import { NotFoundError } from "@/lib/errors/AppError";
+import { updateContactByEmail } from "@/lib/hubspot/contacts";
+import { HALO_GDPR_VERSION } from "@/lib/constants/gdpr";
 
 interface ProfilePatch {
   firstName?: string;
@@ -16,6 +19,7 @@ interface CreateSubscriptionArgs {
   userId: string;
   athleteSlug: string;
   partnerOffersConsent: boolean;
+  consentIp?: string | null;
   profilePatch?: ProfilePatch;
 }
 
@@ -24,10 +28,66 @@ interface CreateSubscriptionResult {
   userId: string;
 }
 
+// Derives the HubSpot consent property name from the athlete's first name —
+// e.g. "Arthur Rinderknech" → `halo_opt_in_arthur`. Sanitised to a-z0-9 so
+// HubSpot accepts it as an internal property name. One property per athlete is
+// intentional: GDPR requires consent be tied to a named recipient/list, so we
+// can't roll all subscriptions into a single boolean.
+function getAthleteConsentProperty(firstName: string): string {
+  const slug = firstName.toLowerCase().replace(/[^a-z0-9]/g, "");
+  return `halo_opt_in_${slug}`;
+}
+
+interface SyncConsentInput {
+  email: string;
+  consentPropertyName: string;
+  consentIp: string | null;
+  athleteSlug: string;
+}
+
+// Identity fields (firstname/lastname/country) are pushed once at signup under
+// legitimate-interest — see better-auth/auth.ts. This call only writes the
+// consent record itself plus the marketable-status flip.
+async function syncConsentToHubspot(input: SyncConsentInput): Promise<void> {
+  const { email, consentPropertyName, consentIp, athleteSlug } = input;
+
+  const properties: Record<string, string> = {
+    [consentPropertyName]: "true",
+    halo_opt_in_date: new Date().toISOString(),
+    halo_gdpr_version: HALO_GDPR_VERSION,
+    // Consent landed — this contact is now marketable. The signup hook set
+    // it to NO; we flip to YES here. Idempotent on re-consent.
+    hs_marketable_status: "YES",
+    ...(consentIp ? { halo_opt_in_ip: consentIp } : {}),
+  };
+
+  try {
+    await updateContactByEmail({ email, properties });
+  } catch (error: unknown) {
+    const errInfo =
+      error instanceof Error
+        ? { name: error.name, message: error.message }
+        : { message: String(error) };
+    console.error(
+      JSON.stringify({
+        scope: "subscribe.hubspot_consent_failed",
+        athleteSlug,
+        ...errInfo,
+      }),
+    );
+  }
+}
+
 export async function createSubscription(
   args: CreateSubscriptionArgs,
 ): Promise<CreateSubscriptionResult> {
-  const { userId, athleteSlug, partnerOffersConsent, profilePatch } = args;
+  const {
+    userId,
+    athleteSlug,
+    partnerOffersConsent,
+    consentIp,
+    profilePatch,
+  } = args;
 
   const athlete = await getAthleteBySlug(athleteSlug);
   if (!athlete) {
@@ -143,6 +203,19 @@ export async function createSubscription(
       );
     });
   }
+
+  // Stamp the HubSpot contact with the consent record — date + IP + GDPR
+  // version are the GDPR-required audit trail. Always run (not just for new
+  // subscribers) so re-consent after an unsubscribe gets a fresh timestamp.
+  // after() keeps the serverless function alive until HubSpot returns.
+  after(() =>
+    syncConsentToHubspot({
+      email: user.email,
+      consentPropertyName: getAthleteConsentProperty(athlete.firstName),
+      consentIp: consentIp ?? null,
+      athleteSlug: athlete.slug,
+    }),
+  );
 
   return { subscriptionId, userId };
 }

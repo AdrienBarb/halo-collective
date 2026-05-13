@@ -5,6 +5,11 @@ interface CreateContactInput {
   properties?: Record<string, string>;
 }
 
+interface UpdateContactInput {
+  email: string;
+  properties: Record<string, string>;
+}
+
 interface HubSpotContactResponse {
   id: string;
 }
@@ -46,11 +51,41 @@ export async function createContact({
         },
       }
     );
-    console.log("🚀 ~ createContact ~ res:", res);
     return res ?? null;
   } catch (error) {
     if (isDuplicateError(error)) {
       return null;
+    }
+    throw error;
+  }
+}
+
+/**
+ * Upsert by email: PATCH existing contact, create when missing.
+ * Use this for properties that overwrite each time (consent flags, timestamps,
+ * country) — never for first-touch attribution like UTMs.
+ *
+ * The fallback create matters: if the better-auth signup hook's HubSpot push
+ * ever fails silently, we'd otherwise drop the consent record on the floor
+ * — and that's exactly the audit trail GDPR needs us to keep.
+ */
+export async function updateContactByEmail({
+  email,
+  properties,
+}: UpdateContactInput): Promise<HubSpotContactResponse | null> {
+  const encodedEmail = encodeURIComponent(email);
+  try {
+    const res = await hubspotFetch<HubSpotContactResponse | undefined>(
+      `/crm/v3/objects/contacts/${encodedEmail}?idProperty=email`,
+      {
+        method: "PATCH",
+        body: { properties },
+      },
+    );
+    return res ?? null;
+  } catch (error) {
+    if (error instanceof HubSpotError && error.status === 404) {
+      return createContact({ email, properties });
     }
     throw error;
   }

@@ -12,6 +12,7 @@ import {
 } from "@/lib/schemas/trackingParams";
 import { createContact as createHubspotContact } from "@/lib/hubspot/contacts";
 import { ATTRIBUTION_COOKIE } from "@/lib/constants/attribution";
+import { resolveCountryName } from "@/lib/utils/resolveCountryName";
 
 const baseURL =
   process.env.BETTER_AUTH_URL ||
@@ -45,17 +46,26 @@ interface SyncHubspotInput {
   email: string;
   firstName: string | null;
   lastName: string | null;
+  countryCode: string | null;
   trackingParams: TrackingParams | null;
 }
 
 async function syncToHubspot(input: SyncHubspotInput): Promise<void> {
-  const { email, firstName, lastName, trackingParams } = input;
+  const { email, firstName, lastName, countryCode, trackingParams } = input;
+  const countryName = resolveCountryName(countryCode);
   try {
     await createHubspotContact({
       email,
       properties: {
+        // Mark every fresh signup as non-marketable. Storing the contact under
+        // legitimate-interest is fine; flipping to YES requires explicit
+        // newsletter consent, which happens at subscribe time. This is the
+        // GDPR safety net — if anyone ever wires HubSpot up to send mail,
+        // they'd skip these contacts until consent lands.
+        hs_marketable_status: "NO",
         ...(firstName ? { firstname: firstName } : {}),
         ...(lastName ? { lastname: lastName } : {}),
+        ...(countryName ? { country: countryName } : {}),
         ...(trackingParams ?? {}),
       },
     });
@@ -142,7 +152,12 @@ export const auth = betterAuth({
             // casts on Better Auth's hook payload).
             const dbUser = await prisma.user.findUnique({
               where: { id: user.id },
-              select: { email: true, firstName: true, lastName: true },
+              select: {
+                email: true,
+                firstName: true,
+                lastName: true,
+                countryCode: true,
+              },
             });
             if (!dbUser) return;
 
@@ -170,6 +185,7 @@ export const auth = betterAuth({
                 email: dbUser.email,
                 firstName: dbUser.firstName,
                 lastName: dbUser.lastName,
+                countryCode: dbUser.countryCode,
                 trackingParams,
               }),
             );

@@ -5,6 +5,7 @@ import { errorMessages } from "@/lib/constants/errorMessage";
 import { checkOrigin } from "@/lib/security/checkOrigin";
 import { subscribeAuthSchema } from "@/lib/schemas/subscription";
 import { createSubscription } from "@/lib/services/subscription";
+import { getClientIp } from "@/lib/utils/getClientIp";
 
 type Context = { params: Promise<{ slug: string }> };
 
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest, ctx: Context) {
       userId: session.user.id,
       athleteSlug: slug,
       partnerOffersConsent: validated.partnerOffersConsent,
+      consentIp: getClientIp(req.headers),
       profilePatch: {
         firstName: validated.firstName,
         lastName: validated.lastName,
