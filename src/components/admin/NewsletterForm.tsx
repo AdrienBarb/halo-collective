@@ -65,7 +65,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { toSlug } from "@/lib/newsletter/slug";
 import {
   NEWSLETTER_PREVIEW_ROUTE,
   NEWSLETTER_PREVIEW_STORAGE_KEY,
@@ -151,10 +150,7 @@ export default function NewsletterForm({
     defaultValues: {
       title: initialData?.title ?? "",
       emailSubject: initialData?.emailSubject ?? "",
-      slug: initialData?.slug ?? "",
       heroImageUrl: initialData?.heroImageUrl ?? undefined,
-      editionNumber: initialData?.editionNumber ?? 1,
-      editionDate: toDateInput(initialData?.editionDate),
       editionMode: (initialData?.editionMode as EditionModeValue | undefined) ?? "WEEKLY",
       tournamentName: initialData?.tournamentName ?? undefined,
       tournamentLogoUrl: initialData?.tournamentLogoUrl ?? undefined,
@@ -276,15 +272,6 @@ export default function NewsletterForm({
     generate.mutate({ input: raw });
   }
 
-  const titleValue = useWatch({ control: form.control, name: "title" }) ?? "";
-
-  useEffect(() => {
-    if (isEdit) return;
-    form.setValue("slug", toSlug(titleValue), {
-      shouldValidate: !!titleValue,
-    });
-  }, [titleValue, isEdit, form]);
-
   // Warn before navigating away with unsaved edits — section blocks live
   // outside react-hook-form, so isDirty alone isn't sufficient.
   const isDirty = form.formState.isDirty;
@@ -315,10 +302,7 @@ export default function NewsletterForm({
       form.reset({
         title: data.title,
         emailSubject: data.emailSubject ?? "",
-        slug: data.slug,
         heroImageUrl: data.heroImageUrl ?? undefined,
-        editionNumber: data.editionNumber,
-        editionDate: toDateInput(data.editionDate),
         editionMode: data.editionMode as EditionModeValue,
         tournamentName: data.tournamentName ?? undefined,
         tournamentLogoUrl: data.tournamentLogoUrl ?? undefined,
@@ -695,83 +679,6 @@ export default function NewsletterForm({
                   }}
                 />
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-[2fr_1fr_1fr]">
-                  <FormField
-                    control={form.control}
-                    name="slug"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
-                          URL slug
-                        </FormLabel>
-                        <FormControl>
-                          <Input {...field} value={field.value ?? ""} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="editionNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
-                          Issue #
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            name={field.name}
-                            ref={field.ref}
-                            onBlur={field.onBlur}
-                            value={
-                              typeof field.value === "number" ? field.value : ""
-                            }
-                            onChange={(e) =>
-                              field.onChange(
-                                e.target.value === ""
-                                  ? undefined
-                                  : Number(e.target.value),
-                              )
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="editionDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
-                          Date
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="date"
-                            name={field.name}
-                            ref={field.ref}
-                            onBlur={field.onBlur}
-                            value={
-                              typeof field.value === "string"
-                                ? field.value
-                                : field.value instanceof Date
-                                  ? field.value.toISOString().slice(0, 10)
-                                  : ""
-                            }
-                            onChange={(e) =>
-                              field.onChange(e.target.value || undefined)
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
               </div>
             </section>
 

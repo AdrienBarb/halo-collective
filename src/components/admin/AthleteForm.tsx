@@ -51,6 +51,13 @@ const SOCIAL_FIELDS = [
   { key: "foundation", label: "Foundation" },
 ] as const;
 
+// Personalization tokens exposed in the welcome-email Textarea. Substituted
+// per-fan in sendWelcomeEmail.ts before the message is rendered by Resend.
+const WELCOME_EMAIL_MERGE_TAGS: ReadonlyArray<{ label: string; value: string }> = [
+  { label: "Fan first name", value: "{{fanFirstName}}" },
+  { label: "Athlete first name", value: "{{athleteFirstName}}" },
+];
+
 function toSlug(value: string): string {
   return slugify(value, { lower: true, strict: true, locale: "en" });
 }
@@ -166,6 +173,7 @@ export default function AthleteForm({
   const lastName =
     useWatch({ control: form.control, name: "lastName" }) ?? "";
   const slugManuallyEdited = useRef(isEdit);
+  const welcomeMessageTextareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     if (slugManuallyEdited.current) return;
@@ -543,20 +551,71 @@ export default function AthleteForm({
             <FormField
               control={form.control}
               name="welcomeMessage"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
-                    Welcome email message
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea rows={6} {...field} value={field.value ?? ""} />
-                  </FormControl>
-                  <p className="text-[11px] text-ink-3">
-                    Personal note sent to fans the moment they subscribe. Plain text, blank lines between paragraphs. Leave empty to use the default Halo template.
-                  </p>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                function insertMergeTag(tag: string) {
+                  const el = welcomeMessageTextareaRef.current;
+                  const current = field.value ?? "";
+                  // No DOM ref yet (shouldn't happen post-mount) — append at end.
+                  if (!el) {
+                    form.setValue("welcomeMessage", `${current}${tag}`, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                    return;
+                  }
+                  const start = el.selectionStart ?? current.length;
+                  const end = el.selectionEnd ?? current.length;
+                  const next = `${current.slice(0, start)}${tag}${current.slice(end)}`;
+                  form.setValue("welcomeMessage", next, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  });
+                  // Place cursor right after the inserted tag on next tick,
+                  // once RHF has flushed the new value into the DOM.
+                  requestAnimationFrame(() => {
+                    const cursor = start + tag.length;
+                    el.focus();
+                    el.setSelectionRange(cursor, cursor);
+                  });
+                }
+                return (
+                  <FormItem>
+                    <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                      Welcome email message
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea
+                        rows={6}
+                        {...field}
+                        ref={(el) => {
+                          field.ref(el);
+                          welcomeMessageTextareaRef.current = el;
+                        }}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+                        Insert:
+                      </span>
+                      {WELCOME_EMAIL_MERGE_TAGS.map((tag) => (
+                        <button
+                          key={tag.value}
+                          type="button"
+                          onClick={() => insertMergeTag(tag.value)}
+                          className="rounded-full border border-line bg-cream-2 px-2.5 py-0.5 text-[11px] text-ink transition-colors hover:bg-cream hover:border-ink-3"
+                        >
+                          + {tag.label}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-[11px] text-ink-3">
+                      Personal note sent to fans the moment they subscribe. Plain text, blank lines between paragraphs. Leave empty to use the default Halo template. Use the chips above to personalize with the fan&apos;s or athlete&apos;s first name.
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
           </SectionCard>
 

@@ -67,6 +67,23 @@ function normalizeSponsors(
   return safe.length > 0 ? safe : undefined;
 }
 
+// Replaces {{fanFirstName}} / {{athleteFirstName}} placeholders in the
+// athlete-authored welcome message. Mirrors the newsletter merge-tag UX, but
+// since Resend has no native merge syntax we substitute server-side here.
+// Single-pass replace so a fan-controlled value (e.g. firstName="{{athleteFirstName}}")
+// is not re-scanned and re-substituted.
+function substituteWelcomeMessage(
+  template: string | null | undefined,
+  vars: Record<"fanFirstName" | "athleteFirstName", string>,
+): string | undefined {
+  if (!template) return undefined;
+  const out = template.replace(
+    /\{\{\s*(fanFirstName|athleteFirstName)\s*\}\}/g,
+    (_match, key: "fanFirstName" | "athleteFirstName") => vars[key],
+  );
+  return out.trim() ? out : undefined;
+}
+
 export async function sendWelcomeEmail(input: SendWelcomeEmailInput) {
   const {
     email,
@@ -89,6 +106,10 @@ export async function sendWelcomeEmail(input: SendWelcomeEmailInput) {
     config.project.url;
 
   const safeCover = isHttpsUrl(coverImageUrl) ? coverImageUrl : undefined;
+  const personalizedMessage = substituteWelcomeMessage(welcomeMessage, {
+    fanFirstName: firstName.trim() || t("fanFirstNameFallback"),
+    athleteFirstName,
+  });
 
   const result = await Promise.race([
     resendClient.emails.send({
@@ -99,7 +120,7 @@ export async function sendWelcomeEmail(input: SendWelcomeEmailInput) {
         profileUrl: `${baseUrl}/${athleteSlug}`,
         athleteFirstName,
         coverImageUrl: safeCover,
-        welcomeMessage: welcomeMessage ?? undefined,
+        welcomeMessage: personalizedMessage,
         sponsors: normalizeSponsors(sponsors),
         socialLinks: normalizeSocialLinks(socialLinks),
         messages: {

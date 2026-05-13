@@ -1,5 +1,4 @@
 import { isAllowedMediaUrl, isSafeHttpUrl } from "@/lib/schemas/common";
-import { toSlug } from "@/lib/newsletter/slug";
 import { SECTION_ORDER } from "@/lib/newsletter/sectionDefaults";
 import type { NewsletterFormInput } from "@/lib/schemas/newsletter";
 import {
@@ -363,14 +362,6 @@ function buildHeader(
   if (title !== titleRaw) {
     warnings.push({ section: "header", reason: "Title was trimmed/cleaned" });
   }
-  const slugFromInput = asString(source.slug);
-  const slug =
-    slugFromInput && /^[a-z0-9-]+$/.test(slugFromInput)
-      ? slugFromInput
-      : title
-        ? toSlug(title)
-        : "";
-
   const editionModeRaw = asString(source.editionMode)?.toUpperCase();
   const editionMode =
     editionModeRaw === "TOURNAMENT" || editionModeRaw === "WEEKLY"
@@ -379,10 +370,7 @@ function buildHeader(
 
   return {
     title,
-    slug,
     heroImageUrl: sanitizedSupabaseUrl(source.heroImageUrl),
-    editionNumber: asNumber(source.editionNumber) ?? 1,
-    editionDate: asDateInput(source.editionDate),
     editionMode,
     tournamentName: asString(source.tournamentName),
     tournamentLogoUrl: sanitizedSupabaseUrl(source.tournamentLogoUrl),

@@ -23,6 +23,7 @@ import { render } from "@react-email/render";
 import { getTranslations } from "next-intl/server";
 import { NewsletterEmail } from "@/lib/emails/NewsletterEmail";
 import { DEFAULT_LOCALE } from "@/i18n/locales";
+import { toSlug } from "@/lib/newsletter/slug";
 
 // Cap slug-collision retries at a small number. The original 50× was
 // excessive; if we collide ~5 times the slug strategy is wrong and we
@@ -106,7 +107,6 @@ interface HeaderFields {
   title?: string;
   emailSubject?: string | null;
   heroImageUrl?: string | null;
-  editionDate?: Date | null;
   editionMode?: EditionModeValue;
   tournamentName?: string | null;
   tournamentLogoUrl?: string | null;
@@ -121,14 +121,13 @@ interface HeaderFields {
 
 function buildHeaderData(
   input:
-    | Omit<CreateNewsletterOutput, "athleteId" | "sections" | "slug" | "editionNumber">
+    | Omit<CreateNewsletterOutput, "athleteId" | "sections">
     | UpdateNewsletterOutput,
 ): HeaderFields {
   return {
     title: input.title,
     emailSubject: input.emailSubject,
     heroImageUrl: input.heroImageUrl,
-    editionDate: input.editionDate,
     editionMode: input.editionMode,
     tournamentName: input.tournamentName,
     tournamentLogoUrl: input.tournamentLogoUrl,
@@ -201,7 +200,7 @@ export async function getNewsletterById(id: string) {
 }
 
 export async function createNewsletter(input: CreateNewsletterOutput) {
-  const { athleteId, slug: baseSlug, editionNumber, sections, title } = input;
+  const { athleteId, sections, title } = input;
   const editionMode: EditionModeValue = input.editionMode ?? "WEEKLY";
 
   const athlete = await prisma.athlete.findUnique({
@@ -214,7 +213,18 @@ export async function createNewsletter(input: CreateNewsletterOutput) {
 
   const sectionsToCreate = buildSectionRows(sections ?? [], editionMode);
 
+  const baseSlug = toSlug(title) || "edition";
+  const editionDate = new Date();
+
+  // Compute next edition number from current max — re-read on each
+  // retry so concurrent creates resolve to consecutive numbers instead
+  // of throwing.
   for (let attempt = 0; attempt < MAX_CREATE_ATTEMPTS; attempt++) {
+    const maxRow = await prisma.newsletter.aggregate({
+      where: { athleteId },
+      _max: { editionNumber: true },
+    });
+    const editionNumber = (maxRow._max.editionNumber ?? 0) + 1;
     const slug = attempt === 0 ? baseSlug : `${baseSlug}-${attempt + 1}`;
     try {
       return await prisma.newsletter.create({
@@ -226,7 +236,7 @@ export async function createNewsletter(input: CreateNewsletterOutput) {
           emailSubject: input.emailSubject,
           editionMode,
           heroImageUrl: input.heroImageUrl,
-          editionDate: input.editionDate,
+          editionDate,
           tournamentName: input.tournamentName,
           tournamentLogoUrl: input.tournamentLogoUrl,
           tournamentCategory: input.tournamentCategory,
@@ -254,9 +264,12 @@ export async function createNewsletter(input: CreateNewsletterOutput) {
           attempt: attempt + 1,
         });
         if (isEditionNumberCollision(error)) {
-          throw new ConflictError(
-            `Edition number ${editionNumber} already exists for this athlete`,
-          );
+          logNewsletter("edition_number_collision_retry", {
+            athleteId,
+            editionNumber,
+            attempt: attempt + 1,
+          });
+          continue;
         }
         if (isSlugCollision(error)) {
           logNewsletter("slug_collision_retry", {
@@ -306,8 +319,6 @@ export async function updateNewsletter(
       return tx.newsletter.update({
         where: { id },
         data: {
-          slug: input.slug,
-          editionNumber: input.editionNumber,
           // Any edit invalidates the cached Brevo HTML — the next
           // publish should re-render from current data.
           renderedHtml: null,

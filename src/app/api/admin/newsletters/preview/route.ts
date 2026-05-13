@@ -85,9 +85,13 @@ export async function POST(req: NextRequest) {
       ? rawTitle
       : "Untitled draft"
     ).slice(0, 200);
-    const slug = toSlug(parsed.header.slug ?? "") || "preview-draft";
+    const slug =
+      toSlug(parsed.header.slug ?? "") ||
+      toSlug(title) ||
+      "preview-draft";
     const editionNumber = parsed.header.editionNumber ?? 1;
     const now = new Date();
+    const editionDate = toDate(parsed.header.editionDate) ?? now;
     const newsletterId = parsed.newsletterId ?? "preview";
 
     const sectionRows: NewsletterSection[] = parsed.sections.map((s, i) => ({
@@ -104,7 +108,7 @@ export async function POST(req: NextRequest) {
       id: newsletterId,
       athleteId: parsed.athleteId,
       editionNumber,
-      editionDate: toDate(parsed.header.editionDate),
+      editionDate,
       editionMode,
       title,
       emailSubject: parsed.header.emailSubject ?? null,

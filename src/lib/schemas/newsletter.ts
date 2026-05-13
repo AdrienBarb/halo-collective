@@ -5,7 +5,6 @@ import {
   clearableMediaUrl,
   clearableTrimmedString,
   optionalMediaUrl,
-  slugSchema,
 } from "@/lib/schemas/common";
 import { addSectionSchema, editionModeSchema } from "@/lib/schemas/newsletterSection";
 
@@ -40,10 +39,7 @@ const headerFields = {
       (v) => v == null || /^[^\r\n\t]+$/.test(v),
       { message: "Email subject cannot contain line breaks or tabs" },
     ),
-  slug: slugSchema,
   heroImageUrl: clearableMediaUrl,
-  editionNumber: z.coerce.number().int().positive(),
-  editionDate: clearableDate,
   editionMode: editionModeSchema.default("WEEKLY"),
   tournamentName: clearableTrimmedString,
   tournamentLogoUrl: clearableMediaUrl,
@@ -70,10 +66,7 @@ export const createNewsletterSchema = z.object({
 export const updateNewsletterSchema = z.object({
   title: headerFields.title.optional(),
   emailSubject: headerFields.emailSubject,
-  slug: headerFields.slug.optional(),
   heroImageUrl: headerFields.heroImageUrl,
-  editionNumber: headerFields.editionNumber.optional(),
-  editionDate: headerFields.editionDate,
   editionMode: headerFields.editionMode.optional(),
   tournamentName: headerFields.tournamentName,
   tournamentLogoUrl: headerFields.tournamentLogoUrl,
@@ -91,8 +84,6 @@ export const newsletterFormSchema = updateNewsletterSchema
   .omit({ sections: true })
   .extend({
     title: headerFields.title,
-    slug: headerFields.slug,
-    editionNumber: headerFields.editionNumber,
     editionMode: headerFields.editionMode,
   });
 
