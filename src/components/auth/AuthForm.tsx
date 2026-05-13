@@ -107,37 +107,17 @@ export default function AuthForm({
         toast.error(t("invalidCredentials"));
         return;
       }
-      await syncLocaleFromUser();
+      // syncLocaleFromUser is best-effort — a failure must not block the
+      // post-auth handoff (otherwise the user is signed in but the modal
+      // stays open and the onboarding gate never fires until next nav).
+      try {
+        await syncLocaleFromUser();
+      } catch (error) {
+        console.error("syncLocaleFromUser failed (signin):", error);
+      }
       onSuccess();
     } catch (error) {
       console.error("Sign in failed:", error);
-      toast.error(t("somethingWentWrong"));
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  async function onSignUp(values: SignUpInput) {
-    if (submitting) return;
-    setSubmitting(true);
-    try {
-      const result = await authClient.signUp.email({
-        email: values.email,
-        password: values.password,
-        name: `${values.firstName} ${values.lastName}`.trim(),
-        firstName: values.firstName,
-        lastName: values.lastName,
-        ...(ipCountryCode ? { countryCode: ipCountryCode } : {}),
-      });
-      if (result.error) {
-        console.error("signUp.email error:", result.error);
-        toast.error(t("couldNotCreateAccount"));
-        return;
-      }
-      await syncLocaleFromUser();
-      onSuccess();
-    } catch (error) {
-      console.error("Sign up failed:", error);
       toast.error(t("somethingWentWrong"));
     } finally {
       setSubmitting(false);
@@ -150,43 +130,19 @@ export default function AuthForm({
     const callbackURL =
       redirectAfter ??
       (typeof window !== "undefined" ? window.location.pathname : "/");
-
-    async function redirectFallback() {
-      try {
-        await authClient.signIn.social({ provider: "google", callbackURL });
-      } catch (redirectError) {
-        console.error("Google redirect fallback failed:", redirectError);
-        toast.error(t("couldNotStartGoogle"));
-        setGoogleLoading(false);
-      }
-    }
-
     try {
-      await authClient.oneTap({
-        fetchOptions: {
-          onSuccess: async () => {
-            await syncLocaleFromUser();
-            onSuccess();
-          },
-          onError: (ctx) => {
-            console.error("One Tap onError:", ctx?.error);
-            void redirectFallback();
-          },
-        },
-        onPromptNotification: () => {
-          void redirectFallback();
-        },
-      });
+      await authClient.signIn.social({ provider: "google", callbackURL });
     } catch (error) {
-      console.error("One Tap threw, falling back:", error);
-      await redirectFallback();
+      console.error("Google sign-in failed:", error);
+      toast.error(t("couldNotStartGoogle"));
+      setGoogleLoading(false);
     }
   }
 
   const busy = submitting || googleLoading;
 
-  return (
-    <div className="space-y-5">
+  const googleBlock = (
+    <>
       <button
         type="button"
         onClick={onGoogle}
@@ -207,8 +163,44 @@ export default function AuthForm({
           </span>
         </div>
       </div>
+    </>
+  );
 
-      {mode === "signup" ? (
+  async function onSignUp(values: SignUpInput) {
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      const result = await authClient.signUp.email({
+        email: values.email,
+        password: values.password,
+        name: `${values.firstName} ${values.lastName}`.trim(),
+        firstName: values.firstName,
+        lastName: values.lastName,
+        ...(ipCountryCode ? { countryCode: ipCountryCode } : {}),
+      });
+      if (result.error) {
+        console.error("signUp.email error:", result.error);
+        toast.error(t("couldNotCreateAccount"));
+        return;
+      }
+      try {
+        await syncLocaleFromUser();
+      } catch (error) {
+        console.error("syncLocaleFromUser failed (signup):", error);
+      }
+      onSuccess();
+    } catch (error) {
+      console.error("Sign up failed:", error);
+      toast.error(t("somethingWentWrong"));
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (mode === "signup") {
+    return (
+      <div className="space-y-5">
+        {googleBlock}
         <Form {...signupForm}>
           <form
             onSubmit={signupForm.handleSubmit(onSignUp)}
@@ -321,83 +313,88 @@ export default function AuthForm({
             </p>
           </form>
         </Form>
-      ) : (
-        <Form {...signinForm}>
-          <form
-            onSubmit={signinForm.handleSubmit(onSignIn)}
-            className="space-y-4"
-            noValidate
-          >
-            <FormField
-              control={signinForm.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
-                    {t("email")}
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      autoComplete="email"
-                      placeholder={t("emailPlaceholder")}
-                      disabled={busy}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+      </div>
+    );
+  }
 
-            <FormField
-              control={signinForm.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center justify-between font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
-                    <span>{t("password")}</span>
-                    <Link
-                      href="/forgot-password"
-                      className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3 underline-offset-2 hover:text-ink hover:underline"
-                    >
-                      {t("forgot")}
-                    </Link>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      autoComplete="current-password"
-                      placeholder={t("passwordPlaceholderSignIn")}
-                      disabled={busy}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+  return (
+    <div className="space-y-5">
+      {googleBlock}
+      <Form {...signinForm}>
+        <form
+          onSubmit={signinForm.handleSubmit(onSignIn)}
+          className="space-y-4"
+          noValidate
+        >
+          <FormField
+            control={signinForm.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
+                  {t("email")}
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="email"
+                    autoComplete="email"
+                    placeholder={t("emailPlaceholder")}
+                    disabled={busy}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <button type="submit" disabled={busy} className={buttonClass}>
-              {submitting ? t("signingIn") : t("signIn")}
-            </button>
-
-            <p className="text-center text-[12px] text-ink-3">
-              {t.rich("newHere", {
-                link: (chunks) => (
-                  <button
-                    type="button"
-                    onClick={() => onModeChange?.("signup")}
-                    className="cursor-pointer font-semibold text-ink underline underline-offset-2 hover:text-accent-gold"
+          <FormField
+            control={signinForm.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center justify-between font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
+                  <span>{t("password")}</span>
+                  <Link
+                    href="/forgot-password"
+                    className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3 underline-offset-2 hover:text-ink hover:underline"
                   >
-                    {chunks}
-                  </button>
-                ),
-              })}
-            </p>
-          </form>
-        </Form>
-      )}
+                    {t("forgot")}
+                  </Link>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    autoComplete="current-password"
+                    placeholder={t("passwordPlaceholderSignIn")}
+                    disabled={busy}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <button type="submit" disabled={busy} className={buttonClass}>
+            {submitting ? t("signingIn") : t("signIn")}
+          </button>
+
+          <p className="text-center text-[12px] text-ink-3">
+            {t.rich("newHere", {
+              link: (chunks) => (
+                <button
+                  type="button"
+                  onClick={() => onModeChange?.("signup")}
+                  className="cursor-pointer font-semibold text-ink underline underline-offset-2 hover:text-accent-gold"
+                >
+                  {chunks}
+                </button>
+              ),
+            })}
+          </p>
+        </form>
+      </Form>
     </div>
   );
 }

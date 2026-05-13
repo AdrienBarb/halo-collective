@@ -59,6 +59,7 @@
       "or": "or",
       "continueWithGoogle": "Continue with Google",
       "redirecting": "Redirecting…",
+      "couldNotStartGoogle": "Could not start Google sign-in.",
       "createAccount": "Create account",
       "creatingAccount": "Creating account…",
       "signIn": "Sign in",
@@ -67,8 +68,7 @@
       "newHere": "New here? <link>Create an account</link>",
       "invalidCredentials": "Invalid email or password",
       "somethingWentWrong": "Something went wrong. Try again.",
-      "couldNotCreateAccount": "Could not create account. Check your details or sign in instead.",
-      "couldNotStartGoogle": "Could not start Google sign-in."
+      "couldNotCreateAccount": "Could not create account. Check your details or sign in instead."
     },
     "Modal": {
       "eyebrowSignUp": "Create your account",

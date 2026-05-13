@@ -20,6 +20,10 @@ model User {
   role          UserRole  @default(USER)
   locale        String    @default("en")
   trackingParams Json?    @map("tracking_params")
+  onboardingCompleted  Boolean  @default(false) @map("onboarding_completed")
+  interestSports       String[] @default([])    @map("interest_sports")
+  interestLifestyle    String[] @default([])    @map("interest_lifestyle")
+  interestBrands       String[] @default([])    @map("interest_brands")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @default(now()) @updatedAt
   sessions      Session[]

@@ -59,6 +59,7 @@
       "or": "ou",
       "continueWithGoogle": "Continuer avec Google",
       "redirecting": "Redirection…",
+      "couldNotStartGoogle": "Impossible de démarrer la connexion Google.",
       "createAccount": "Créer un compte",
       "creatingAccount": "Création du compte…",
       "signIn": "Se connecter",
@@ -67,8 +68,7 @@
       "newHere": "Nouveau ici ? <link>Créer un compte</link>",
       "invalidCredentials": "E-mail ou mot de passe incorrect",
       "somethingWentWrong": "Une erreur est survenue. Réessayez.",
-      "couldNotCreateAccount": "Impossible de créer le compte. Vérifiez vos informations ou connectez-vous.",
-      "couldNotStartGoogle": "Impossible de démarrer la connexion Google."
+      "couldNotCreateAccount": "Impossible de créer le compte. Vérifiez vos informations ou connectez-vous."
     },
     "Modal": {
       "eyebrowSignUp": "Créez votre compte",

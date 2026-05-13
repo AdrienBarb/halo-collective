@@ -11,6 +11,7 @@ export type CurrentUser = {
   firstName: string | null;
   lastName: string | null;
   role: UserRole;
+  onboardingCompleted: boolean;
 };
 
 export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
@@ -27,6 +28,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
       lastName: true,
       countryCode: true,
       role: true,
+      onboardingCompleted: true,
     },
   });
   if (!user) return null;
@@ -56,6 +58,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     firstName: user.firstName,
     lastName: user.lastName,
     role: user.role,
+    onboardingCompleted: user.onboardingCompleted,
   };
 });
 

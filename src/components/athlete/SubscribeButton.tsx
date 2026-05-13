@@ -74,7 +74,9 @@ export default function SubscribeButton({
 
   // After auth completes, we *don't* subscribe automatically — that's the
   // user's next explicit action. We just close the modal and refresh so the
-  // page rerenders in its signed-in state (one-click subscribe ready).
+  // page rerenders in its signed-in state (one-click subscribe ready). The
+  // post-signup onboarding modal is mounted globally in the root layout and
+  // gated on the DB flag, so it pops automatically here too.
   function onAuthSuccess() {
     setAuthOpen(false);
     router.refresh();

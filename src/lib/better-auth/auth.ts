@@ -1,6 +1,5 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { oneTap } from "better-auth/plugins";
 import { cookies } from "next/headers";
 import { after } from "next/server";
 import { prisma } from "@/lib/db/prisma";
@@ -138,6 +137,7 @@ export const auth = betterAuth({
       phone: { type: "string", required: false, input: true },
       role: { type: "string", required: false, input: false, defaultValue: "USER" },
       locale: { type: "string", required: false, input: false, defaultValue: "en" },
+      onboardingCompleted: { type: "boolean", required: false, input: false, defaultValue: false },
     },
   },
   databaseHooks: {
@@ -205,5 +205,4 @@ export const auth = betterAuth({
   baseURL,
   secret: getRequiredEnv("BETTER_AUTH_SECRET"),
   trustedOrigins: [baseURL],
-  plugins: [oneTap()],
 });
