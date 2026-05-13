@@ -11,7 +11,6 @@ export function buildAthleteShareLink(
 ): string {
   const base = process.env.NEXT_PUBLIC_BASE_URL ?? "https://halocollective.co";
   const url = new URL(`/${athleteSlug}`, base);
-  url.searchParams.set("utm_source", platform);
-  url.searchParams.set("utm_campaign", athleteSlug);
+  url.searchParams.set("halo_utm_source", platform);
   return url.toString();
 }

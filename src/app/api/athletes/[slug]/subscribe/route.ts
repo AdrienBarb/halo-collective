@@ -36,7 +36,6 @@ export async function POST(req: NextRequest, ctx: Context) {
       userId: session.user.id,
       athleteSlug: slug,
       partnerOffersConsent: validated.partnerOffersConsent,
-      source: validated.source,
       profilePatch: {
         firstName: validated.firstName,
         lastName: validated.lastName,

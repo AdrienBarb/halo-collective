@@ -147,18 +147,39 @@ export default function AuthForm({
   async function onGoogle() {
     if (googleLoading) return;
     setGoogleLoading(true);
+    const callbackURL =
+      redirectAfter ??
+      (typeof window !== "undefined" ? window.location.pathname : "/");
+
+    async function redirectFallback() {
+      try {
+        await authClient.signIn.social({ provider: "google", callbackURL });
+      } catch (redirectError) {
+        console.error("Google redirect fallback failed:", redirectError);
+        toast.error(t("couldNotStartGoogle"));
+        setGoogleLoading(false);
+      }
+    }
+
     try {
-      const callbackURL =
-        redirectAfter ??
-        (typeof window !== "undefined" ? window.location.pathname : "/");
-      await authClient.signIn.social({
-        provider: "google",
-        callbackURL,
+      await authClient.oneTap({
+        fetchOptions: {
+          onSuccess: async () => {
+            await syncLocaleFromUser();
+            onSuccess();
+          },
+          onError: (ctx) => {
+            console.error("One Tap onError:", ctx?.error);
+            void redirectFallback();
+          },
+        },
+        onPromptNotification: () => {
+          void redirectFallback();
+        },
       });
     } catch (error) {
-      console.error("Google sign in failed:", error);
-      toast.error(t("couldNotStartGoogle"));
-      setGoogleLoading(false);
+      console.error("One Tap threw, falling back:", error);
+      await redirectFallback();
     }
   }
 

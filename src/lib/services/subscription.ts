@@ -16,7 +16,6 @@ interface CreateSubscriptionArgs {
   userId: string;
   athleteSlug: string;
   partnerOffersConsent: boolean;
-  source?: string;
   profilePatch?: ProfilePatch;
 }
 
@@ -28,8 +27,7 @@ interface CreateSubscriptionResult {
 export async function createSubscription(
   args: CreateSubscriptionArgs,
 ): Promise<CreateSubscriptionResult> {
-  const { userId, athleteSlug, partnerOffersConsent, source, profilePatch } =
-    args;
+  const { userId, athleteSlug, partnerOffersConsent, profilePatch } = args;
 
   const athlete = await getAthleteBySlug(athleteSlug);
   if (!athlete) {
@@ -99,7 +97,6 @@ export async function createSubscription(
       data: {
         userId,
         athleteId: athlete.id,
-        source,
         partnerOffersConsent,
         brevoContactId: String(brevoContactId),
       },
