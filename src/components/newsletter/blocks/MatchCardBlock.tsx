@@ -5,6 +5,7 @@ import {
   type NewsletterLocale,
 } from "@/lib/newsletter/labels";
 import { parseYouTubeId } from "@/lib/newsletter/youtube";
+import YouTubeEmbed from "@/components/newsletter/blocks/YouTubeEmbed";
 import { DEFAULT_LOCALE, isLocale } from "@/i18n/locales";
 
 interface MatchCardBlockProps {
@@ -26,8 +27,8 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
     ? rawLocale
     : DEFAULT_LOCALE;
   const labels = getNewsletterLabels(locale);
-  const isYouTube = parseYouTubeId(match.highlightUrl) !== null;
-  const highlightsLabel = isYouTube
+  const youtubeId = parseYouTubeId(match.highlightUrl);
+  const highlightsLabel = youtubeId
     ? labels.ctas.watchOnYoutube
     : labels.ctas.highlights;
 
@@ -79,7 +80,11 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
         </p>
       ) : null}
 
-      {match.highlightUrl ? (
+      {youtubeId ? (
+        <div className="mt-4">
+          <YouTubeEmbed videoId={youtubeId} label={highlightsLabel} />
+        </div>
+      ) : match.highlightUrl ? (
         <div className="mt-4">
           <a
             href={match.highlightUrl}
