@@ -44,10 +44,13 @@ When building features, ask: *does this help an agent close a sponsorship, or he
 npm run dev            # Start dev server
 npm run build          # Production build
 npm run lint           # ESLint
-npm run db:generate    # Generate Prisma client
-npm run db:push        # Push schema directly (dev mode — no migration files)
-npm run db:studio      # Open Prisma Studio
-npm run email:dev      # Preview email templates
+npm run db:generate         # Generate Prisma client
+npm run db:migrate          # Create + apply a new migration in dev (prisma migrate dev)
+npm run db:migrate:deploy   # Apply pending migrations (used by Vercel build)
+npm run db:reset            # Drop DB, re-apply all migrations, run seed (dev only)
+npm run db:seed             # Run the seed script
+npm run db:studio           # Open Prisma Studio
+npm run email:dev           # Preview email templates
 ```
 
 ## Project Structure
@@ -248,6 +251,8 @@ STRIPE_WEBHOOK_SECRET=
 
 - Schema lives at `src/lib/db/schema.prisma` and **does not** declare `url`/`directUrl` — those come from `prisma.config.ts`.
 - Connection runs through the **`@prisma/adapter-pg`** driver adapter (Prisma 7 requirement).
+- Migrations live in `src/lib/db/migrations/` and are the **source of truth** for the schema. Never use `prisma db push` against any environment — always create a migration with `npm run db:migrate -- --name <change>` and commit the generated SQL.
+- Vercel build runs `prisma migrate deploy` before `next build` (see `vercel-build` in `package.json`) — pending migrations are applied automatically on every deploy.
 - Seed script: `tsx src/lib/db/seed.ts`, declared in `prisma.config.ts`.
 
 ## Configuration
