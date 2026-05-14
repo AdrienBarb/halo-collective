@@ -175,6 +175,7 @@ model NewsletterSection {
   newsletterId String
   order        Int
   type         SectionType
+  eyebrow      String?
   title        String?
   blocks       Json
   createdAt    DateTime    @default(now())

@@ -20,7 +20,12 @@ interface PreviewPayload {
   athleteId: string;
   newsletterId?: string;
   header: Record<string, unknown>;
-  sections: Array<{ type: string; blocks: unknown }>;
+  sections: Array<{
+    type: string;
+    eyebrow: string | null;
+    title: string | null;
+    blocks: unknown;
+  }>;
   stashedAt: number;
 }
 

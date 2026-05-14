@@ -52,6 +52,7 @@ export const draftPayloadSchema = z.object({
       // Reuse the persisted-write schema so preview/test-send and publish
       // normalise titles identically — the toRenderInput invariant says
       // the preview MUST match what Brevo would send.
+      eyebrow: optionalSectionTitle,
       title: optionalSectionTitle,
       blocks: z.unknown(),
     }),
@@ -111,6 +112,7 @@ export async function buildDraftPreview(
     newsletterId,
     order: i,
     type: s.type as SectionTypeValue,
+    eyebrow: s.eyebrow ?? null,
     title: s.title ?? null,
     blocks: s.blocks as NewsletterSection["blocks"],
     createdAt: now,
@@ -158,6 +160,7 @@ export async function buildDraftPreview(
     id: s.id,
     type: s.type as SectionTypeValue,
     order: s.order,
+    eyebrow: s.eyebrow,
     title: s.title,
     blocks: s.blocks,
   }));

@@ -22,6 +22,7 @@ export interface ImportWarning {
 }
 
 export interface ParsedNewsletterSection {
+  eyebrow: string | null;
   title: string | null;
   blocks: unknown[];
 }
@@ -432,12 +433,14 @@ function buildSections(
     const raw = incoming[type];
     let blocks: unknown[] = [];
     let titleRaw: unknown = undefined;
+    let eyebrowRaw: unknown = undefined;
     if (raw && typeof raw === "object" && !Array.isArray(raw)) {
       const wrapper = raw as Record<string, unknown>;
       if (Array.isArray(wrapper.blocks)) {
         blocks = wrapper.blocks;
       }
       titleRaw = wrapper.title;
+      eyebrowRaw = wrapper.eyebrow;
     } else if (Array.isArray(raw)) {
       blocks = raw;
     }
@@ -449,10 +452,19 @@ function buildSections(
     if (titleRaw != null && titleRaw !== "" && !titleParsed.success) {
       warnings.push({
         section: type,
+        reason: "Custom subtitle dropped (failed validation, e.g., > 120 chars or line break).",
+      });
+    }
+    const eyebrowParsed = optionalSectionTitle.safeParse(eyebrowRaw);
+    const eyebrow = eyebrowParsed.success ? eyebrowParsed.data : null;
+    if (eyebrowRaw != null && eyebrowRaw !== "" && !eyebrowParsed.success) {
+      warnings.push({
+        section: type,
         reason: "Custom title dropped (failed validation, e.g., > 120 chars or line break).",
       });
     }
     map[type] = {
+      eyebrow,
       title,
       blocks: sanitizeSectionBlocks(type, blocks, warnings),
     };

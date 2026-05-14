@@ -26,6 +26,7 @@ export interface EmailRawSection {
   id: string;
   type: SectionTypeValue;
   order: number;
+  eyebrow: string | null;
   title: string | null;
   blocks: unknown;
 }
@@ -94,7 +95,8 @@ export default function SectionRenderer({
   if (body === null) return null;
 
   const labels = getNewsletterLabels();
-  const eyebrow = labels.sections[section.type].eyebrow;
+  const eyebrow =
+    section.eyebrow?.trim() || labels.sections[section.type].eyebrow;
   const number = (index + 1).toString().padStart(2, "0");
   // Explicit string|null annotation — same reasoning as the web renderer.
   const title: string | null =

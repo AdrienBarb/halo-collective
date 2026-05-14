@@ -45,7 +45,7 @@ export const optionalSectionTitle = z
     message: `Must be ${LABEL} characters or fewer`,
   })
   .refine((v) => v == null || /^[^\r\n\t]+$/.test(v), {
-    message: "Title cannot contain line breaks or tabs",
+    message: "Cannot contain line breaks or tabs",
   });
 
 const cappedMediaUrl = mediaUrl.max(URL_MAX);
@@ -533,6 +533,7 @@ export function isSectionMeaningful(
 
 export const addSectionSchema = z.object({
   type: sectionTypeSchema,
+  eyebrow: optionalSectionTitle,
   title: optionalSectionTitle,
   blocks: z.unknown(),
   order: z.number().int().nonnegative().optional(),

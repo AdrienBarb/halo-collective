@@ -90,6 +90,7 @@ function logPrismaUniqueViolation(
 interface SectionRowInput {
   type: SectionTypeValue;
   order: number;
+  eyebrow: string | null;
   title: string | null;
   blocks: Prisma.InputJsonValue;
 }
@@ -105,6 +106,7 @@ function buildSectionRows(
   sections: Array<{
     type: SectionTypeValue;
     blocks: unknown;
+    eyebrow?: string | null;
     title?: string | null;
   }>,
   mode: EditionModeValue,
@@ -112,6 +114,7 @@ function buildSectionRows(
   return sections.map((s, index) => ({
     type: s.type,
     order: index,
+    eyebrow: s.eyebrow ?? null,
     title: s.title ?? null,
     // .parse() output (including Zod defaults) is what we persist —
     // keeps stored JSON canonical with the schema.
@@ -426,10 +429,12 @@ export async function cloneFromPreviousEdition(athleteId: string) {
         // writes — falls back to null on any failure so a legacy or
         // out-of-band-written row can't propagate a malformed title
         // into a fresh edition.
+        const eyebrowParsed = optionalSectionTitle.safeParse(s.eyebrow);
         const titleParsed = optionalSectionTitle.safeParse(s.title);
         sectionsToCreate.push({
           type: s.type as SectionTypeValue,
           order: nextOrder++,
+          eyebrow: eyebrowParsed.success ? eyebrowParsed.data : null,
           title: titleParsed.success ? titleParsed.data : null,
           blocks: blocks as Prisma.InputJsonValue,
         });
@@ -601,6 +606,7 @@ export interface NewsletterEmailRenderInput {
     id: string;
     type: SectionTypeValue;
     order: number;
+    eyebrow: string | null;
     title: string | null;
     blocks: unknown;
   }>;
@@ -722,6 +728,7 @@ async function renderNewsletterEmail(
     id: s.id,
     type: s.type as SectionTypeValue,
     order: s.order,
+    eyebrow: s.eyebrow,
     title: s.title,
     blocks: s.blocks,
   }));

@@ -57,7 +57,7 @@ import {
   parseNewsletterImport,
   type ParsedNewsletterImport,
 } from "@/lib/newsletter/importJson";
-import { getSectionTitle } from "@/lib/newsletter/labels";
+import { getNewsletterLabels, getSectionTitle } from "@/lib/newsletter/labels";
 import { DEFAULT_LOCALE } from "@/i18n/locales";
 import { CLAUDE_BRIEF_PROJECT_SYSTEM_PROMPT } from "@/lib/newsletter/claudeBriefPrompt";
 import {
@@ -136,6 +136,7 @@ function buildSectionBlocksMap(
 }
 
 type SectionTitlesMap = Record<SectionTypeValue, string>;
+type SectionEyebrowsMap = Record<SectionTypeValue, string>;
 
 function buildSectionTitlesMap(
   initial: NewsletterSection[] | undefined,
@@ -148,6 +149,21 @@ function buildSectionTitlesMap(
   const map = {} as SectionTitlesMap;
   for (const type of SECTION_ORDER) {
     map[type] = byType.get(type)?.title ?? "";
+  }
+  return map;
+}
+
+function buildSectionEyebrowsMap(
+  initial: NewsletterSection[] | undefined,
+): SectionEyebrowsMap {
+  const byType = new Map<SectionTypeValue, NewsletterSection>();
+  for (const s of initial ?? []) {
+    const t = s.type as SectionTypeValue;
+    if (!byType.has(t)) byType.set(t, s);
+  }
+  const map = {} as SectionEyebrowsMap;
+  for (const type of SECTION_ORDER) {
+    map[type] = byType.get(type)?.eyebrow ?? "";
   }
   return map;
 }
@@ -191,6 +207,9 @@ export default function NewsletterForm({
   const [sectionTitles, setSectionTitles] = useState<SectionTitlesMap>(() =>
     buildSectionTitlesMap(initialData?.sections),
   );
+  const [sectionEyebrows, setSectionEyebrows] = useState<SectionEyebrowsMap>(() =>
+    buildSectionEyebrowsMap(initialData?.sections),
+  );
 
   const editionMode = (useWatch({
     control: form.control,
@@ -207,12 +226,15 @@ export default function NewsletterForm({
     form.reset(parsed.header);
     const nextSections = {} as SectionBlocksMap;
     const nextTitles = {} as SectionTitlesMap;
+    const nextEyebrows = {} as SectionEyebrowsMap;
     for (const type of SECTION_ORDER) {
       nextSections[type] = parsed.sections[type].blocks;
       nextTitles[type] = parsed.sections[type].title ?? "";
+      nextEyebrows[type] = parsed.sections[type].eyebrow ?? "";
     }
     setSections(nextSections);
     setSectionTitles(nextTitles);
+    setSectionEyebrows(nextEyebrows);
     setImportError(null);
     const blockCount = Object.values(nextSections).reduce(
       (sum, blocks) => sum + blocks.length,
@@ -354,6 +376,7 @@ export default function NewsletterForm({
       });
       setSections(buildSectionBlocksMap(data.sections));
       setSectionTitles(buildSectionTitlesMap(data.sections));
+      setSectionEyebrows(buildSectionEyebrowsMap(data.sections));
       router.refresh();
     },
     onError: (error: Error & { response?: { data?: { error?: string } } }) => {
@@ -413,9 +436,15 @@ export default function NewsletterForm({
   // sees what publish will actually render.
   const buildSectionPayloads = (
     blocksOverrides?: Partial<Record<SectionTypeValue, unknown[]>>,
-  ): Array<{ type: SectionTypeValue; title: string | null; blocks: unknown[] }> =>
+  ): Array<{
+    type: SectionTypeValue;
+    eyebrow: string | null;
+    title: string | null;
+    blocks: unknown[];
+  }> =>
     SECTION_ORDER.map((type) => ({
       type,
+      eyebrow: sectionEyebrows[type]?.trim() || null,
       title: sectionTitles[type]?.trim() || null,
       blocks: blocksOverrides?.[type] ?? sections[type] ?? [],
     }));
@@ -1049,6 +1078,8 @@ export default function NewsletterForm({
               // a future titleTemplate interpolates `{tournament}`.
               const placeholder =
                 getSectionTitle(type, null, DEFAULT_LOCALE) ?? "";
+              const eyebrowPlaceholder =
+                getNewsletterLabels(DEFAULT_LOCALE).sections[type].eyebrow;
               return (
                 <SectionCard
                   key={type}
@@ -1056,6 +1087,11 @@ export default function NewsletterForm({
                   number={number}
                   name={SECTION_LABELS[type]}
                   description={SECTION_DESCRIPTIONS[type]}
+                  eyebrow={sectionEyebrows[type]}
+                  eyebrowPlaceholder={eyebrowPlaceholder}
+                  onEyebrowChange={(value) =>
+                    setSectionEyebrows((prev) => ({ ...prev, [type]: value }))
+                  }
                   title={sectionTitles[type]}
                   titlePlaceholder={placeholder}
                   onTitleChange={(value) =>

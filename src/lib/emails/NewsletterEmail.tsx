@@ -160,6 +160,7 @@ const samplePreviewSections: EmailRawSection[] = [
     id: "preview-athlete-review",
     type: "ATHLETE_REVIEW" satisfies SectionTypeValue,
     order: 0,
+    eyebrow: null,
     title: null,
     blocks: [
       {
@@ -173,6 +174,7 @@ const samplePreviewSections: EmailRawSection[] = [
     id: "preview-week-recap",
     type: "WEEK_RECAP" satisfies SectionTypeValue,
     order: 1,
+    eyebrow: null,
     title: null,
     blocks: [
       { kind: "hero_metric", value: "1-1", label: "W/L" },
@@ -195,6 +197,8 @@ const samplePreviewSections: EmailRawSection[] = [
     id: "preview-coming-up",
     type: "COMING_UP" satisfies SectionTypeValue,
     order: 2,
+    // Custom eyebrow + default title — exercises independent override.
+    eyebrow: "Next stop",
     title: null,
     blocks: [
       {
@@ -213,7 +217,8 @@ const samplePreviewSections: EmailRawSection[] = [
     id: "preview-monetisation",
     type: "MONETISATION" satisfies SectionTypeValue,
     order: 3,
-    // Non-null title exercises the override path in email:dev preview.
+    // Non-null eyebrow + title exercise the override path in email:dev preview.
+    eyebrow: "My current picks",
     title: "What I'm playing with",
     blocks: [
       {
@@ -230,7 +235,8 @@ const samplePreviewSections: EmailRawSection[] = [
     id: "preview-fan-engagement",
     type: "FAN_ENGAGEMENT" satisfies SectionTypeValue,
     order: 4,
-    // Null title exercises the fallback to the static "Your turn" label.
+    // Null eyebrow + title exercise the fallback to the static labels.
+    eyebrow: null,
     title: null,
     blocks: [
       {

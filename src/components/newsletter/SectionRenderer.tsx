@@ -27,6 +27,7 @@ export interface RawSection {
   id: string;
   type: SectionTypeValue;
   order: number;
+  eyebrow: string | null;
   title: string | null;
   blocks: unknown;
 }
@@ -131,7 +132,8 @@ export default function SectionRenderer({
     ? rawLocale
     : DEFAULT_LOCALE;
   const labels = getNewsletterLabels(locale);
-  const eyebrow = labels.sections[section.type].eyebrow;
+  const eyebrow =
+    section.eyebrow?.trim() || labels.sections[section.type].eyebrow;
   const number = (index + 1).toString().padStart(2, "0");
   // Explicit string|null annotation: the `{title ? ...}` guard below
   // depends on this being nullable — locks the contract even if
