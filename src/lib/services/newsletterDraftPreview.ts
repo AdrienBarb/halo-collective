@@ -10,6 +10,7 @@ import {
   renderNewsletterPreviewEmail,
   toRenderInput,
 } from "@/lib/services/newsletter";
+import { renderNewsletterPreviewEmailMjml } from "@/lib/services/newsletterMjml";
 import { getAthleteBySlug } from "@/lib/services/athlete";
 import {
   editionModeSchema,
@@ -22,6 +23,7 @@ import { toSlug } from "@/lib/newsletter/slug";
 export const draftPayloadSchema = z.object({
   athleteId: z.string().min(1),
   newsletterId: z.string().optional(),
+  engine: z.enum(["react-email", "mjml"]).optional().default("react-email"),
   header: z.object({
     title: z.string().optional(),
     emailSubject: z.string().optional().nullable(),
@@ -154,7 +156,10 @@ export async function buildDraftPreview(
     order: s.order,
     blocks: s.blocks,
   }));
-  const emailHtml = await renderNewsletterPreviewEmail(athlete, input);
+  const emailHtml =
+    parsed.engine === "mjml"
+      ? await renderNewsletterPreviewEmailMjml(athlete, input)
+      : await renderNewsletterPreviewEmail(athlete, input);
 
   return { athleteRow, athlete, newsletter, emailHtml, title };
 }

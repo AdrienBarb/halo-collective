@@ -573,10 +573,13 @@ function safeUrl(url: string | null | undefined): string {
   return /^https?:\/\//i.test(url) ? url : "#";
 }
 
-async function renderEmailHtml(
+// Shared between the React Email render path and the MJML preview path
+// (src/lib/services/newsletterMjml.ts) — keeps shell/identity message
+// keys + URL building in lockstep so the two engines can't drift.
+export async function buildNewsletterEmailProps(
   athlete: AthleteForEmail,
   input: NewsletterEmailRenderInput,
-): Promise<string> {
+) {
   const editionUrl = buildEditionUrl(athlete.slug, input.slug);
   const askQuestionUrl = buildAskQuestionUrl(athlete.slug);
   const athleteName = `${athlete.firstName} ${athlete.lastName}`;
@@ -587,46 +590,52 @@ async function renderEmailHtml(
   const editionLabel = t("editionLabel", {
     n: input.editionNumber.toString().padStart(2, "0"),
   });
-  return render(
-    NewsletterEmail({
-      title: input.title,
-      heroImageUrl: safeUrl(input.heroImageUrl),
-      editionMode: input.editionMode,
-      athleteName,
-      editionUrl,
-      askQuestionUrl,
-      editionNumber: input.editionNumber,
-      editionDate: input.editionDate,
-      countryName: athlete.countryName,
-      // Per-edition snapshot wins when present, falls back to athlete profile.
-      worldRank: input.worldRankSnapshot ?? athlete.worldRank,
-      titlesCount: athlete.titlesCount,
-      sponsors: athlete.sponsors,
-      tournamentName: input.tournamentName,
-      tournamentLogoUrl: safeUrl(input.tournamentLogoUrl),
-      tournamentCategory: input.tournamentCategory,
-      tournamentLocation: input.tournamentLocation,
-      tournamentSurface: input.tournamentSurface,
-      tournamentStartDate: input.tournamentStartDate,
-      tournamentEndDate: input.tournamentEndDate,
-      sections: input.sections,
-      locale,
-      messages: {
-        shell: {
-          editionLabel,
-          footerNote: t("footerNote", { athleteName }),
-          unsubscribe: t("unsubscribe"),
-          viewInBrowser: t("viewInBrowser"),
-        },
-        identity: {
-          worldAtp: t("worldAtp"),
-          careerTitles: t("careerTitles"),
-          myPartners: t("myPartners"),
-          member: t("member"),
-        },
+  return {
+    title: input.title,
+    heroImageUrl: safeUrl(input.heroImageUrl),
+    editionMode: input.editionMode,
+    athleteName,
+    editionUrl,
+    askQuestionUrl,
+    editionNumber: input.editionNumber,
+    editionDate: input.editionDate,
+    countryName: athlete.countryName,
+    // Per-edition snapshot wins when present, falls back to athlete profile.
+    worldRank: input.worldRankSnapshot ?? athlete.worldRank,
+    titlesCount: athlete.titlesCount,
+    sponsors: athlete.sponsors,
+    tournamentName: input.tournamentName,
+    tournamentLogoUrl: safeUrl(input.tournamentLogoUrl),
+    tournamentCategory: input.tournamentCategory,
+    tournamentLocation: input.tournamentLocation,
+    tournamentSurface: input.tournamentSurface,
+    tournamentStartDate: input.tournamentStartDate,
+    tournamentEndDate: input.tournamentEndDate,
+    sections: input.sections,
+    locale,
+    messages: {
+      shell: {
+        editionLabel,
+        footerNote: t("footerNote", { athleteName }),
+        unsubscribe: t("unsubscribe"),
+        viewInBrowser: t("viewInBrowser"),
       },
-    }),
-  );
+      identity: {
+        worldAtp: t("worldAtp"),
+        careerTitles: t("careerTitles"),
+        myPartners: t("myPartners"),
+        member: t("member"),
+      },
+    },
+  } as const;
+}
+
+async function renderEmailHtml(
+  athlete: AthleteForEmail,
+  input: NewsletterEmailRenderInput,
+): Promise<string> {
+  const props = await buildNewsletterEmailProps(athlete, input);
+  return render(NewsletterEmail(props));
 }
 
 /**
@@ -677,6 +686,11 @@ export async function renderNewsletterPreviewEmail(
 ): Promise<string> {
   return renderEmailHtml(athlete, input);
 }
+
+// MJML render path lives in src/lib/services/newsletterMjml.ts to keep
+// mjml-core (~3MB: html-minifier, juice, parsers) out of newsletter.ts's
+// transitive imports. See the EBADF incident: top-level mjml imports here
+// broke the publish-path /api/admin/newsletters/test-send build.
 
 async function claimForSending(
   id: string,

@@ -8,8 +8,11 @@ import {
 } from "@/lib/services/newsletterDraftPreview";
 import { sendTransactionalEmail } from "@/lib/brevo/transactional";
 
+// Force the react-email engine for test sends — the MJML engine is a POC
+// (preview-only) and hasn't been audited for parity with the publish path.
 const testSendSchema = draftPayloadSchema.extend({
   testEmail: z.string().email(),
+  engine: z.literal("react-email").optional().default("react-email"),
 });
 
 const TEST_SUBJECT_PREFIX = "[TEST] ";
