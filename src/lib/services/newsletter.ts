@@ -315,18 +315,15 @@ export async function updateNewsletter(
   if (!existing) {
     throw new NotFoundError("Newsletter not found");
   }
-  // A previous bug allowed admins to edit while a publish was in flight,
-  // which wiped renderedHtml (see updateNewsletter's `renderedHtml: null`
-  // below) and stranded the SENDING row with no archive. Lock edits while
-  // SENDING; PUBLISHED is locked too so the archive stays canonical.
+  // Edits to a SENDING row would wipe `renderedHtml` mid-flight and
+  // strand the publish. Edits to a PUBLISHED row are FINE — the public
+  // web page renders from live section data, so the edit just updates
+  // the web version. The email already shipped is immutable on Brevo's
+  // side; no re-send happens (republish hits `republishWithoutResending`
+  // because `brevoCampaignId` is set).
   if (existing.status === NewsletterStatus.SENDING) {
     throw new ConflictError(
       "Newsletter is currently being sent — wait for it to complete before editing",
-    );
-  }
-  if (existing.status === NewsletterStatus.PUBLISHED) {
-    throw new ConflictError(
-      "Newsletter is published — unpublish first if you need to edit",
     );
   }
   const editionMode: EditionModeValue =
