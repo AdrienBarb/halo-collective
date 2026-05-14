@@ -90,14 +90,15 @@ The athlete's first-person debrief. Lead with a \`text\` block.
 - tournament_summary: { name, logoUrl, category, location, surface, dateRange }
 - hero_metric: { value: <"Final" | "QF" | "4-1">, label: <"Result" | "W / L"> }   # 2–4 of these
 - match_card:
+    format: <singles | doubles>   # default singles. Mark doubles matches explicitly so they group separately in the recap.
     result: <W | L | BYE | EXEMPT>
     roundName: <"Round 1" | "Round of 16" | "Quarterfinal" | "Semifinal" | "Final">
-    opponentName: <"B. Shelton">
+    opponentName: <"B. Shelton" for singles, "Medvedev / Tien" for doubles>
     opponentCountry: <3-letter code, e.g., "USA">
     opponentRank: <"#6">
     score: <"6-4 7-5">
     date: <"14 April" or ISO>
-    contextNote: <short context>
+    contextNote: <short context, e.g., "with V. Vacherot" for doubles>
     commentary: <1–2 sentence post-match line in athlete voice>
     highlightUrl: <https>
 - media_link: { source: <"ATP Tour">, headline, url: <https>, ctaLabel: <"Read" | "See"> }
@@ -179,6 +180,7 @@ Drive replies. A \`poll\` is the default if nothing else fits.
 - **Dates**: prefer \`YYYY-MM-DD\`. Keep relative dates ("this Sunday") only inside human-readable \`body\`/\`commentary\` fields.
 - **Scores**: copy exactly (\`6-4 7-5\`). Don't reorder sets.
 - **Rounds**: normalise to one of \`Round 1\`, \`Round of 16\`, \`Quarterfinal\`, \`Semifinal\`, \`Final\`.
+- **Match format**: every \`match_card\` carries \`format: singles | doubles\`. Default to \`singles\`. Mark \`doubles\` whenever the source mentions a partner, a team-style opponent (\`Medvedev / Tien\`), or any "doubles" / "double" / "/ " cue. The renderer groups singles and doubles separately, so wrong tagging splits a singles match into the wrong section.
 - **Country codes**: 3-letter ISO (\`USA\`, \`FRA\`, \`ESP\`). Skip if source uses just a flag emoji.
 - **Quotes**: never wrap in \`"…"\` — the renderer adds them. Strip surrounding quotation marks.
 - **Voice**: first-person inside \`body\`/\`commentary\`/\`text\`. Third-person only in \`media_link\`, \`media_recap\`, press-sourced copy.
@@ -284,14 +286,15 @@ The athlete's first-person debrief. Lead with a \`text\` block.
 - tournament_summary: { name, logoUrl, category, location, surface, dateRange }
 - hero_metric: { value: <"Final" | "QF" | "4-1">, label: <"Result" | "W / L"> }   # 2–4 of these
 - match_card:
+    format: <singles | doubles>   # default singles. Mark doubles matches explicitly so they group separately in the recap.
     result: <W | L | BYE | EXEMPT>
     roundName: <"Round 1" | "Round of 16" | "Quarterfinal" | "Semifinal" | "Final">
-    opponentName: <"B. Shelton">
+    opponentName: <"B. Shelton" for singles, "Medvedev / Tien" for doubles>
     opponentCountry: <3-letter code, e.g., "USA">
     opponentRank: <"#6">
     score: <"6-4 7-5">
     date: <"14 April" or ISO>
-    contextNote: <short context>
+    contextNote: <short context, e.g., "with V. Vacherot" for doubles>
     commentary: <1–2 sentence post-match line in athlete voice>
     highlightUrl: <https>
 - media_link: { source: <"ATP Tour">, headline, url: <https>, ctaLabel: <"Read" | "See"> }
@@ -373,6 +376,7 @@ Drive replies. A \`poll\` is the default if nothing else fits.
 - **Dates**: prefer \`YYYY-MM-DD\`. Keep relative dates ("this Sunday") only inside human-readable \`body\`/\`commentary\` fields.
 - **Scores**: copy exactly (\`6-4 7-5\`). Don't reorder sets.
 - **Rounds**: normalise to one of \`Round 1\`, \`Round of 16\`, \`Quarterfinal\`, \`Semifinal\`, \`Final\`.
+- **Match format**: every \`match_card\` carries \`format: singles | doubles\`. Default to \`singles\`. Mark \`doubles\` whenever the source mentions a partner, a team-style opponent (\`Medvedev / Tien\`), or any "doubles" / "double" / "/ " cue. The renderer groups singles and doubles separately, so wrong tagging splits a singles match into the wrong section.
 - **Country codes**: 3-letter ISO (\`USA\`, \`FRA\`, \`ESP\`). Skip if source uses just a flag emoji.
 - **Quotes**: never wrap in \`"…"\` — the renderer adds them. Strip surrounding quotation marks.
 - **Voice**: first-person inside \`body\`/\`commentary\`/\`text\`. Third-person only in \`media_link\`, \`media_recap\`, press-sourced copy.

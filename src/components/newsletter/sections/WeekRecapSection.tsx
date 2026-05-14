@@ -25,18 +25,29 @@ interface WeekRecapSectionProps {
 // Group hero_metric blocks so they render side-by-side as a stat row,
 // matching the tournament-recap visual rhythm. Also group consecutive
 // media_link blocks so we can render them under a single "What they
-// wrote" header instead of leaving press rows headerless. Non-grouped
-// blocks render inline in their original order.
-const GROUPABLE_KINDS = new Set(["hero_metric", "media_link"]);
+// wrote" header instead of leaving press rows headerless, and group
+// match_card blocks by format so singles and doubles land under
+// separate "Simples" / "Doubles" headers when both are present.
+const GROUPABLE_KINDS = new Set(["hero_metric", "media_link", "match_card"]);
 
-function groupRuns<T extends { kind: string }>(blocks: T[]): T[][] {
-  const groups: T[][] = [];
+const MATCH_FORMAT_LABELS: Record<"singles" | "doubles", string> = {
+  singles: "Simples",
+  doubles: "Doubles",
+};
+
+function groupKeyOf(block: WeekRecapBlock): string {
+  if (block.kind === "match_card") return `match_card:${block.format}`;
+  return block.kind;
+}
+
+function groupRuns(blocks: WeekRecapBlock[]): WeekRecapBlock[][] {
+  const groups: WeekRecapBlock[][] = [];
   for (const block of blocks) {
     const last = groups[groups.length - 1];
     if (
       last &&
       GROUPABLE_KINDS.has(block.kind) &&
-      last[0].kind === block.kind
+      groupKeyOf(last[0]) === groupKeyOf(block)
     ) {
       last.push(block);
     } else {
@@ -51,7 +62,7 @@ function renderBlock(block: WeekRecapBlock, key: number): React.ReactNode {
     case "tournament_summary":
       return <TournamentSummaryBlock key={key} summary={block} />;
     case "match_card":
-      return <MatchCardBlock key={key} match={block} />;
+      return null; // handled by grouping
     case "media_link":
       return (
         <div key={key}>
@@ -79,6 +90,10 @@ function renderBlock(block: WeekRecapBlock, key: number): React.ReactNode {
 
 export default function WeekRecapSection({ blocks }: WeekRecapSectionProps) {
   const groups = groupRuns(blocks);
+  const matchFormatsPresent = new Set(
+    blocks.flatMap((b) => (b.kind === "match_card" ? [b.format] : [])),
+  );
+  const showMatchFormatHeaders = matchFormatsPresent.size > 1;
   return (
     <div className="space-y-5">
       {groups.map((group, gi) => {
@@ -107,6 +122,26 @@ export default function WeekRecapSection({ blocks }: WeekRecapSectionProps) {
                   />
                 ))}
               </div>
+            </div>
+          );
+        }
+        if (group[0].kind === "match_card") {
+          const head = group[0] as Extract<WeekRecapBlock, { kind: "match_card" }>;
+          return (
+            <div key={gi} className="space-y-1">
+              {showMatchFormatHeaders && (
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                  {MATCH_FORMAT_LABELS[head.format]}
+                </p>
+              )}
+              {group.map((match, mi) => (
+                <MatchCardBlock
+                  key={mi}
+                  match={
+                    match as Extract<WeekRecapBlock, { kind: "match_card" }>
+                  }
+                />
+              ))}
             </div>
           );
         }

@@ -180,6 +180,7 @@ const samplePreviewSections: EmailRawSection[] = [
       { kind: "hero_metric", value: "12", label: "Aces" },
       {
         kind: "match_card",
+        format: "singles",
         result: "W",
         roundName: "Round 1",
         opponentName: "J. Doe",

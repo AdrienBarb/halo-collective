@@ -321,6 +321,7 @@ const newsletters: NewsletterSeed[] = [
           { kind: "hero_metric", value: "4-1", label: "V / D" },
           {
             kind: "match_card",
+            format: "singles",
             result: "EXEMPT",
             roundName: "Simple · 1er Tour",
             date: "4 Mars",
@@ -328,6 +329,7 @@ const newsletters: NewsletterSeed[] = [
           },
           {
             kind: "match_card",
+            format: "singles",
             result: "W",
             roundName: "Simple · 2e Tour",
             opponentName: "J.M. Cerundolo",
@@ -338,6 +340,7 @@ const newsletters: NewsletterSeed[] = [
           },
           {
             kind: "match_card",
+            format: "singles",
             result: "L",
             roundName: "Simple · 3e Tour",
             opponentName: "C. Alcaraz",
@@ -352,6 +355,7 @@ const newsletters: NewsletterSeed[] = [
           },
           {
             kind: "match_card",
+            format: "doubles",
             result: "W",
             roundName: "Double · 1er Tour",
             opponentName: "Medvedev / Tien",
@@ -363,6 +367,7 @@ const newsletters: NewsletterSeed[] = [
           },
           {
             kind: "match_card",
+            format: "doubles",
             result: "W",
             roundName: "Double · 2e Tour",
             opponentName: "Djokovic / Tsitsipas",
@@ -374,6 +379,7 @@ const newsletters: NewsletterSeed[] = [
           },
           {
             kind: "match_card",
+            format: "doubles",
             result: "W",
             roundName: "Double · Quart de finale",
             opponentName: "Khachanov / Rublev",
@@ -383,6 +389,7 @@ const newsletters: NewsletterSeed[] = [
           },
           {
             kind: "match_card",
+            format: "doubles",
             result: "W",
             roundName: "Double · Demi-finale",
             opponentName: "Goransson / Bhambri",
@@ -394,6 +401,7 @@ const newsletters: NewsletterSeed[] = [
           },
           {
             kind: "match_card",
+            format: "doubles",
             result: "L",
             roundName: "Double · Finale 🥈",
             opponentName: "Andreozzi / Guinard",
@@ -603,6 +611,7 @@ const newsletters: NewsletterSeed[] = [
           { kind: "hero_metric", value: "0-1", label: "V / D" },
           {
             kind: "match_card",
+            format: "singles",
             result: "EXEMPT",
             roundName: "1er Tour",
             date: "19 Mars",
@@ -610,6 +619,7 @@ const newsletters: NewsletterSeed[] = [
           },
           {
             kind: "match_card",
+            format: "singles",
             result: "L",
             roundName: "2e Tour",
             opponentName: "T. Atmane",

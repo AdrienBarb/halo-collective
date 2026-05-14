@@ -74,6 +74,7 @@ export function emptyWeekRecapBlock(
     case "match_card":
       return {
         kind: "match_card",
+        format: "singles",
         result: "W",
         roundName: "",
         opponentName: undefined,

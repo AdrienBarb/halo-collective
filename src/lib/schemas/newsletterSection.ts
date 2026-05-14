@@ -167,6 +167,9 @@ const heroMetricBlockSchema = z.object({
 
 const matchCardBlockSchema = z.object({
   kind: z.literal("match_card"),
+  // .default lets old persisted blocks (pre-format) parse as "singles"
+  // so no DB migration is needed — Zod backfills on read.
+  format: z.enum(["singles", "doubles"]).default("singles"),
   result: z.enum(["W", "L", "BYE", "EXEMPT"]),
   roundName: shortText(),
   opponentName: optionalTrimmedString,

@@ -122,6 +122,11 @@ const heroMetric = z
 const matchCard = z
   .object({
     kind: z.literal("match_card"),
+    format: z
+      .enum(["singles", "doubles"])
+      .describe(
+        "Match format: 'singles' (1v1) or 'doubles' (2v2). Required on every match_card. Use 'singles' when in doubt (the source rarely says 'singles' explicitly). Use 'doubles' whenever the source mentions a partner, a '/' in the opponent name (e.g. 'Medvedev / Tien'), or any explicit doubles cue. Used to group matches under separate 'Simples' / 'Doubles' headers in the recap.",
+      ),
     result: z.enum(["W", "L", "BYE", "EXEMPT"]).describe("Match outcome."),
     roundName: z
       .string()

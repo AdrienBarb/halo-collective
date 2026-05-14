@@ -67,6 +67,11 @@ const MATCH_RESULTS: Array<{ value: MatchCardBlock["result"]; label: string }> =
   { value: "EXEMPT", label: "Exempt" },
 ];
 
+const MATCH_FORMATS: Array<{ value: MatchCardBlock["format"]; label: string }> = [
+  { value: "singles", label: "Singles" },
+  { value: "doubles", label: "Doubles" },
+];
+
 export default function WeekRecapFields({
   blocks,
   editionMode,
@@ -164,7 +169,22 @@ function renderBlockEditor(
     case "match_card":
       return (
         <div className="space-y-3">
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            <Field label="Format">
+              <select
+                value={block.format}
+                onChange={(e) =>
+                  set({ ...block, format: e.target.value as MatchCardBlock["format"] })
+                }
+                className="w-full rounded-xs border border-line bg-cream px-3 py-2 text-sm text-ink"
+              >
+                {MATCH_FORMATS.map((f) => (
+                  <option key={f.value} value={f.value}>
+                    {f.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
             <Field label="Result">
               <select
                 value={block.result}
