@@ -78,7 +78,24 @@ const mediaBlock = z.discriminatedUnion("kind", [
 
 const optionalMedia = mediaBlock.optional();
 
-const athleteReviewBlock = mediaBlock;
+// Pull-quote primitive — used by ATHLETE_REVIEW and WEEK_RECAP (weekly).
+const quote = z
+  .object({
+    kind: z.literal("quote"),
+    text: z.string().describe("Quote text, without surrounding quotation marks."),
+    attribution: looseString.describe(
+      "Optional context label shown above the quote (e.g., 'After the match vs Alcaraz').",
+    ),
+  })
+  .describe("A pull quote.");
+
+const athleteReviewBlock = z.discriminatedUnion("kind", [
+  textMedia,
+  imageMedia,
+  audioMedia,
+  videoMedia,
+  quote,
+]);
 
 // ── WEEK_RECAP block kinds (tournament family) ────────────────────────
 
@@ -189,14 +206,6 @@ const throwback = z
     media: optionalMedia,
   })
   .describe("WEEKLY mode.");
-
-const quote = z
-  .object({
-    kind: z.literal("quote"),
-    text: z.string().describe("Quote text, without surrounding quotation marks."),
-    attribution: looseString.describe("Omit if the athlete is speaking."),
-  })
-  .describe("WEEKLY mode. A pull quote.");
 
 // Single flat discriminated union over ALL week-recap kinds — the
 // importer drops blocks that don't match the active editionMode and

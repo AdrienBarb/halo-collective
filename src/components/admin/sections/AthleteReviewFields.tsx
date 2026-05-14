@@ -1,12 +1,13 @@
 "use client";
 
-import type {
-  AthleteReviewBlock,
-  MediaBlock,
-} from "@/lib/schemas/newsletterSection";
+import type { AthleteReviewBlock } from "@/lib/schemas/newsletterSection";
 import BlockList from "@/components/admin/sections/BlockList";
 import BlockPicker from "@/components/admin/sections/BlockPicker";
 import MediaBlockInput from "@/components/admin/sections/MediaBlockInput";
+import {
+  TextareaField,
+  TextField,
+} from "@/components/admin/sections/FormAtoms";
 import { emptyAthleteReviewBlock } from "@/components/admin/sections/blockDefaults";
 
 interface AthleteReviewFieldsProps {
@@ -14,22 +15,26 @@ interface AthleteReviewFieldsProps {
   onChange: (next: AthleteReviewBlock[]) => void;
 }
 
-const KIND_LABELS: Record<MediaBlock["kind"], string> = {
+type Kind = AthleteReviewBlock["kind"];
+
+const KIND_LABELS: Record<Kind, string> = {
   text: "Text",
   image: "Image",
   audio: "Voice note",
   video: "Video",
+  quote: "Quote",
 };
 
-const OPTIONS = (Object.keys(KIND_LABELS) as Array<MediaBlock["kind"]>).map(
-  (kind) => ({ kind, label: KIND_LABELS[kind] }),
-);
+const OPTIONS = (Object.keys(KIND_LABELS) as Kind[]).map((kind) => ({
+  kind,
+  label: KIND_LABELS[kind],
+}));
 
 export default function AthleteReviewFields({
   blocks,
   onChange,
 }: AthleteReviewFieldsProps) {
-  function handleAdd(kind: MediaBlock["kind"]) {
+  function handleAdd(kind: Kind) {
     onChange([...blocks, emptyAthleteReviewBlock(kind)]);
   }
 
@@ -40,16 +45,38 @@ export default function AthleteReviewFields({
         items={blocks}
         onChange={onChange}
         kindLabel={(b) => KIND_LABELS[b.kind]}
-        renderItem={(block, set) => (
-          <MediaBlockInput
-            value={block}
-            onChange={(next) => {
-              if (next) set(next as AthleteReviewBlock);
-            }}
-            required
-            label="Content"
-          />
-        )}
+        renderItem={(block, set) => {
+          if (block.kind === "quote") {
+            return (
+              <div className="space-y-3">
+                <TextField
+                  label="Context (optional)"
+                  placeholder="After the match vs Alcaraz"
+                  help="Shown as an uppercase label above the quote."
+                  value={block.attribution ?? ""}
+                  onChange={(v) => set({ ...block, attribution: v || undefined })}
+                />
+                <TextareaField
+                  label="Quote"
+                  placeholder="The line you want pulled out."
+                  rows={5}
+                  value={block.text}
+                  onChange={(v) => set({ ...block, text: v })}
+                />
+              </div>
+            );
+          }
+          return (
+            <MediaBlockInput
+              value={block}
+              onChange={(next) => {
+                if (next) set(next);
+              }}
+              required
+              label="Content"
+            />
+          );
+        }}
       />
     </div>
   );

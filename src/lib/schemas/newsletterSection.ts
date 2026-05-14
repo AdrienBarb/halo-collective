@@ -110,9 +110,22 @@ export const mediaBlockSchema = z.discriminatedUnion("kind", [
 
 const optionalNestedMedia = mediaBlockSchema.optional();
 
+// Pull-quote primitive — used by ATHLETE_REVIEW and WEEK_RECAP (weekly).
+const quoteBlockSchema = z.object({
+  kind: z.literal("quote"),
+  text: bodyText(),
+  attribution: optionalTrimmedString,
+});
+
 // ── ATHLETE_REVIEW blocks ─────────────────────────────────────────────
 
-export const athleteReviewBlockSchema = mediaBlockSchema;
+export const athleteReviewBlockSchema = z.discriminatedUnion("kind", [
+  textMediaSchema,
+  imageMediaSchema,
+  audioMediaSchema,
+  videoMediaSchema,
+  quoteBlockSchema,
+]);
 
 // ── WEEK_RECAP — TOURNAMENT blocks ────────────────────────────────────
 
@@ -207,12 +220,6 @@ const throwbackBlockSchema = z.object({
   kind: z.literal("throwback"),
   body: bodyText(),
   media: optionalNestedMedia,
-});
-
-const quoteBlockSchema = z.object({
-  kind: z.literal("quote"),
-  text: bodyText(),
-  attribution: optionalTrimmedString,
 });
 
 export const weekRecapWeeklyBlockSchema = z.discriminatedUnion("kind", [

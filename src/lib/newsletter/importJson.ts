@@ -227,7 +227,18 @@ const SANITISERS: Record<string, Sanitiser> = {
     return block;
   },
   stats_update: (block) => block,
-  quote: (block) => block,
+  quote(block) {
+    // Drop unsalvageable quotes (empty text) so the rest of the section
+    // survives. Normalise attribution: the loose schema permits `null`,
+    // the strict schema demands `string | undefined`.
+    const text = asString(block.text);
+    if (!text) return undefined;
+    block.text = text;
+    const attribution = asString(block.attribution);
+    if (attribution) block.attribution = attribution;
+    else delete block.attribution;
+    return block;
+  },
 
   // COMING_UP
   schedule_item: (block) => block,
@@ -307,8 +318,12 @@ function sanitizeBlock(
     return undefined;
   }
 
-  // ATHLETE_REVIEW + media kinds inside COMING_UP are plain MediaBlocks.
-  if (type === "ATHLETE_REVIEW" || MEDIA_KINDS.has(kind)) {
+  // Media kinds (text/image/audio/video) appear at top level in
+  // ATHLETE_REVIEW and COMING_UP — route through the dedicated media
+  // sanitiser. Non-media ATHLETE_REVIEW kinds (e.g. `quote`) fall
+  // through to the SANITISERS registry below, which centralises warning
+  // emission and id-bearing safety checks.
+  if (MEDIA_KINDS.has(kind)) {
     const cleaned = sanitizeMediaBlock(block);
     if (!cleaned) {
       warnings.push({ section: type, kind, reason: "Media block was unsalvageable" });

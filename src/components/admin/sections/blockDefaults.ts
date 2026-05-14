@@ -40,7 +40,15 @@ export function emptyMediaBlock(kind: MediaBlock["kind"]): MediaBlock {
 export function emptyAthleteReviewBlock(
   kind: AthleteReviewBlock["kind"],
 ): AthleteReviewBlock {
-  return emptyMediaBlock(kind);
+  switch (kind) {
+    case "text":
+    case "image":
+    case "audio":
+    case "video":
+      return emptyMediaBlock(kind);
+    case "quote":
+      return { kind: "quote", text: "", attribution: undefined };
+  }
 }
 
 export type WeekRecapBlockKind =

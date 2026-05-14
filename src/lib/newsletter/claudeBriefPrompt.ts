@@ -70,6 +70,7 @@ The athlete's first-person debrief. Lead with a \`text\` block.
 - image: { url: <https>, alt: <short alt text or "" if decorative> }
 - audio: { url: <https>, title: <"My Munich debrief">, location: <"Post-final · Munich">, durationLabel: <"1 min 30"> }
 - video: { url: <https>, thumbnailUrl: <https> }
+- quote: { text: <quote, no surrounding quotation marks>, attribution: <short uppercase context like "After the match vs Alcaraz"; omit if no context> }
 
 ## Section: WEEK_RECAP
 
