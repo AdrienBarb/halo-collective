@@ -57,6 +57,7 @@ import {
   parseNewsletterImport,
   type ParsedNewsletterImport,
 } from "@/lib/newsletter/importJson";
+import { CLAUDE_BRIEF_PROMPT } from "@/lib/newsletter/claudeBriefPrompt";
 import {
   Dialog,
   DialogContent,
@@ -70,6 +71,7 @@ import {
   NEWSLETTER_PREVIEW_STORAGE_KEY,
 } from "@/lib/newsletter/preview";
 import { cn } from "@/lib/utils";
+import { useSession } from "@/lib/better-auth/auth-client";
 
 type NewsletterWithSections = Newsletter & {
   sections: NewsletterSection[];
@@ -272,6 +274,15 @@ export default function NewsletterForm({
     generate.mutate({ input: raw });
   }
 
+  async function handleCopyClaudePrompt() {
+    try {
+      await navigator.clipboard.writeText(CLAUDE_BRIEF_PROMPT);
+      toast.success("Claude prompt copied — paste it into a new Claude.ai chat");
+    } catch {
+      toast.error("Could not copy the prompt");
+    }
+  }
+
   // Warn before navigating away with unsaved edits — section blocks live
   // outside react-hook-form, so isDirty alone isn't sufficient.
   const isDirty = form.formState.isDirty;
@@ -323,6 +334,50 @@ export default function NewsletterForm({
   });
 
   const isPending = create.isPending || update.isPending;
+
+  const { data: sessionData } = useSession();
+  const [testDialogOpen, setTestDialogOpen] = useState(false);
+  const [testEmail, setTestEmail] = useState("");
+
+  function handleOpenTestDialog() {
+    if (!testEmail && sessionData?.user.email) {
+      setTestEmail(sessionData.user.email);
+    }
+    setTestDialogOpen(true);
+  }
+
+  const testSend = usePost("/admin/newsletters/test-send", {
+    onSuccess: () => {
+      toast.success("Test email sent");
+      setTestDialogOpen(false);
+    },
+    onError: (error: Error & { response?: { data?: { error?: string } } }) => {
+      toast.error(error.response?.data?.error ?? "Failed to send test email");
+    },
+  });
+
+  function handleSendTest() {
+    const athleteId = isEdit ? initialData?.athleteId : selectedAthleteId;
+    if (!athleteId) {
+      toast.error("Pick an athlete first");
+      return;
+    }
+    const trimmed = testEmail.trim();
+    if (!trimmed) {
+      toast.error("Enter an email address");
+      return;
+    }
+    testSend.mutate({
+      athleteId,
+      newsletterId: isEdit ? initialData?.id : undefined,
+      header: form.getValues(),
+      sections: SECTION_ORDER.map((type) => ({
+        type,
+        blocks: sections[type] ?? [],
+      })),
+      testEmail: trimmed,
+    });
+  }
 
   function setSectionBlocks(type: SectionTypeValue, blocks: unknown[]) {
     setSections((prev) => ({ ...prev, [type]: blocks }));
@@ -464,7 +519,15 @@ export default function NewsletterForm({
                     placeholder="Paste anything — past newsletter HTML, a written brief, a voice transcript, post-match notes…"
                     className="h-48 w-full resize-y rounded-sm border border-line bg-cream px-3 py-2 font-mono text-[12px] leading-relaxed text-ink-1 placeholder:text-ink-3 focus:outline-none focus:ring-1 focus:ring-accent-gold"
                   />
-                  <div className="flex flex-wrap items-center justify-end gap-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleCopyClaudePrompt}
+                      title="Copy the prompt to paste into a new Claude.ai chat. Claude will turn your raw material into a brief you can paste back here."
+                    >
+                      Copy Claude prompt
+                    </Button>
                     <Button
                       type="button"
                       onClick={handleGenerate}
@@ -1009,6 +1072,14 @@ export default function NewsletterForm({
               >
                 Preview
               </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleOpenTestDialog}
+                disabled={!canPreview}
+              >
+                Send test
+              </Button>
               <Button type="submit" disabled={isPending}>
                 {submitLabel}
               </Button>
@@ -1054,6 +1125,48 @@ export default function NewsletterForm({
               }}
             >
               Replace
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={testDialogOpen} onOpenChange={setTestDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Send test email</DialogTitle>
+            <DialogDescription>
+              Sends the current draft to one address via Brevo so you can
+              preview it the way fans will see it. Subject is prefixed with
+              [TEST].
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <label className="text-sm" htmlFor="test-email-input">
+              Recipient email
+            </label>
+            <Input
+              id="test-email-input"
+              type="email"
+              value={testEmail}
+              onChange={(e) => setTestEmail(e.target.value)}
+              placeholder="you@example.com"
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setTestDialogOpen(false)}
+              disabled={testSend.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleSendTest}
+              disabled={testSend.isPending}
+            >
+              {testSend.isPending ? "Sending…" : "Send"}
             </Button>
           </DialogFooter>
         </DialogContent>
