@@ -193,7 +193,9 @@
       "partnersLabel": "Partners",
       "followSocial": "Follow {athleteFirstName} on socials",
       "unsubscribeLabel": "Unsubscribe",
-      "footerNote": "You're receiving this because you subscribed to {athleteName}'s newsletter on Halo Collective. You can unsubscribe at any time."
+      "footerNote": "You're receiving this because you subscribed to {athleteName}'s newsletter on Halo Collective. You can unsubscribe at any time.",
+      "previousEditionsLabel": "Previous editions",
+      "editionLabel": "Edition"
     },
     "Newsletter": {
       "editionLabel": "Edition #{n}",

@@ -27,6 +27,13 @@ export interface WelcomeSponsor {
   websiteUrl: string;
 }
 
+export interface WelcomeRecentEdition {
+  title: string;
+  editionNumber: number;
+  formattedDate?: string;
+  url: string;
+}
+
 export interface WelcomeMessages {
   preview: string;
   fallbackBody: string;
@@ -34,6 +41,8 @@ export interface WelcomeMessages {
   followSocial: string;
   unsubscribeLabel: string;
   footerNote: string;
+  previousEditionsLabel: string;
+  editionLabel: string;
 }
 
 interface WelcomeEmailProps {
@@ -43,6 +52,7 @@ interface WelcomeEmailProps {
   welcomeMessage?: string;
   sponsors?: WelcomeSponsor[];
   socialLinks?: WelcomeSocialLinks;
+  recentEditions?: WelcomeRecentEdition[];
   unsubscribeUrl?: string;
   messages: WelcomeMessages;
 }
@@ -241,6 +251,112 @@ function BodyCard({
   );
 }
 
+function RecentEditionsSection({
+  editions,
+  label,
+  editionLabel,
+}: {
+  editions: WelcomeRecentEdition[];
+  label: string;
+  editionLabel: string;
+}) {
+  return (
+    <Section
+      style={{
+        backgroundColor: CARD_BG,
+        padding: "8px 32px 28px",
+      }}
+    >
+      <Text
+        style={{
+          ...EYEBROW_LABEL,
+          marginBottom: 8,
+          fontSize: 10,
+          letterSpacing: "0.22em",
+        }}
+      >
+        {label}
+      </Text>
+      {editions.map((edition) => {
+        const meta = edition.formattedDate
+          ? `${editionLabel} #${edition.editionNumber} · ${edition.formattedDate}`
+          : `${editionLabel} #${edition.editionNumber}`;
+        return (
+          <Link
+            key={edition.url}
+            href={edition.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ textDecoration: "none", display: "block" }}
+          >
+            <table
+              role="presentation"
+              cellPadding={0}
+              cellSpacing={0}
+              border={0}
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                borderTop: `1px solid ${HAIRLINE}`,
+              }}
+            >
+              <tbody>
+                <tr>
+                  <td style={{ verticalAlign: "middle", padding: "14px 0" }}>
+                    <Text
+                      style={{
+                        margin: 0,
+                        color: palette.textMuted,
+                        fontFamily: fonts.mono,
+                        fontSize: 10,
+                        letterSpacing: "0.14em",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {meta}
+                    </Text>
+                    <Text
+                      style={{
+                        margin: "4px 0 0",
+                        color: palette.textPrimary,
+                        fontFamily: fonts.serif,
+                        fontSize: 16,
+                        lineHeight: 1.35,
+                      }}
+                    >
+                      {edition.title}
+                    </Text>
+                  </td>
+                  <td
+                    style={{
+                      width: 1,
+                      verticalAlign: "middle",
+                      paddingLeft: 12,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        margin: 0,
+                        color: palette.accent,
+                        fontFamily: fonts.mono,
+                        fontSize: 14,
+                        fontWeight: 700,
+                      }}
+                    >
+                      →
+                    </Text>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </Link>
+        );
+      })}
+    </Section>
+  );
+}
+
 function SocialRow({
   socials,
   label,
@@ -370,6 +486,7 @@ export const WelcomeEmail = ({
   welcomeMessage,
   sponsors,
   socialLinks,
+  recentEditions,
   unsubscribeUrl,
   messages,
 }: WelcomeEmailProps) => {
@@ -383,6 +500,7 @@ export const WelcomeEmail = ({
   });
 
   const sponsorList = sponsors ?? [];
+  const editionList = recentEditions ?? [];
   const unsubscribeHref = unsubscribeUrl || profileUrl;
 
   return (
@@ -424,6 +542,14 @@ export const WelcomeEmail = ({
             paragraphs={paragraphs}
             signatureName={athleteFirstName}
           />
+
+          {editionList.length > 0 ? (
+            <RecentEditionsSection
+              editions={editionList}
+              label={messages.previousEditionsLabel}
+              editionLabel={messages.editionLabel}
+            />
+          ) : null}
 
           {socials.length > 0 ? (
             <SocialRow socials={socials} label={messages.followSocial} />
@@ -474,6 +600,26 @@ WelcomeEmail.PreviewProps = {
     instagram: "https://www.instagram.com/arthurrinder",
     x: "https://x.com/arthurrinder",
   },
+  recentEditions: [
+    {
+      title: "Monte Carlo Comeback",
+      editionNumber: 5,
+      formattedDate: "Apr 12, 2026",
+      url: "https://halocollective.co/arthur-rinderknech?edition=monte-carlo-comeback",
+    },
+    {
+      title: "Indian Wells: behind the scenes",
+      editionNumber: 4,
+      formattedDate: "Mar 22, 2026",
+      url: "https://halocollective.co/arthur-rinderknech?edition=indian-wells-behind-the-scenes",
+    },
+    {
+      title: "Pre-season: the work nobody sees",
+      editionNumber: 3,
+      formattedDate: "Feb 14, 2026",
+      url: "https://halocollective.co/arthur-rinderknech?edition=pre-season-the-work-nobody-sees",
+    },
+  ],
   messages: {
     preview: "You're in. Welcome to Arthur's circle.",
     fallbackBody:
@@ -483,6 +629,8 @@ WelcomeEmail.PreviewProps = {
     unsubscribeLabel: "Unsubscribe",
     footerNote:
       "You're receiving this because you subscribed to Arthur Rinderknech's newsletter on Halo Collective.",
+    previousEditionsLabel: "Previous editions",
+    editionLabel: "Edition",
   },
 } satisfies WelcomeEmailProps;
 

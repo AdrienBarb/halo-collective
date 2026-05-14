@@ -169,6 +169,28 @@ export const listPublishedByAthleteId = cache(async (athleteId: string) => {
   });
 });
 
+export async function listRecentPublishedEditionsByAthleteId(
+  athleteId: string,
+  limit: number,
+) {
+  return prisma.newsletter.findMany({
+    where: {
+      athleteId,
+      status: NewsletterStatus.PUBLISHED,
+      publishedAt: { not: null },
+    },
+    orderBy: { editionNumber: "desc" },
+    take: limit,
+    select: {
+      slug: true,
+      title: true,
+      editionNumber: true,
+      editionDate: true,
+      publishedAt: true,
+    },
+  });
+}
+
 export const getPublishedNewsletterBySlugs = cache(
   async (athleteSlug: string, editionSlug: string) => {
     return prisma.newsletter.findFirst({

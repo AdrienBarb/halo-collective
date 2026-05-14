@@ -193,7 +193,9 @@
       "partnersLabel": "Partenaires",
       "followSocial": "Retrouvez {athleteFirstName} sur les réseaux",
       "unsubscribeLabel": "Se désabonner",
-      "footerNote": "Vous recevez cet e-mail parce que vous vous êtes abonné·e à la newsletter de {athleteName} sur Halo Collective. Vous pouvez vous désabonner à tout moment."
+      "footerNote": "Vous recevez cet e-mail parce que vous vous êtes abonné·e à la newsletter de {athleteName} sur Halo Collective. Vous pouvez vous désabonner à tout moment.",
+      "previousEditionsLabel": "Éditions précédentes",
+      "editionLabel": "Édition"
     },
     "Newsletter": {
       "editionLabel": "Édition n°{n}",
