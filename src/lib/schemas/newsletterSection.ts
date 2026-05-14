@@ -28,6 +28,26 @@ const promptText = (min = 1) =>
 const labelText = (min = 1) =>
   z.string().trim().min(min).max(LABEL, `Must be ${LABEL} characters or fewer`);
 
+// Optional per-section custom title. Trimmed; empty → null so renderers
+// can fall back to the static default from `lib/newsletter/labels.ts`.
+// Same line-break/tab rejection as the newsletter title because this
+// string also lands in HTML email headers where stray CRs would corrupt
+// downstream Brevo headers if ever surfaced there.
+export const optionalSectionTitle = z
+  .union([z.string(), z.null(), z.undefined()])
+  .optional()
+  .transform((v) => {
+    if (v == null) return null;
+    const trimmed = v.trim();
+    return trimmed === "" ? null : trimmed;
+  })
+  .refine((v) => v == null || v.length <= LABEL, {
+    message: `Must be ${LABEL} characters or fewer`,
+  })
+  .refine((v) => v == null || /^[^\r\n\t]+$/.test(v), {
+    message: "Title cannot contain line breaks or tabs",
+  });
+
 const cappedMediaUrl = mediaUrl.max(URL_MAX);
 const cappedOptionalMediaUrl = optionalMediaUrl;
 const cappedSafeUrl = safeUrl.max(URL_MAX);
@@ -490,6 +510,7 @@ export function isSectionMeaningful(
 
 export const addSectionSchema = z.object({
   type: sectionTypeSchema,
+  title: optionalSectionTitle,
   blocks: z.unknown(),
   order: z.number().int().nonnegative().optional(),
 });

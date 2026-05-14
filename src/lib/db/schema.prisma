@@ -175,6 +175,7 @@ model NewsletterSection {
   newsletterId String
   order        Int
   type         SectionType
+  title        String?
   blocks       Json
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt

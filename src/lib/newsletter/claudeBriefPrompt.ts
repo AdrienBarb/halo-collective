@@ -63,6 +63,8 @@ Output exactly this skeleton, in order. Omit any line or section with no source 
 ## Section: ATHLETE_REVIEW
 The athlete's first-person debrief. Lead with a \`text\` block.
 
+- title: <optional custom section header in athlete's voice, ≤ 120 chars, e.g., "Three matches, one lesson". Omit to use the default "My week".>
+
 - text: |
     <paragraph in athlete's voice>
 - text: |
@@ -73,6 +75,8 @@ The athlete's first-person debrief. Lead with a \`text\` block.
 - quote: { text: <quote, no surrounding quotation marks>, attribution: <short uppercase context like "After the match vs Alcaraz"; omit if no context> }
 
 ## Section: WEEK_RECAP
+
+- title: <optional custom section header, ≤ 120 chars, e.g., "Monte Carlo, by the numbers". Omit to use the default "What happened this week".>
 
 ### If editionMode = TOURNAMENT — use ONLY these kinds:
 - tournament_summary: { name, logoUrl, category, location, surface, dateRange }
@@ -106,6 +110,9 @@ The athlete's first-person debrief. Lead with a \`text\` block.
 - quote: { text: <quote, no surrounding quotation marks>, attribution: <omit if athlete speaking> }
 
 ## Section: COMING_UP
+
+- title: <optional custom section header, ≤ 120 chars, e.g., "Next stop: Barcelona". Omit to use the default "What's coming next".>
+
 What's next. Mix any of:
 - text: <paragraph>
 - image | audio | video: <same shape as ATHLETE_REVIEW>
@@ -113,6 +120,9 @@ What's next. Mix any of:
 - cta: { label: <"Watch the preview">, url: <https> }
 
 ## Section: MONETISATION
+
+- title: <optional custom section header, ≤ 120 chars, e.g., "Gear I trust on clay". Omit to use the default "What I'm into right now".>
+
 Each block needs a \`cta: { label, url }\`. Use the right kind:
 - kit: { title, body, price: <"$129">, media?, cta }
 - partner_content: { title, body, partnerName: <"On Running">, media?, cta }
@@ -125,6 +135,9 @@ Each block needs a \`cta: { label, url }\`. Use the right kind:
 Omit this section entirely if the source has no commerce/sponsor hooks.
 
 ## Section: FAN_ENGAGEMENT
+
+- title: <optional custom section header, ≤ 120 chars, e.g., "Your call this week". Omit to use the default "Your turn".>
+
 Drive replies. A \`poll\` is the default if nothing else fits.
 - poll:
     question: <athlete's voice, e.g., "Which final was tougher?">
@@ -163,6 +176,7 @@ Drive replies. A \`poll\` is the default if nothing else fits.
 - **Voice**: first-person inside \`body\`/\`commentary\`/\`text\`. Third-person only in \`media_link\`, \`media_recap\`, press-sourced copy.
 - **Length**: paragraphs ≤ 5000 chars; titles/labels ≤ 200 chars. If something runs long, split into multiple \`text\` blocks.
 - **No hallucinations**: if the source says "I lost in the QF" but doesn't name the opponent, emit a \`match_card\` with \`result: L\`, \`roundName: Quarterfinal\`, and **omit** \`opponentName\` rather than guessing.
+- **Section titles**: each section has an optional \`title:\` (≤ 120 chars, no line breaks). Only emit one when the source carries a clear week-specific headline (e.g., the athlete writes "Three matches, one lesson"). Omit otherwise so the default label is used.
 
 # SAFETY
 

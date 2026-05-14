@@ -50,6 +50,7 @@ function toRawSection(section: NewsletterSection): RawSection {
     id: section.id,
     type: section.type as SectionTypeValue,
     order: section.order,
+    title: section.title,
     blocks: section.blocks,
   };
 }

@@ -10,7 +10,10 @@ import type {
   EditionModeValue,
   SectionTypeValue,
 } from "@/lib/schemas/newsletterSection";
-import { validateSectionBlocks } from "@/lib/schemas/newsletterSection";
+import {
+  optionalSectionTitle,
+  validateSectionBlocks,
+} from "@/lib/schemas/newsletterSection";
 import {
   BadRequestError,
   ConflictError,
@@ -80,6 +83,7 @@ function logPrismaUniqueViolation(
 interface SectionRowInput {
   type: SectionTypeValue;
   order: number;
+  title: string | null;
   blocks: Prisma.InputJsonValue;
 }
 
@@ -91,12 +95,17 @@ interface SectionRowInput {
  * is centralised here.
  */
 function buildSectionRows(
-  sections: Array<{ type: SectionTypeValue; blocks: unknown }>,
+  sections: Array<{
+    type: SectionTypeValue;
+    blocks: unknown;
+    title?: string | null;
+  }>,
   mode: EditionModeValue,
 ): SectionRowInput[] {
   return sections.map((s, index) => ({
     type: s.type,
     order: index,
+    title: s.title ?? null,
     // .parse() output (including Zod defaults) is what we persist —
     // keeps stored JSON canonical with the schema.
     blocks: validateSectionBlocks(s.type, mode, s.blocks) as Prisma.InputJsonValue,
@@ -148,7 +157,7 @@ export const listPublishedByAthleteId = cache(async (athleteId: string) => {
       status: NewsletterStatus.PUBLISHED,
       publishedAt: { not: null },
     },
-    orderBy: { publishedAt: { sort: "desc", nulls: "last" } },
+    orderBy: { editionNumber: "desc" },
     include: { sections: { orderBy: { order: "asc" } } },
   });
 });
@@ -373,9 +382,15 @@ export async function cloneFromPreviousEdition(athleteId: string) {
           editionMode,
           s.blocks,
         );
+        // Re-validate the title through the same chokepoint as new
+        // writes — falls back to null on any failure so a legacy or
+        // out-of-band-written row can't propagate a malformed title
+        // into a fresh edition.
+        const titleParsed = optionalSectionTitle.safeParse(s.title);
         sectionsToCreate.push({
           type: s.type as SectionTypeValue,
           order: nextOrder++,
+          title: titleParsed.success ? titleParsed.data : null,
           blocks: blocks as Prisma.InputJsonValue,
         });
       } catch (validationError) {
@@ -546,6 +561,7 @@ export interface NewsletterEmailRenderInput {
     id: string;
     type: SectionTypeValue;
     order: number;
+    title: string | null;
     blocks: unknown;
   }>;
 }
@@ -666,6 +682,7 @@ async function renderNewsletterEmail(
     id: s.id,
     type: s.type as SectionTypeValue,
     order: s.order,
+    title: s.title,
     blocks: s.blocks,
   }));
   return renderEmailHtml(newsletter.athlete, input);

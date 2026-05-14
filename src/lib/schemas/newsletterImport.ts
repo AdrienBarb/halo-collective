@@ -455,6 +455,9 @@ export const newsletterImportSchema = z.object({
     .object({
       ATHLETE_REVIEW: z
         .object({
+          title: looseString.describe(
+            "Optional custom section header (≤ 120 chars). Omit to use the default 'My week'.",
+          ),
           blocks: z
             .array(athleteReviewBlock)
             .describe("Athlete's first-person debrief. Lead with a `text` block."),
@@ -462,6 +465,9 @@ export const newsletterImportSchema = z.object({
         .optional(),
       WEEK_RECAP: z
         .object({
+          title: looseString.describe(
+            "Optional custom section header (≤ 120 chars). Omit to use the default 'What happened this week'.",
+          ),
           blocks: z
             .array(weekRecapBlock)
             .describe(
@@ -471,11 +477,17 @@ export const newsletterImportSchema = z.object({
         .optional(),
       COMING_UP: z
         .object({
+          title: looseString.describe(
+            "Optional custom section header (≤ 120 chars). Omit to use the default 'What's coming next'.",
+          ),
           blocks: z.array(comingUpBlock).describe("What's next: schedule items, previews, CTAs."),
         })
         .optional(),
       MONETISATION: z
         .object({
+          title: looseString.describe(
+            "Optional custom section header (≤ 120 chars). Omit to use the default 'What I'm into right now'.",
+          ),
           blocks: z
             .array(monetisationBlock)
             .describe("Commerce / sponsor / kit blocks. Omit if the source has no monetisation hooks."),
@@ -483,6 +495,9 @@ export const newsletterImportSchema = z.object({
         .optional(),
       FAN_ENGAGEMENT: z
         .object({
+          title: looseString.describe(
+            "Optional custom section header (≤ 120 chars). Omit to use the default 'Your turn'.",
+          ),
           blocks: z
             .array(fanEngagementBlock)
             .describe("Polls, quizzes, Q&A. A poll is a good default to drive replies."),

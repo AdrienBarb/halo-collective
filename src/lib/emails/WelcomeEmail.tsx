@@ -101,10 +101,10 @@ const FOOTER_LABEL: CSSProperties = {
 
 const BODY_PARAGRAPH: CSSProperties = {
   margin: 0,
-  marginBottom: 16,
+  marginBottom: 18,
   fontFamily: fonts.serif,
-  fontSize: 16,
-  lineHeight: 1.85,
+  fontSize: 18,
+  lineHeight: 1.75,
   color: palette.textBody,
   whiteSpace: "pre-line",
 };

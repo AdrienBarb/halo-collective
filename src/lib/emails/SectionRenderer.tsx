@@ -26,6 +26,7 @@ export interface EmailRawSection {
   id: string;
   type: SectionTypeValue;
   order: number;
+  title: string | null;
   blocks: unknown;
 }
 
@@ -95,7 +96,9 @@ export default function SectionRenderer({
   const labels = getNewsletterLabels();
   const eyebrow = labels.sections[section.type].eyebrow;
   const number = (index + 1).toString().padStart(2, "0");
-  const title = getSectionTitle(section.type, tournamentName);
+  // Explicit string|null annotation — same reasoning as the web renderer.
+  const title: string | null =
+    section.title?.trim() || getSectionTitle(section.type, tournamentName);
 
   return (
     <Section style={{ marginTop: 8 }}>
