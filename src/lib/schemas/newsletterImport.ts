@@ -323,6 +323,23 @@ const fanExperience = z
   })
   .describe("Fan event, meet-and-greet, or clinic.");
 
+const phaseItem = z.object({
+  label: z.string().describe("Left-column tag, e.g., 'PHASE 1', 'WEEK 1-2'."),
+  title: z.string().describe("Short headline for the phase."),
+  description: z.string().describe("1-2 sentences describing the phase."),
+});
+
+const phaseTimeline = z
+  .object({
+    kind: z.literal("phase_timeline"),
+    phases: z
+      .array(phaseItem)
+      .describe("Ordered phases (2-10) — recovery plan, season prep, programme steps."),
+  })
+  .describe(
+    "Standalone phase/programme timeline. No title/body/cta — the section title acts as the heading.",
+  );
+
 const monetisationBlock = z.discriminatedUnion("kind", [
   kit,
   partnerContent,
@@ -331,6 +348,7 @@ const monetisationBlock = z.discriminatedUnion("kind", [
   athleteProduct,
   donation,
   fanExperience,
+  phaseTimeline,
 ]);
 
 // ── FAN_ENGAGEMENT blocks ─────────────────────────────────────────────

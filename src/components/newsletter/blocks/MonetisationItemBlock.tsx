@@ -1,7 +1,11 @@
 import type { MonetisationBlock } from "@/lib/schemas/newsletterSection";
 
+// The list-row renderer handles commerce blocks only; phase_timeline is
+// rendered upstream via PhaseTimelineBlock (no title/cta to display here).
+type CommercialBlock = Exclude<MonetisationBlock, { kind: "phase_timeline" }>;
+
 interface MonetisationItemBlockProps {
-  block: MonetisationBlock;
+  block: CommercialBlock;
   /** 1-based row number shown as the "01 / 02" badge. */
   index: number;
 }

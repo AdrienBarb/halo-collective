@@ -87,6 +87,7 @@ const blockId = z.string().uuid({ message: "Block id must be a UUID" });
 const MAX_BLOCKS_PER_SECTION = 50;
 const MAX_OPTIONS_PER_BLOCK = 20;
 const MAX_LINKS_PER_BLOCK = 20;
+const MAX_PHASES_PER_BLOCK = 10;
 
 // ── Shared MediaBlock primitive ───────────────────────────────────────
 
@@ -334,6 +335,24 @@ const fanExperienceBlockSchema = z.object({
   ...monetisationBaseFields,
 });
 
+// A single phase inside a phase_timeline block. `label` is the left
+// column tag (e.g. "PHASE 1", "SEM. 1-2"); `title` is the short headline;
+// `description` is one or two sentences of detail.
+const phaseItemSchema = z.object({
+  label: shortText(),
+  title: shortText(),
+  description: bodyText(),
+});
+
+// Standalone visual block (no title/body/cta) that lists ordered phases
+// — used for recovery plans, season prep, multi-step programmes inside
+// the MONETISATION section.
+const phaseTimelineBlockSchema = z.object({
+  kind: z.literal("phase_timeline"),
+  id: blockId,
+  phases: z.array(phaseItemSchema).min(2).max(MAX_PHASES_PER_BLOCK),
+});
+
 export const monetisationBlockSchema = z.discriminatedUnion("kind", [
   kitBlockSchema,
   partnerContentBlockSchema,
@@ -342,6 +361,7 @@ export const monetisationBlockSchema = z.discriminatedUnion("kind", [
   athleteProductBlockSchema,
   donationBlockSchema,
   fanExperienceBlockSchema,
+  phaseTimelineBlockSchema,
 ]);
 
 // ── FAN_ENGAGEMENT blocks ─────────────────────────────────────────────
@@ -562,6 +582,8 @@ export type PaidContentBlock = z.output<typeof paidContentBlockSchema>;
 export type AthleteProductBlock = z.output<typeof athleteProductBlockSchema>;
 export type DonationBlock = z.output<typeof donationBlockSchema>;
 export type FanExperienceBlock = z.output<typeof fanExperienceBlockSchema>;
+export type PhaseItem = z.output<typeof phaseItemSchema>;
+export type PhaseTimelineBlock = z.output<typeof phaseTimelineBlockSchema>;
 export type MonetisationBlock = z.output<typeof monetisationBlockSchema>;
 
 export type PollBlock = z.output<typeof pollBlockSchema>;

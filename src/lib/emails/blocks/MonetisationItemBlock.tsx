@@ -6,11 +6,15 @@ import { palette, fonts } from "@/lib/emails/_brand/theme";
 import { EmailCtaButton, EmailParagraphs } from "@/lib/emails/_brand/atoms";
 import MediaBlock from "@/lib/emails/blocks/MediaBlock";
 
+// The email row renderer handles commerce blocks only; phase_timeline is
+// rendered upstream via PhaseTimelineBlock and never reaches this component.
+type CommercialBlock = Exclude<MonetisationBlock, { kind: "phase_timeline" }>;
+
 interface MonetisationItemBlockProps {
-  block: MonetisationBlock;
+  block: CommercialBlock;
 }
 
-function kindExtra(block: MonetisationBlock): string | null {
+function kindExtra(block: CommercialBlock): string | null {
   switch (block.kind) {
     case "kit":
     case "athlete_product":

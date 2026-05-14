@@ -251,7 +251,7 @@ const SANITISERS: Record<string, Sanitiser> = {
     return block;
   },
 
-  // MONETISATION (7 kinds, same anatomy)
+  // MONETISATION (7 commerce kinds, same anatomy)
   ...Object.fromEntries(
     [
       "kit",
@@ -271,6 +271,24 @@ const SANITISERS: Record<string, Sanitiser> = {
       },
     ]),
   ),
+  phase_timeline(block) {
+    if (!Array.isArray(block.phases)) return undefined;
+    const cleaned = block.phases
+      .map((p) => {
+        if (!p || typeof p !== "object" || Array.isArray(p)) return null;
+        const item = { ...(p as Record<string, unknown>) };
+        const label = asString(item.label);
+        const title = asString(item.title);
+        const description = asString(item.description);
+        if (!label || !title || !description) return null;
+        return { label, title, description };
+      })
+      .filter((p): p is { label: string; title: string; description: string } => p !== null);
+    if (cleaned.length === 0) return undefined;
+    block.phases = cleaned;
+    ensureBlockId(block);
+    return block;
+  },
 
   // FAN_ENGAGEMENT
   poll: (block) => (ensureBlockId(block), block),
