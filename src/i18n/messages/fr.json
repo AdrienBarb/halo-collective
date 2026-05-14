@@ -186,9 +186,8 @@
       "button": "Réinitialiser le mot de passe"
     },
     "Welcome": {
+      "subject": "Bienvenue dans mon cercle privé",
       "preview": "C'est confirmé. Bienvenue dans le cercle de {athleteFirstName}.",
-      "greetingHeading": "Bienvenue {fanFirstName} !",
-      "greetingHeadingFallback": "Bienvenue dans le cercle de {athleteFirstName}.",
       "fanFirstNameFallback": "toi",
       "fallbackBody": "Merci d'avoir rejoint le cercle. La prochaine édition arrivera ici dès que {athleteFirstName} la publiera — en attendant, le catalogue est disponible sur le profil.",
       "partnersLabel": "Partenaires",

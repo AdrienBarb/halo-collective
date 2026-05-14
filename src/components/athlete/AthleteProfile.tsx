@@ -367,8 +367,11 @@ function ProfileBio({ bio }: { bio: string }) {
 }
 
 function StatsRow({ athlete }: { athlete: Athlete }) {
+  const showTitles = athlete.titlesCount > 0;
   return (
-    <dl className="mt-6 grid grid-cols-3 border-y border-line">
+    <dl
+      className={`mt-6 grid border-y border-line ${showTitles ? "grid-cols-3" : "grid-cols-2"}`}
+    >
       <Stat
         value={athlete.worldRank !== null ? `#${athlete.worldRank}` : "—"}
         label={athlete.tour ? `${athlete.tour} World` : "World"}
@@ -378,9 +381,11 @@ function StatsRow({ athlete }: { athlete: Athlete }) {
           athlete.countryRank !== null ? `#${athlete.countryRank}` : "—"
         }
         label={athlete.countryCode}
-        withDividers
+        divider={showTitles ? "both" : "left"}
       />
-      <Stat value={athlete.titlesCount.toString()} label="Titles" />
+      {showTitles && (
+        <Stat value={athlete.titlesCount.toString()} label="Titles" />
+      )}
     </dl>
   );
 }
@@ -403,7 +408,7 @@ function SponsorsStrip({ sponsors }: { sponsors: Sponsor[] }) {
               href={s.websiteUrl}
               target="_blank"
               rel="sponsored nofollow noopener noreferrer"
-              className="group flex aspect-[5/3] w-[80px] items-center justify-center rounded-sm border border-line bg-cream p-2 transition-colors duration-200 hover:border-line-2 md:w-[140px] md:p-4"
+              className="group flex aspect-[5/3] w-[100px] items-center justify-center rounded-sm border border-line bg-cream p-2 transition-colors duration-200 hover:border-line-2 md:w-[170px] md:p-4"
               aria-label={s.name}
               title={s.name}
             >
@@ -435,15 +440,21 @@ function FrostedBadge({ children }: { children: React.ReactNode }) {
 function Stat({
   value,
   label,
-  withDividers,
+  divider,
 }: {
   value: string;
   label: string;
-  withDividers?: boolean;
+  divider?: "both" | "left";
 }) {
+  const dividerClass =
+    divider === "both"
+      ? "border-x border-line"
+      : divider === "left"
+        ? "border-l border-line"
+        : "";
   return (
     <div
-      className={`flex flex-col items-center px-2 py-5 ${withDividers ? "border-x border-line" : ""}`}
+      className={`flex flex-col items-center px-2 py-5 ${dividerClass}`}
     >
       <span className="font-serif text-[28px] font-semibold leading-none tracking-[-0.01em] text-ink md:text-[34px]">
         {value}

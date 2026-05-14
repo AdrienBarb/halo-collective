@@ -29,7 +29,6 @@ export interface WelcomeSponsor {
 
 export interface WelcomeMessages {
   preview: string;
-  greetingHeading: string;
   fallbackBody: string;
   partnersLabel: string;
   followSocial: string;
@@ -63,11 +62,27 @@ const SOCIAL_META: Array<{
   alt: string;
   icon: string;
 }> = [
-  { key: "instagram", alt: "Instagram", icon: `${SOCIAL_ICON_BASE}/instagram_32px.png` },
-  { key: "x", alt: "X / Twitter", icon: `${SOCIAL_ICON_BASE}/twitter_32px.png` },
+  {
+    key: "instagram",
+    alt: "Instagram",
+    icon: `${SOCIAL_ICON_BASE}/instagram_32px.png`,
+  },
+  {
+    key: "x",
+    alt: "X / Twitter",
+    icon: `${SOCIAL_ICON_BASE}/twitter_32px.png`,
+  },
   { key: "tiktok", alt: "TikTok", icon: `${SOCIAL_ICON_BASE}/tiktok_32px.png` },
-  { key: "facebook", alt: "Facebook", icon: `${SOCIAL_ICON_BASE}/facebook_32px.png` },
-  { key: "linkedin", alt: "LinkedIn", icon: `${SOCIAL_ICON_BASE}/linkedin_32px.png` },
+  {
+    key: "facebook",
+    alt: "Facebook",
+    icon: `${SOCIAL_ICON_BASE}/facebook_32px.png`,
+  },
+  {
+    key: "linkedin",
+    alt: "LinkedIn",
+    icon: `${SOCIAL_ICON_BASE}/linkedin_32px.png`,
+  },
 ];
 
 const EYEBROW_LABEL: CSSProperties = {
@@ -122,7 +137,13 @@ function CoverHero({ src, alt }: { src: string; alt: string }) {
   );
 }
 
-function SponsorsStrip({ sponsors, label }: { sponsors: WelcomeSponsor[]; label: string }) {
+function SponsorsStrip({
+  sponsors,
+  label,
+}: {
+  sponsors: WelcomeSponsor[];
+  label: string;
+}) {
   return (
     <Section
       style={{
@@ -199,37 +220,23 @@ function SponsorsStrip({ sponsors, label }: { sponsors: WelcomeSponsor[]; label:
 }
 
 function BodyCard({
-  heading,
   paragraphs,
   signatureName,
 }: {
-  heading: string;
   paragraphs: string[];
   signatureName: string;
 }) {
   return (
     <Section style={{ backgroundColor: CARD_BG, padding: "32px 32px 28px" }}>
-      <Text
-        style={{
-          margin: 0,
-          marginBottom: 20,
-          fontFamily: fonts.serif,
-          fontSize: 18,
-          fontWeight: 700,
-          lineHeight: 1.3,
-          color: palette.panelDark,
-        }}
-      >
-        {heading}
-      </Text>
-
       {paragraphs.map((p, i) => (
         <Text key={i} style={BODY_PARAGRAPH}>
           {p}
         </Text>
       ))}
 
-      <Text style={{ ...BODY_PARAGRAPH, marginTop: 4, marginBottom: 0 }}>— {signatureName}</Text>
+      <Text style={{ ...BODY_PARAGRAPH, marginTop: 4, marginBottom: 0 }}>
+        — {signatureName}
+      </Text>
     </Section>
   );
 }
@@ -238,7 +245,12 @@ function SocialRow({
   socials,
   label,
 }: {
-  socials: Array<{ key: keyof WelcomeSocialLinks; alt: string; icon: string; url: string }>;
+  socials: Array<{
+    key: keyof WelcomeSocialLinks;
+    alt: string;
+    icon: string;
+    url: string;
+  }>;
   label: string;
 }) {
   return (
@@ -249,7 +261,14 @@ function SocialRow({
         borderTop: `1px solid ${HAIRLINE}`,
       }}
     >
-      <Text style={{ ...FOOTER_LABEL, marginBottom: 12, fontSize: 10, letterSpacing: "0.18em" }}>
+      <Text
+        style={{
+          ...FOOTER_LABEL,
+          marginBottom: 12,
+          fontSize: 10,
+          letterSpacing: "0.18em",
+        }}
+      >
         {label}
       </Text>
       <table
@@ -390,14 +409,18 @@ export const WelcomeEmail = ({
             padding: 0,
           }}
         >
-          {coverImageUrl ? <CoverHero src={coverImageUrl} alt={athleteFirstName} /> : null}
+          {coverImageUrl ? (
+            <CoverHero src={coverImageUrl} alt={athleteFirstName} />
+          ) : null}
 
           {sponsorList.length > 0 ? (
-            <SponsorsStrip sponsors={sponsorList} label={messages.partnersLabel} />
+            <SponsorsStrip
+              sponsors={sponsorList}
+              label={messages.partnersLabel}
+            />
           ) : null}
 
           <BodyCard
-            heading={messages.greetingHeading}
             paragraphs={paragraphs}
             signatureName={athleteFirstName}
           />
@@ -453,7 +476,6 @@ WelcomeEmail.PreviewProps = {
   },
   messages: {
     preview: "You're in. Welcome to Arthur's circle.",
-    greetingHeading: "Welcome Adrien!",
     fallbackBody:
       "Thanks for stepping inside. The next edition will land here the moment I publish it — until then, the back catalogue lives on my profile.",
     partnersLabel: "Partners",

@@ -115,7 +115,7 @@ export async function sendWelcomeEmail(input: SendWelcomeEmailInput) {
     resendClient.emails.send({
       from: `"${athleteName.replace(/["\\]/g, "")}" <${getRequiredEnv("RESEND_FROM_EMAIL")}>`,
       to: email,
-      subject: t("preview", { athleteFirstName }),
+      subject: t("subject"),
       react: WelcomeEmail({
         profileUrl: `${baseUrl}/${athleteSlug}`,
         athleteFirstName,
@@ -125,9 +125,6 @@ export async function sendWelcomeEmail(input: SendWelcomeEmailInput) {
         socialLinks: normalizeSocialLinks(socialLinks),
         messages: {
           preview: t("preview", { athleteFirstName }),
-          greetingHeading: firstName
-            ? t("greetingHeading", { fanFirstName: firstName })
-            : t("greetingHeadingFallback", { athleteFirstName }),
           fallbackBody: t("fallbackBody", { athleteFirstName }),
           partnersLabel: t("partnersLabel"),
           followSocial: t("followSocial", { athleteFirstName }),
