@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -18,6 +19,8 @@ type SubscribeError = Error & {
 interface SubscribeButtonProps {
   athleteSlug: string;
   athleteFirstName: string;
+  athleteLastName?: string;
+  athleteAvatarUrl?: string | null;
   isSignedIn: boolean;
   isSubscribed: boolean;
   ipCountryCode: string | null;
@@ -26,6 +29,8 @@ interface SubscribeButtonProps {
 export default function SubscribeButton({
   athleteSlug,
   athleteFirstName,
+  athleteLastName,
+  athleteAvatarUrl,
   isSignedIn,
   isSubscribed,
   ipCountryCode,
@@ -87,7 +92,26 @@ export default function SubscribeButton({
   return (
     <section className="px-6 pt-10 pb-12 md:pt-12">
       <div className="overflow-hidden rounded-2xl border border-line bg-cream-2">
-        <div className="bg-ink px-6 py-6 text-center md:px-10 md:py-8">
+        <div className="bg-ink px-6 py-8 text-center md:px-10 md:py-10">
+          {athleteAvatarUrl !== undefined ? (
+            <div className="relative mx-auto mb-5 h-20 w-20 overflow-hidden rounded-full border-2 border-cream/20 bg-[linear-gradient(135deg,#5a6478_0%,#2c3340_100%)] md:h-24 md:w-24">
+              {athleteAvatarUrl ? (
+                <Image
+                  src={athleteAvatarUrl}
+                  alt=""
+                  fill
+                  sizes="96px"
+                  className="object-cover"
+                  unoptimized
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center font-serif text-2xl font-semibold text-cream">
+                  {(athleteFirstName[0] ?? "") +
+                    (athleteLastName?.[0] ?? "")}
+                </div>
+              )}
+            </div>
+          ) : null}
           <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-accent-gold">
             {t("eyebrow")}
           </div>
@@ -97,10 +121,6 @@ export default function SubscribeButton({
         </div>
 
         <div className="px-6 py-8 md:px-10 md:py-10">
-          <p className="mb-8 border-l-[3px] border-loss pl-4 font-serif text-[16px] italic leading-relaxed text-ink-2 md:text-[17px]">
-            {t("lead", { athleteFirstName })}
-          </p>
-
           <div className="space-y-3">
             <label
               className={`flex cursor-pointer gap-4 rounded-xl border-2 bg-cream-2 p-5 transition ${

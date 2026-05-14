@@ -10,8 +10,6 @@ import { ConfirmProvider } from "@/components/providers/ConfirmProvider";
 import { PostHogProvider } from "@/components/tracking/PostHogProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import OnboardingGate from "@/components/onboarding/OnboardingGate";
-import { getCurrentUser } from "@/lib/services/currentUser";
 import "./globals.css";
 import { genPageMetadata } from "@/lib/seo/genPageMetadata";
 import { siteMetadata } from "@/data/siteMetadata";
@@ -52,8 +50,6 @@ export default async function RootLayout({
 }>) {
   const locale = await getLocale();
   const messages = await getMessages();
-  const currentUser = await getCurrentUser();
-  const showOnboarding = !!currentUser && !currentUser.onboardingCompleted;
 
   return (
     <html lang={locale}>
@@ -72,7 +68,6 @@ export default async function RootLayout({
                   </div>
                   <Toaster position="bottom-center" />
                   <GlobalErrorHandler />
-                  {showOnboarding ? <OnboardingGate /> : null}
                 </ConfirmProvider>
               </PostHogProvider>
             </QueryProviders>

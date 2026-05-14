@@ -96,6 +96,27 @@ export default function AthleteProfile({
         ).toUpperCase()}`
       : null;
 
+  // Anonymous visitors get a single-purpose gate: only the subscribe card,
+  // inside the standard cream layout (navbar + footer stay).
+  // Subscription requires a user account, so !isSignedIn implies !isSubscribed.
+  if (!isSignedIn && !previewMode) {
+    return (
+      <div className="bg-cream">
+        <div className="mx-auto max-w-[820px] border-x border-line bg-cream-2">
+          <SubscribeButton
+            athleteSlug={athlete.slug}
+            athleteFirstName={athlete.firstName}
+            athleteLastName={athlete.lastName}
+            athleteAvatarUrl={athlete.avatarUrl}
+            isSignedIn={isSignedIn}
+            isSubscribed={isSubscribed}
+            ipCountryCode={ipCountryCode}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-cream">
       <div className="mx-auto max-w-[820px] border-x border-line bg-cream-2">

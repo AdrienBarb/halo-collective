@@ -126,7 +126,7 @@
     "Subscribe": {
       "tickBoxError": "Cochez la case pour recevoir la newsletter",
       "eyebrow": "Rejoindre la newsletter",
-      "title": "Entrez dans la saison de {athleteFirstName}",
+      "title": "Entrer dans la saison de {athleteFirstName}",
       "lead": "Chaque semaine, {athleteFirstName} partage ses résultats, les coulisses des tournois, sa routine hebdomadaire, son équipement et d'autres contenus exclusifs.",
       "newsletterHeading": "La newsletter de {athleteFirstName}",
       "newsletterConsent": "J'accepte de recevoir les e-mails de {athleteFirstName} : résultats, coulisses, routine hebdomadaire, équipement et contenu exclusif.",
