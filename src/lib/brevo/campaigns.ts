@@ -141,8 +141,11 @@ export async function findCampaignByNewsletterId(
   newsletterId: string,
 ): Promise<CampaignSummary | null> {
   const marker = `[nl:${newsletterId}]`;
-  const startDate = new Date(Date.now() - ORPHAN_LOOKUP_WINDOW_MS)
-    .toISOString();
+  // Brevo requires startDate AND endDate together — passing just one
+  // returns 400 "End date is mandatory with start date".
+  const now = Date.now();
+  const startDate = new Date(now - ORPHAN_LOOKUP_WINDOW_MS).toISOString();
+  const endDate = new Date(now).toISOString();
   let offset = 0;
   let pagesScanned = 0;
   let totalMatched = 0;
@@ -153,6 +156,7 @@ export async function findCampaignByNewsletterId(
       limit: String(BREVO_CAMPAIGN_PAGE_SIZE),
       offset: String(offset),
       startDate,
+      endDate,
     });
     const res = await brevoFetch<CampaignListResponse>(
       `/emailCampaigns?${qs.toString()}`,
