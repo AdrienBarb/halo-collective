@@ -411,10 +411,6 @@ export const WelcomeEmail = ({
             unsubscribeLabel={messages.unsubscribeLabel}
             unsubscribeHref={unsubscribeHref}
           />
-
-          <Section style={{ height: 24, backgroundColor: CONTAINER_BG, fontSize: 0, lineHeight: 0 }}>
-            &nbsp;
-          </Section>
         </Container>
       </Body>
     </Html>

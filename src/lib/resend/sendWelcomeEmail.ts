@@ -113,7 +113,7 @@ export async function sendWelcomeEmail(input: SendWelcomeEmailInput) {
 
   const result = await Promise.race([
     resendClient.emails.send({
-      from: getRequiredEnv("RESEND_FROM_EMAIL"),
+      from: `"${athleteName.replace(/["\\]/g, "")}" <${getRequiredEnv("RESEND_FROM_EMAIL")}>`,
       to: email,
       subject: t("preview", { athleteFirstName }),
       react: WelcomeEmail({

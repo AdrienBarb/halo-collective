@@ -131,7 +131,19 @@ export default function AuthForm({
       redirectAfter ??
       (typeof window !== "undefined" ? window.location.pathname : "/");
     try {
-      await authClient.signIn.social({ provider: "google", callbackURL });
+      // better-auth returns { data, error } — it does NOT throw on failure.
+      // Without re-checking, googleLoading stays true and disables every input
+      // (busy = submitting || googleLoading), locking the user out of the form.
+      const result = await authClient.signIn.social({
+        provider: "google",
+        callbackURL,
+      });
+      if (result?.error) {
+        console.error("Google sign-in failed:", result.error);
+        toast.error(t("couldNotStartGoogle"));
+        setGoogleLoading(false);
+      }
+      // On success the browser is redirecting away — leave loading set.
     } catch (error) {
       console.error("Google sign-in failed:", error);
       toast.error(t("couldNotStartGoogle"));
@@ -199,7 +211,7 @@ export default function AuthForm({
 
   if (mode === "signup") {
     return (
-      <div className="space-y-5">
+      <div key={mode} className="space-y-5">
         {googleBlock}
         <Form {...signupForm}>
           <form
@@ -318,7 +330,7 @@ export default function AuthForm({
   }
 
   return (
-    <div className="space-y-5">
+    <div key={mode} className="space-y-5">
       {googleBlock}
       <Form {...signinForm}>
         <form
