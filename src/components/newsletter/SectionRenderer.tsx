@@ -142,16 +142,18 @@ export default function SectionRenderer({
 
   return (
     <section className="overflow-hidden rounded-2xl border border-line bg-cream-2">
-      <header className="relative space-y-3 bg-banner px-6 py-6 md:px-8 md:py-7">
+      <header className="relative space-y-2.5 bg-banner px-5 py-5 md:space-y-3 md:px-8 md:py-7">
         <span
           aria-hidden
           className="absolute inset-x-0 top-0 h-[3px] bg-accent-gold"
         />
-        <div className="font-mono text-[12px] font-semibold uppercase tracking-[0.28em] text-accent-warm md:text-[13px]">
-          {number} &nbsp;·&nbsp; {eyebrow}
+        <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-accent-warm md:text-[13px] md:tracking-[0.28em]">
+          <span>{number}</span>
+          <span aria-hidden className="mx-1.5 md:mx-2">·</span>
+          <span>{eyebrow}</span>
         </div>
         {title ? (
-          <h2 className="font-serif text-[30px] font-medium leading-[1.1] tracking-[-0.02em] text-cream md:text-[36px]">
+          <h2 className="font-serif text-[24px] font-medium leading-[1.1] tracking-[-0.02em] text-cream md:text-[36px]">
             {title}
           </h2>
         ) : null}

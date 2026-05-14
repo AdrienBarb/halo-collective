@@ -402,14 +402,14 @@ function SponsorsStrip({ sponsors }: { sponsors: Sponsor[] }) {
       <div className="text-center font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-ink-3">
         {t("partners")}
       </div>
-      <ul className="mt-3 flex flex-wrap items-center justify-center gap-2 md:mt-4 md:gap-2.5">
+      <ul className="mt-3 flex flex-nowrap items-center justify-center gap-2 md:mt-4 md:gap-2.5">
         {sponsors.map((s) => (
-          <li key={s.id}>
+          <li key={s.id} className="min-w-0 flex-1 max-w-[100px] md:max-w-[170px]">
             <a
               href={s.websiteUrl}
               target="_blank"
               rel="sponsored nofollow noopener noreferrer"
-              className="group flex aspect-[5/3] w-[100px] items-center justify-center rounded-sm border border-line bg-cream p-2 transition-colors duration-200 hover:border-line-2 md:w-[170px] md:p-4"
+              className="group flex aspect-[5/3] w-full items-center justify-center rounded-sm border border-line bg-cream p-2 transition-colors duration-200 hover:border-line-2 md:p-4"
               aria-label={s.name}
               title={s.name}
             >
