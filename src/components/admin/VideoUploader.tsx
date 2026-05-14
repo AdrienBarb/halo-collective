@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import toast from "react-hot-toast";
+import { useDirectUpload } from "@/lib/hooks/useDirectUpload";
 
 interface VideoUploaderProps {
   url?: string | null;
@@ -17,40 +18,24 @@ export default function VideoUploader({
   onClear,
 }: VideoUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const { upload, isUploading } = useDirectUpload();
 
   const handleFile = useCallback(
     async (file: File) => {
-      setIsUploading(true);
       try {
-        const formData = new FormData();
-        formData.append("file", file);
-        const res = await fetch("/api/admin/upload-video", {
-          method: "POST",
-          body: formData,
+        const { url: uploadedUrl } = await upload(file, {
+          kind: "video",
+          signEndpoint: "/api/admin/upload-video",
         });
-        if (!res.ok) {
-          const data = (await res.json().catch(() => ({}))) as {
-            error?: string;
-          };
-          throw new Error(data.error ?? "Upload failed");
-        }
-        const data = (await res.json().catch(() => ({}))) as {
-          url?: unknown;
-        };
-        if (typeof data.url !== "string" || data.url.length === 0) {
-          throw new Error("Upload failed");
-        }
-        onChange({ url: data.url });
+        onChange({ url: uploadedUrl });
         toast.success("Video uploaded");
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "Upload failed");
       } finally {
-        setIsUploading(false);
         if (inputRef.current) inputRef.current.value = "";
       }
     },
-    [onChange],
+    [onChange, upload],
   );
 
   return (

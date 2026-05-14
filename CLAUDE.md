@@ -219,6 +219,11 @@ import type { User } from "@prisma/client";
 DATABASE_URL=
 DIRECT_URL=
 
+# Storage (Supabase Storage)
+NEXT_PUBLIC_SUPABASE_URL=
+SUPABASE_SECRET_KEY=             # service role key, server-only
+NEXT_PUBLIC_SUPABASE_ANON_KEY=   # required for browser direct-uploads via signed URLs
+
 # Auth
 BETTER_AUTH_SECRET=
 BETTER_AUTH_URL=

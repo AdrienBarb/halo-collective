@@ -5,13 +5,12 @@ import { adminGuard } from "@/lib/better-auth/adminGuard";
 import { errorHandler } from "@/lib/errors/errorHandler";
 import { BadRequestError } from "@/lib/errors/AppError";
 import { createSignedMediaUpload } from "@/lib/storage/signedUpload";
-import {
-  AUDIO_MIME_ALLOWLIST,
-  EXTENSION_BY_MIME,
-} from "@/lib/storage/mimeSniff";
+import { EXTENSION_BY_MIME } from "@/lib/storage/mimeSniff";
+
+const VECTORIZE_SOURCE_MIME = ["image/jpeg", "image/png", "image/webp"] as const;
 
 const bodySchema = z.object({
-  contentType: z.enum(AUDIO_MIME_ALLOWLIST),
+  contentType: z.enum(VECTORIZE_SOURCE_MIME),
 });
 
 export async function POST(req: NextRequest) {
@@ -22,16 +21,16 @@ export async function POST(req: NextRequest) {
     const parsed = bodySchema.safeParse(await req.json());
     if (!parsed.success) {
       throw new BadRequestError(
-        "Unsupported file — only MP3, M4A, WAV, or WebM audio is allowed",
+        "Unsupported file — only JPEG, PNG, or WebP images are allowed",
       );
     }
 
-    const { contentType } = parsed.data;
+    const contentType = parsed.data.contentType;
     const ext = EXTENSION_BY_MIME[contentType];
     const filename = `${randomUUID()}.${ext}`;
 
     const signed = await createSignedMediaUpload({
-      pathPrefix: "admin/audio",
+      pathPrefix: "admin/sponsors/_temp",
       filename,
     });
 

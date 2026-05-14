@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import { useDirectUpload } from "@/lib/hooks/useDirectUpload";
 
 interface LogoUploaderProps {
   value?: string | null;
@@ -14,6 +15,7 @@ interface LogoUploaderProps {
 
 const DEFAULT_ACCEPT = "image/jpeg,image/png,image/webp,image/avif";
 const DEFAULT_ENDPOINT = "/api/admin/upload";
+const VECTORIZE_ENDPOINT = "/api/admin/vectorize-logo";
 
 export default function LogoUploader({
   value,
@@ -23,35 +25,44 @@ export default function LogoUploader({
   accept = DEFAULT_ACCEPT,
 }: LogoUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const { upload, isUploading } = useDirectUpload();
 
   const handleFile = useCallback(
     async (file: File) => {
-      setIsUploading(true);
       try {
-        const formData = new FormData();
-        formData.append("file", file);
-        const res = await fetch(endpoint, {
-          method: "POST",
-          body: formData,
-        });
-        if (!res.ok) {
-          const data = (await res.json().catch(() => ({}))) as {
-            error?: string;
-          };
-          throw new Error(data.error ?? "Upload failed");
+        if (endpoint === VECTORIZE_ENDPOINT) {
+          const { path } = await upload(file, {
+            kind: "image",
+            signEndpoint: "/api/admin/vectorize-logo/sign",
+          });
+          const res = await fetch(VECTORIZE_ENDPOINT, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ sourcePath: path }),
+          });
+          if (!res.ok) {
+            const data = (await res.json().catch(() => ({}))) as {
+              error?: string;
+            };
+            throw new Error(data.error ?? "Vectorization failed");
+          }
+          const data = (await res.json()) as { url: string };
+          onChange(data.url);
+        } else {
+          const { url: uploadedUrl } = await upload(file, {
+            kind: "image",
+            signEndpoint: endpoint,
+          });
+          onChange(uploadedUrl);
         }
-        const data = (await res.json()) as { url: string };
-        onChange(data.url);
         toast.success("Logo uploaded");
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "Upload failed");
       } finally {
-        setIsUploading(false);
         if (inputRef.current) inputRef.current.value = "";
       }
     },
-    [onChange, endpoint],
+    [onChange, endpoint, upload],
   );
 
   return (
