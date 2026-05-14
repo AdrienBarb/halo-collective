@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { Play } from "lucide-react";
 
 interface YouTubeEmbedProps {
   videoId: string;
@@ -50,9 +51,9 @@ export default function YouTubeEmbed({
       />
       <span
         aria-hidden="true"
-        className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-action text-2xl text-cream shadow-lg"
+        className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-action text-cream shadow-lg"
       >
-        ▶
+        <Play className="h-7 w-7 translate-x-[2px] fill-current" aria-hidden="true" />
       </span>
       <span className="absolute bottom-3 right-3 z-10 rounded bg-ink/80 px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wide text-cream">
         YouTube

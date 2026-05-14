@@ -42,6 +42,10 @@ const LOCAL_CONTENT_TYPES: Record<string, string> = {
   png: "image/png",
   webp: "image/webp",
   avif: "image/avif",
+  mp3: "audio/mpeg",
+  wav: "audio/wav",
+  m4a: "audio/mp4",
+  ogg: "audio/ogg",
 };
 
 async function loadSeedAssetBytes(
@@ -218,9 +222,13 @@ type NewsletterSeed = {
   hero: AssetRef;
   tournamentLogo: AssetRef | null;
   kitImage: AssetRef | null;
+  reviewVoicenote: AssetRef | null;
+  comingUpVoicenote: AssetRef | null;
   buildSections: (assets: {
     kitImageUrl: string | null;
     tournamentLogoUrl: string | null;
+    reviewVoicenoteUrl: string | null;
+    comingUpVoicenoteUrl: string | null;
   }) => Array<{ type: SectionTypeValue; blocks: Prisma.InputJsonValue }>;
 };
 
@@ -256,14 +264,43 @@ const newsletters: NewsletterSeed[] = [
       sourceUrl:
         "https://img.mailinblue.com/10839939/images/content_library/original/69d4d57206cc717826a737b9.jpg",
     },
-    buildSections: ({ kitImageUrl, tournamentLogoUrl }) => [
+    reviewVoicenote: {
+      filename: "arthur-iw2026-review-voicenote.wav",
+      sourceUrl: "/brand/voicenotes/sample-silence.wav",
+    },
+    comingUpVoicenote: {
+      filename: "arthur-mc2026-preview-voicenote.wav",
+      sourceUrl: "/brand/voicenotes/sample-silence.wav",
+    },
+    buildSections: ({
+      kitImageUrl,
+      tournamentLogoUrl,
+      reviewVoicenoteUrl,
+      comingUpVoicenoteUrl,
+    }) => [
       {
         type: "ATHLETE_REVIEW",
         blocks: [
+          ...(reviewVoicenoteUrl
+            ? [
+                {
+                  kind: "audio",
+                  url: reviewVoicenoteUrl,
+                  title: "Note vocale",
+                  location: "Indian Wells · 16 Mars",
+                  durationLabel: "0:54",
+                },
+              ]
+            : []),
           {
             kind: "text",
             body:
-              "Indian Wells c'est terminé. En simple, j'ai pris le premier set à Alcaraz, mené un break dans le 2e. Mes ischio-jambiers ont crampé — c'est lui qui m'a mis dans cet état. En double avec Valentin, on bat Medvedev, Djokovic, Tsitsipas, Rublev, Khachanov. On arrive en finale d'un Masters 1000. Finale perdue, mais la tête haute.\n\n« Il y en a peut-être un dans le monde capable de tenir cette intensité. J'aurais aimé être le premier à le battre en 2026, mais ça ne sera pas pour ce soir. » — Après le match vs Alcaraz",
+              "Indian Wells c'est terminé. En simple, j'ai pris le premier set à Alcaraz, mené un break dans le 2e. Mes ischio-jambiers ont crampé — c'est lui qui m'a mis dans cet état. En double avec Valentin, on bat Medvedev, Djokovic, Tsitsipas, Rublev, Khachanov. On arrive en finale d'un Masters 1000. Finale perdue, mais la tête haute.",
+          },
+          {
+            kind: "text",
+            body:
+              "Après le match vs Alcaraz — « Il y en a peut-être un dans le monde capable de tenir cette intensité. J'aurais aimé être le premier à le battre en 2026, mais ça ne sera pas pour ce soir. »",
           },
         ],
       },
@@ -398,10 +435,26 @@ const newsletters: NewsletterSeed[] = [
       {
         type: "COMING_UP",
         blocks: [
+          ...(comingUpVoicenoteUrl
+            ? [
+                {
+                  kind: "audio",
+                  url: comingUpVoicenoteUrl,
+                  title: "Note vocale",
+                  location: "Monte-Carlo · Preview semaine",
+                  durationLabel: "0:45",
+                },
+              ]
+            : []),
           {
             kind: "text",
             body:
-              "Rolex Monte-Carlo Masters · 6–13 Avril 2026 · Tête de série #26 · 🟤 Terre battue\n\nMonte-Carlo dans trois semaines. La terre battue, c'est là où je veux vraiment faire parler de moi cette saison. Je rentre à Rennes quelques jours. Ensuite direction Monte-Carlo pour une préparation spécifique. Je veux arriver à 100%.",
+              "Rolex Monte-Carlo Masters · 6–13 Avril 2026 · Tête de série #26 · 🟤 Terre battue",
+          },
+          {
+            kind: "text",
+            body:
+              "Monte-Carlo dans trois semaines. La terre battue, c'est là où je veux vraiment faire parler de moi cette saison. Je rentre à Rennes quelques jours. Ensuite direction Monte-Carlo pour une préparation spécifique. Je veux arriver à 100%.",
           },
         ],
       },
@@ -443,9 +496,18 @@ const newsletters: NewsletterSeed[] = [
             kind: "prize_draw",
             id: randomUUID(),
             title: "Raquette Tecnifibre TF-40 dédicacée",
-            body: "Tirage au sort parmi tous les participants au pronostic.",
+            body:
+              "Tirage au sort parmi tous les participants au pronostic. Résultat annoncé le 6 avril.",
             ctaLabel: "Voter et tenter de gagner",
             closesAt: "6 Avril 2026",
+          },
+          {
+            kind: "survey",
+            id: randomUUID(),
+            title: "Donne ton avis sur ma newsletter",
+            body:
+              "Deux minutes pour me dire ce qui te plaît et ce que tu veux voir plus souvent.",
+            externalUrl: "https://arthurrinderknech.com/feedback",
           },
         ],
       },
@@ -483,7 +545,12 @@ const newsletters: NewsletterSeed[] = [
       sourceUrl:
         "https://img.mailinblue.com/10839939/images/content_library/original/69ce5867956b428284c0ab9d.jpg",
     },
-    buildSections: ({ kitImageUrl, tournamentLogoUrl }) => [
+    reviewVoicenote: {
+      filename: "arthur-miami-bleus-analysis-voicenote.wav",
+      sourceUrl: "/brand/voicenotes/sample-silence.wav",
+    },
+    comingUpVoicenote: null,
+    buildSections: ({ kitImageUrl, tournamentLogoUrl, reviewVoicenoteUrl }) => [
       {
         type: "ATHLETE_REVIEW",
         blocks: [
@@ -495,6 +562,27 @@ const newsletters: NewsletterSeed[] = [
             kind: "text",
             body:
               "Salut ! Miami, c'est fini pour moi. Éliminé par Térence Atmane au 2e tour dans un duel 100% français. Lui a très bien joué. Moi, j'ai pris un coup de fatigue après Indian Wells. Le premier set était serré, j'avais ma chance. Le deuxième m'a échappé. Je rentre, je récupère. Monte-Carlo arrive vite — et c'est là où je veux vraiment faire la différence.",
+          },
+          {
+            kind: "text",
+            body:
+              "Après le match vs Atmane — « Il a été meilleur que moi aujourd'hui. Il m'a pas laissé grand-chose. Maintenant j'ai hâte d'être à Monte-Carlo, sur ma surface, pour repartir de l'avant. »",
+          },
+          ...(reviewVoicenoteUrl
+            ? [
+                {
+                  kind: "audio",
+                  url: reviewVoicenoteUrl,
+                  title: "Mon analyse · Les Bleus à Miami",
+                  location: "Miami · 22 Mars",
+                  durationLabel: "1 min",
+                },
+              ]
+            : []),
+          {
+            kind: "text",
+            body:
+              "Pendant que moi je rentrais tôt, les gars ont fait quelque chose d'historique. Quatre Français en 8e de finale d'un Masters 1000 — Fils, Atmane, Humbert, Halys. Ça ne s'était pas vu depuis 2017. Arthur Fils a été le meilleur de tous : il a sorti des gros joueurs, joué un tennis offensif et tranchant. La demi contre Lehecka, c'est une défaite qui ne remet rien en question — Lehecka était chaud, mais Fils aurait pu passer. Atmane continue sur sa lancée de Cincinnati. Il m'a battu et il a ensuite battu Auger-Aliassime. Ça me fait plaisir et un peu mal en même temps — c'est ça le sport. Le tennis français est en train de faire quelque chose.",
           },
         ],
       },
@@ -565,7 +653,12 @@ const newsletters: NewsletterSeed[] = [
           {
             kind: "text",
             body:
-              "Rolex Monte-Carlo Masters · 6–13 Avril 2026 · Tête de série #26 · 🟤 Terre battue\n\nDeux semaines à Indian Wells et Miami, c'est physiquement éprouvant. Je rentre à Rennes me reposer. La terre battue arrive vite — je veux y arriver frais et affûté.",
+              "Rolex Monte-Carlo Masters · 6–13 Avril 2026 · Tête de série #26 · 🟤 Terre battue",
+          },
+          {
+            kind: "text",
+            body:
+              "Deux semaines à Indian Wells et Miami, c'est physiquement éprouvant. Je rentre à Rennes me reposer. La terre battue arrive vite — je veux y arriver frais et affûté.",
           },
           {
             kind: "schedule_item",
@@ -630,7 +723,7 @@ const newsletters: NewsletterSeed[] = [
             kind: "poll",
             id: randomUUID(),
             question:
-              "Quelle partie de mon jeu pensez-vous que je devrais travailler avant Monte-Carlo ?",
+              "Quelle partie de mon jeu pensez-vous que je devrais travailler avant Monte-Carlo ? Votez pour m'aider à prioriser ma préparation.",
             options: [
               { label: "Coup droit", isHighlighted: false },
               { label: "Revers", isHighlighted: false },
@@ -702,8 +795,25 @@ async function syncNewsletter(
   const kitImageUrl = n.kitImage
     ? await ensureSeedAsset(n.kitImage.filename, n.kitImage.sourceUrl)
     : null;
+  const reviewVoicenoteUrl = n.reviewVoicenote
+    ? await ensureSeedAsset(
+        n.reviewVoicenote.filename,
+        n.reviewVoicenote.sourceUrl,
+      )
+    : null;
+  const comingUpVoicenoteUrl = n.comingUpVoicenote
+    ? await ensureSeedAsset(
+        n.comingUpVoicenote.filename,
+        n.comingUpVoicenote.sourceUrl,
+      )
+    : null;
 
-  const sections = n.buildSections({ kitImageUrl, tournamentLogoUrl });
+  const sections = n.buildSections({
+    kitImageUrl,
+    tournamentLogoUrl,
+    reviewVoicenoteUrl,
+    comingUpVoicenoteUrl,
+  });
 
   await prisma.newsletter.deleteMany({
     where: { athleteId, editionNumber: n.editionNumber },

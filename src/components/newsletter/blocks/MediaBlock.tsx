@@ -4,6 +4,7 @@ import type { MediaBlock as MediaBlockType } from "@/lib/schemas/newsletterSecti
 import { splitParagraphs } from "@/lib/newsletter/splitParagraphs";
 import { parseYouTubeId } from "@/lib/newsletter/youtube";
 import YouTubeEmbed from "@/components/newsletter/blocks/YouTubeEmbed";
+import VoiceNotePlayer from "@/components/newsletter/blocks/VoiceNotePlayer";
 
 interface MediaBlockProps {
   media: MediaBlockType;
@@ -68,37 +69,5 @@ export default function MediaBlock({ media }: MediaBlockProps) {
   }
 
   // audio
-  const meta = [media.location, media.durationLabel].filter(Boolean).join(" · ");
-  const audioLabel = t("playVoiceNote", {
-    hasTitle: media.title ? "yes" : "no",
-    title: media.title ?? "",
-  });
-  return (
-    <a
-      href={media.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={audioLabel}
-      className="flex min-h-11 items-center gap-4 rounded-lg border border-line bg-cream-2 p-4 transition hover:border-line-2"
-    >
-      <span
-        aria-hidden="true"
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-action text-lg text-cream"
-      >
-        ▶
-      </span>
-      <span className="min-w-0 flex-1">
-        {media.title ? (
-          <span className="block truncate text-sm font-semibold text-ink">
-            {media.title}
-          </span>
-        ) : null}
-        {meta ? (
-          <span className="mt-1 block truncate font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3">
-            {meta}
-          </span>
-        ) : null}
-      </span>
-    </a>
-  );
+  return <VoiceNotePlayer media={media} />;
 }

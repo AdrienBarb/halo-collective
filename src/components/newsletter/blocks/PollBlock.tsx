@@ -159,7 +159,7 @@ export default function PollBlock({
                 if (selectedIndex !== null) vote(selectedIndex);
               }}
               disabled={isClosed || anyPending || selectedIndex === null}
-              className="block w-full rounded-xl bg-action px-4 py-3.5 font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-cream transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
+              className="block w-full cursor-pointer rounded-xl bg-action px-4 py-3.5 font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-cream transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
             >
               {anyPending
                 ? labels.engagementInteractive.submitting

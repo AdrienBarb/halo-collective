@@ -164,7 +164,8 @@
     "Media": {
       "watchOnYoutube": "Watch video on YouTube",
       "watchVideo": "Watch video",
-      "playVoiceNote": "{hasTitle, select, yes {Play voice note: {title}} other {Play voice note}}"
+      "playVoiceNote": "{hasTitle, select, yes {Play voice note: {title}} other {Play voice note}}",
+      "pauseVoiceNote": "{hasTitle, select, yes {Pause: {title}} other {Pause voice note}}"
     }
   },
   "Emails": {
