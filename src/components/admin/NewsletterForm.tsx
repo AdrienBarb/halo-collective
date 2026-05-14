@@ -59,7 +59,7 @@ import {
 } from "@/lib/newsletter/importJson";
 import { getSectionTitle } from "@/lib/newsletter/labels";
 import { DEFAULT_LOCALE } from "@/i18n/locales";
-import { CLAUDE_BRIEF_PROMPT } from "@/lib/newsletter/claudeBriefPrompt";
+import { CLAUDE_BRIEF_PROJECT_SYSTEM_PROMPT } from "@/lib/newsletter/claudeBriefPrompt";
 import {
   Dialog,
   DialogContent,
@@ -301,8 +301,10 @@ export default function NewsletterForm({
 
   async function handleCopyClaudePrompt() {
     try {
-      await navigator.clipboard.writeText(CLAUDE_BRIEF_PROMPT);
-      toast.success("Claude prompt copied — paste it into a new Claude.ai chat");
+      await navigator.clipboard.writeText(CLAUDE_BRIEF_PROJECT_SYSTEM_PROMPT);
+      toast.success(
+        "System prompt copied — paste it into your Claude.ai Project's custom instructions",
+      );
     } catch {
       toast.error("Could not copy the prompt");
     }
@@ -562,9 +564,9 @@ export default function NewsletterForm({
                       type="button"
                       variant="outline"
                       onClick={handleCopyClaudePrompt}
-                      title="Copy the prompt to paste into a new Claude.ai chat. Claude will turn your raw material into a brief you can paste back here."
+                      title="Copy the system prompt to install in your Claude.ai Project. Once installed, paste raw material in any conversation in that project and Claude returns a brief you can paste back here."
                     >
-                      Copy Claude prompt
+                      Copy Claude system prompt
                     </Button>
                     <Button
                       type="button"
