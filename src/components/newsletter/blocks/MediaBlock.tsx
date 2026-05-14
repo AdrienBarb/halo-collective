@@ -46,13 +46,7 @@ export default function MediaBlock({ media }: MediaBlockProps) {
   if (media.kind === "video") {
     const youtubeId = parseYouTubeId(media.url);
     if (youtubeId) {
-      return (
-        <YouTubeEmbed
-          videoId={youtubeId}
-          thumbnailUrl={media.thumbnailUrl}
-          label={t("watchOnYoutube")}
-        />
-      );
+      return <YouTubeEmbed videoId={youtubeId} label={t("watchOnYoutube")} />;
     }
 
     return (
