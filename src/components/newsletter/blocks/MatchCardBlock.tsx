@@ -31,9 +31,17 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
   const highlightsLabel = youtubeId
     ? labels.ctas.watchOnYoutube
     : labels.ctas.highlights;
+  const resultLetter =
+    match.result === "W"
+      ? labels.matchResultLetters.win
+      : match.result === "L"
+        ? labels.matchResultLetters.loss
+        : match.result === "EXEMPT"
+          ? "—"
+          : match.result;
 
   const metaRight = [match.roundName, match.date].filter(Boolean).join(" · ");
-  const headline = showOpponent ? match.opponentName : match.result;
+  const headline = showOpponent ? match.opponentName : resultLetter;
   const subline = showOpponent
     ? match.opponentRank
       ? `${match.opponentRank}${match.opponentCountry ? ` · ${match.opponentCountry}` : ""}`
@@ -46,7 +54,7 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
         <span
           className={`inline-flex h-6 min-w-[28px] items-center justify-center rounded-md px-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.12em] ${BADGE_STYLES[match.result]}`}
         >
-          {match.result === "EXEMPT" ? "—" : match.result}
+          {resultLetter}
         </span>
         {metaRight ? (
           <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">

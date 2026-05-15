@@ -83,6 +83,11 @@ export interface NewsletterLabels {
   questionIntro: string;
   /** Use `{tournament}` as a placeholder. */
   tournamentLabelTemplate: string;
+  /** Single letter badges in match result rings (W/L) — localized. */
+  matchResultLetters: {
+    win: string;
+    loss: string;
+  };
 }
 
 const EN: NewsletterLabels = {
@@ -176,6 +181,7 @@ const EN: NewsletterLabels = {
     "I'll pick 3 fan questions and answer them in the next newsletter.",
   questionIntro: "Vote to help me prioritise — I'll respond in the next edition.",
   tournamentLabelTemplate: "My week at {tournament}",
+  matchResultLetters: { win: "W", loss: "L" },
 };
 
 const FR: NewsletterLabels = {
@@ -270,6 +276,7 @@ const FR: NewsletterLabels = {
   questionIntro:
     "Vote pour m'aider à prioriser — je réponds dans la prochaine édition.",
   tournamentLabelTemplate: "Ma semaine à {tournament}",
+  matchResultLetters: { win: "V", loss: "D" },
 };
 
 const REGISTRY: Record<NewsletterLocale, NewsletterLabels> = { en: EN, fr: FR };

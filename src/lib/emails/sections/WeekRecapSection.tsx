@@ -177,6 +177,7 @@ export default function WeekRecapSection({
                   match={
                     match as Extract<WeekRecapBlock, { kind: "match_card" }>
                   }
+                  locale={locale}
                 />
               ))}
             </Section>
