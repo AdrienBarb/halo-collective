@@ -227,6 +227,13 @@ function renderBlockEditor(
               onChange={(v) => set({ ...block, opponentRank: v || undefined })}
             />
           </div>
+          <TextField
+            label="Context note (optional)"
+            placeholder="Seed #22 · Walkover · with V. Vacherot"
+            help="Short qualifier shown next to the opponent name. Don't repeat the opponent's name here."
+            value={block.contextNote ?? ""}
+            onChange={(v) => set({ ...block, contextNote: v || undefined })}
+          />
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <TextField
               label="Score"
