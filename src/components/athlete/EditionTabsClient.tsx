@@ -48,7 +48,7 @@ export default function EditionTabsClient({
   const rawLocale = useLocale();
   const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const [editionParam, setEdition] = useQueryState("edition", {
-    shallow: false,
+    shallow: true,
   });
   const selectedSlug =
     editions.find((e) => e.slug === editionParam)?.slug ?? defaultSlug;
@@ -105,8 +105,8 @@ export default function EditionTabsClient({
   }
 
   return (
-    <section className="border-b border-line px-6 py-8">
-      <div className="mb-4 flex items-baseline justify-between">
+    <section className="border-b border-line px-6 py-5">
+      <div className="mb-3 flex items-baseline justify-between">
         <div className="flex items-baseline gap-3">
           <h3 className="font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink">
             {t("title")}
@@ -136,7 +136,7 @@ export default function EditionTabsClient({
       <div
         ref={scrollerRef}
         onScroll={updateScrollState}
-        className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 scroll-px-1 motion-safe:scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-1 scroll-px-1 motion-safe:scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
       >
         {editions.map((edition) => {
           const isActive = edition.slug === selectedSlug;
@@ -152,10 +152,8 @@ export default function EditionTabsClient({
               data-slug={edition.slug}
               onClick={() => selectEdition(edition.slug)}
               aria-pressed={isActive}
-              className={`group relative aspect-[5/4] w-[62%] shrink-0 cursor-pointer snap-start overflow-hidden rounded-2xl border bg-[linear-gradient(135deg,#5a6478_0%,#2c3340_100%)] text-left transition-[transform,opacity,box-shadow,border-color] duration-200 ease-out sm:w-[44%] md:w-[32%] ${
-                isActive
-                  ? "border-accent-gold opacity-100 [box-shadow:0_0_0_3px_var(--color-accent-gold)_inset,0_14px_32px_-10px_rgba(200,147,46,0.55)] motion-safe:scale-[1.02]"
-                  : "border-line opacity-50 motion-safe:scale-[0.96] motion-safe:hover:-translate-y-[2px] motion-safe:hover:opacity-80 motion-safe:hover:[box-shadow:0_10px_28px_rgba(0,0,0,0.12)]"
+              className={`group relative aspect-[5/4] w-[62%] shrink-0 cursor-pointer snap-start overflow-hidden rounded-2xl border border-line bg-[linear-gradient(135deg,#5a6478_0%,#2c3340_100%)] text-left transition-opacity duration-200 ease-out sm:w-[44%] md:w-[32%] ${
+                isActive ? "opacity-100" : "opacity-50 hover:opacity-80"
               }`}
             >
               {edition.heroImageUrl ? (
