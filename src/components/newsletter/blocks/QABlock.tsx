@@ -96,7 +96,11 @@ export default function QABlock({
             maxLength={TEXT_MAX}
             rows={4}
           />
-          <Button type="submit" disabled={isPending || text.trim().length === 0}>
+          <Button
+            type="submit"
+            size="sm"
+            disabled={isPending || text.trim().length === 0}
+          >
             {isPending
               ? labels.engagementInteractive.submitting
               : labels.engagementInteractive.submit}
