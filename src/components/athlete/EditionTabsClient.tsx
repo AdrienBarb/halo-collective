@@ -174,13 +174,10 @@ export default function EditionTabsClient({
                 {meta}
               </div>
               {isActive ? (
-                <div className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-accent-gold px-2.5 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)]">
-                  <span
-                    aria-hidden
-                    className="h-1.5 w-1.5 rounded-full bg-white motion-safe:animate-pulse"
-                  />
-                  {t("reading")}
-                </div>
+                <span
+                  aria-label={t("reading")}
+                  className="absolute right-3 top-3 h-2 w-2 rounded-full bg-accent-gold shadow-[0_0_0_2px_rgba(255,255,255,0.6)] motion-safe:animate-pulse"
+                />
               ) : null}
               <div className="absolute bottom-4 left-4 right-4">
                 <h4 className="font-serif text-[18px] font-semibold leading-[1.15] tracking-[-0.015em] text-white md:text-[20px]">
