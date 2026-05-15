@@ -196,7 +196,7 @@ export async function createSubscription(
         slug: e.slug,
         title: e.title,
         editionNumber: e.editionNumber,
-        editionDate: e.editionDate ?? e.publishedAt,
+        editionDate: e.publishedAt,
       })),
       locale: user.locale,
     }).catch((error: unknown) => {

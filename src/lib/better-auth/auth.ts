@@ -154,7 +154,7 @@ export const auth = betterAuth({
       countryCode: { type: "string", required: false, input: true },
       phone: { type: "string", required: false, input: true },
       role: { type: "string", required: false, input: false, defaultValue: "USER" },
-      locale: { type: "string", required: false, input: false, defaultValue: "en" },
+      locale: { type: "string", required: false, input: false, defaultValue: "fr" },
       onboardingCompleted: { type: "boolean", required: false, input: false, defaultValue: false },
     },
   },
