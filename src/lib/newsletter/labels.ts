@@ -49,6 +49,13 @@ export interface NewsletterLabels {
     partners: string;
     exclusiveMember: string;
   };
+  mediaRecap: {
+    header: string;
+    /** Use `{count}` placeholder */
+    articleSingularTemplate: string;
+    /** Use `{count}` placeholder */
+    articlePluralTemplate: string;
+  };
   engagementInteractive: {
     signInToParticipate: string;
     subscribeToParticipate: string;
@@ -139,6 +146,11 @@ const EN: NewsletterLabels = {
     partners: "My partners",
     exclusiveMember: "Exclusive member",
   },
+  mediaRecap: {
+    header: "What they wrote",
+    articleSingularTemplate: "{count} article",
+    articlePluralTemplate: "{count} articles",
+  },
   engagementInteractive: {
     signInToParticipate: "Sign in to participate",
     subscribeToParticipate: "Subscribe to participate",
@@ -226,6 +238,11 @@ const FR: NewsletterLabels = {
     press: "Ce qu'on a écrit sur moi",
     partners: "Mes partenaires",
     exclusiveMember: "Membre exclusif",
+  },
+  mediaRecap: {
+    header: "Ce qu'on a écrit sur moi",
+    articleSingularTemplate: "{count} article",
+    articlePluralTemplate: "{count} articles",
   },
   engagementInteractive: {
     signInToParticipate: "Connecte-toi pour participer",

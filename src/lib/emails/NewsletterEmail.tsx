@@ -140,6 +140,7 @@ export const NewsletterEmail = ({
           tournamentName={tournamentName}
           editionUrl={editionUrl}
           askQuestionUrl={askQuestionUrl}
+          locale={locale}
         />
       ))}
 

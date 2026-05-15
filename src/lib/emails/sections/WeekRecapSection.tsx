@@ -3,6 +3,7 @@ import type {
   WeekRecapTournamentBlock,
   WeekRecapWeeklyBlock,
 } from "@/lib/schemas/newsletterSection";
+import type { NewsletterLocale } from "@/lib/newsletter/labels";
 import { palette, fonts } from "@/lib/emails/_brand/theme";
 import HeroMetricBlock from "@/lib/emails/blocks/HeroMetricBlock";
 import MatchCardBlock from "@/lib/emails/blocks/MatchCardBlock";
@@ -20,6 +21,7 @@ type WeekRecapBlock = WeekRecapTournamentBlock | WeekRecapWeeklyBlock;
 
 interface WeekRecapSectionProps {
   blocks: WeekRecapBlock[];
+  locale: NewsletterLocale;
 }
 
 const GROUPABLE_KINDS = new Set(["hero_metric", "media_link", "match_card"]);
@@ -71,7 +73,11 @@ function MatchFormatHeader({ format }: { format: "singles" | "doubles" }) {
   );
 }
 
-function renderBlock(block: WeekRecapBlock, key: number): React.ReactNode {
+function renderBlock(
+  block: WeekRecapBlock,
+  key: number,
+  locale: NewsletterLocale,
+): React.ReactNode {
   switch (block.kind) {
     case "tournament_summary":
       return <TournamentSummaryBlock key={key} summary={block} />;
@@ -88,7 +94,7 @@ function renderBlock(block: WeekRecapBlock, key: number): React.ReactNode {
     case "social_recap":
       return <SocialRecapBlock key={key} block={block} />;
     case "media_recap":
-      return <MediaRecapBlock key={key} block={block} />;
+      return <MediaRecapBlock key={key} block={block} locale={locale} />;
     case "stats_update":
       return <StatsUpdateBlock key={key} block={block} />;
     case "quote":
@@ -98,7 +104,10 @@ function renderBlock(block: WeekRecapBlock, key: number): React.ReactNode {
   }
 }
 
-export default function WeekRecapSection({ blocks }: WeekRecapSectionProps) {
+export default function WeekRecapSection({
+  blocks,
+  locale,
+}: WeekRecapSectionProps) {
   const groups = groupRuns(blocks);
   // Only label match groups when both formats are present in the section
   // — a singles-only or doubles-only recap reads cleaner without a header.
@@ -145,7 +154,7 @@ export default function WeekRecapSection({ blocks }: WeekRecapSectionProps) {
         if (group[0].kind === "media_link") {
           return (
             <Section key={gi} style={{ marginBottom: 16 }}>
-              <MediaLinkGroupHeader />
+              <MediaLinkGroupHeader locale={locale} />
               {group.map((link, li) => (
                 <MediaLinkRow
                   key={li}
@@ -174,7 +183,9 @@ export default function WeekRecapSection({ blocks }: WeekRecapSectionProps) {
           );
         }
         return (
-          <Section key={gi}>{group.map((b, bi) => renderBlock(b, bi))}</Section>
+          <Section key={gi}>
+            {group.map((b, bi) => renderBlock(b, bi, locale))}
+          </Section>
         );
       })}
     </Section>
