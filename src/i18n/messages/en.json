@@ -187,7 +187,7 @@
       "button": "Reset password"
     },
     "Welcome": {
-      "subject": "Welcome to my inner circle",
+      "subject": "Welcome to my team",
       "preview": "You're in. Welcome to {athleteFirstName}'s circle.",
       "fanFirstNameFallback": "there",
       "fallbackBody": "Thanks for stepping inside. The next edition will land here the moment {athleteFirstName} publishes it. Until then, the back catalogue lives on the profile.",

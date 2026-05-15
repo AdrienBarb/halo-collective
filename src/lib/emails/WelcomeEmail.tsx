@@ -245,7 +245,7 @@ function BodyCard({
       ))}
 
       <Text style={{ ...BODY_PARAGRAPH, marginTop: 4, marginBottom: 0 }}>
-        — {signatureName}
+        {signatureName}
       </Text>
     </Section>
   );
@@ -623,7 +623,7 @@ WelcomeEmail.PreviewProps = {
   messages: {
     preview: "You're in. Welcome to Arthur's circle.",
     fallbackBody:
-      "Thanks for stepping inside. The next edition will land here the moment I publish it — until then, the back catalogue lives on my profile.",
+      "Thanks for stepping inside. The next edition will land here the moment I publish it. Until then, the back catalogue lives on my profile.",
     partnersLabel: "Partners",
     followSocial: "Follow Arthur on socials",
     unsubscribeLabel: "Unsubscribe",
