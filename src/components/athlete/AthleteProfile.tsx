@@ -383,7 +383,7 @@ function ProfileIdentity({
 
 function ProfileBio({ bio }: { bio: string }) {
   return (
-    <p className="mx-auto mt-5 max-w-[560px] px-6 text-center font-serif text-[17px] leading-[1.55] text-ink-2 md:text-[18px]">
+    <p className="mx-auto mt-5 max-w-[560px] px-6 text-center font-sans text-[17px] leading-[1.55] text-ink-2 md:text-[18px]">
       {bio}
     </p>
   );

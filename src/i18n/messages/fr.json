@@ -121,7 +121,8 @@
     "Editions": {
       "title": "Éditions",
       "previous": "Édition précédente",
-      "next": "Édition suivante"
+      "next": "Édition suivante",
+      "reading": "En cours"
     },
     "Subscribe": {
       "tickBoxError": "Cochez la case pour recevoir la newsletter",

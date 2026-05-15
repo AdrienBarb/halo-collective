@@ -121,7 +121,8 @@
     "Editions": {
       "title": "Editions",
       "previous": "Previous edition",
-      "next": "Next edition"
+      "next": "Next edition",
+      "reading": "Reading"
     },
     "Subscribe": {
       "tickBoxError": "Tick the box to receive the newsletter",

@@ -152,10 +152,10 @@ export default function EditionTabsClient({
               data-slug={edition.slug}
               onClick={() => selectEdition(edition.slug)}
               aria-pressed={isActive}
-              className={`group relative aspect-[5/4] w-[62%] shrink-0 cursor-pointer snap-start overflow-hidden rounded-2xl border bg-[linear-gradient(135deg,#5a6478_0%,#2c3340_100%)] text-left transition-[transform,box-shadow,border-color] duration-200 ease-out motion-safe:hover:-translate-y-[2px] motion-safe:hover:[box-shadow:0_10px_28px_rgba(0,0,0,0.12)] sm:w-[44%] md:w-[32%] ${
+              className={`group relative aspect-[5/4] w-[62%] shrink-0 cursor-pointer snap-start overflow-hidden rounded-2xl border bg-[linear-gradient(135deg,#5a6478_0%,#2c3340_100%)] text-left transition-[transform,opacity,box-shadow,border-color] duration-200 ease-out sm:w-[44%] md:w-[32%] ${
                 isActive
-                  ? "border-accent-gold [box-shadow:0_0_0_2px_var(--color-accent-gold,#c9a86b)_inset]"
-                  : "border-line"
+                  ? "border-accent-gold opacity-100 [box-shadow:0_0_0_3px_var(--color-accent-gold)_inset,0_14px_32px_-10px_rgba(200,147,46,0.55)] motion-safe:scale-[1.02]"
+                  : "border-line opacity-50 motion-safe:scale-[0.96] motion-safe:hover:-translate-y-[2px] motion-safe:hover:opacity-80 motion-safe:hover:[box-shadow:0_10px_28px_rgba(0,0,0,0.12)]"
               }`}
             >
               {edition.heroImageUrl ? (
@@ -175,6 +175,15 @@ export default function EditionTabsClient({
               <div className="absolute left-4 top-4 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-white">
                 {meta}
               </div>
+              {isActive ? (
+                <div className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-accent-gold px-2.5 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)]">
+                  <span
+                    aria-hidden
+                    className="h-1.5 w-1.5 rounded-full bg-white motion-safe:animate-pulse"
+                  />
+                  {t("reading")}
+                </div>
+              ) : null}
               <div className="absolute bottom-4 left-4 right-4">
                 <h4 className="font-serif text-[18px] font-semibold leading-[1.15] tracking-[-0.015em] text-white md:text-[20px]">
                   {edition.title}
