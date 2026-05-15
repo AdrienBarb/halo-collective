@@ -106,8 +106,7 @@ export default function SubscribeButton({
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center font-serif text-2xl font-semibold text-cream">
-                  {(athleteFirstName[0] ?? "") +
-                    (athleteLastName?.[0] ?? "")}
+                  {(athleteFirstName[0] ?? "") + (athleteLastName?.[0] ?? "")}
                 </div>
               )}
             </div>
@@ -174,10 +173,6 @@ export default function SubscribeButton({
             </p>
           ) : null}
 
-          <p className="mt-6 text-center text-[12px] leading-relaxed text-ink-3">
-            {t("finePrint")}
-          </p>
-
           <button
             type="button"
             onClick={onSubscribeClick}
@@ -187,11 +182,9 @@ export default function SubscribeButton({
             {submitting ? t("subscribing") : t("subscribeCta")}
           </button>
 
-          {!isSignedIn ? (
-            <p className="mt-4 text-center text-[12px] text-ink-3">
-              {t("authPrompt")}
-            </p>
-          ) : null}
+          <p className="mt-6 text-center text-[12px] leading-relaxed text-ink-3">
+            {t("finePrint")}
+          </p>
         </div>
       </div>
 
