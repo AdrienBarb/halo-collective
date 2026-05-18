@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { resendClient } from "@/lib/resend/resendClient";
 import {
   WelcomeEmail,
+  type WelcomeRecentEdition,
   type WelcomeSocialLinks,
   type WelcomeSponsor,
 } from "@/lib/emails/WelcomeEmail";
@@ -24,11 +25,18 @@ interface SendWelcomeEmailInput {
     logoUrl: string;
     websiteUrl: string;
   }>;
+  recentEditions?: Array<{
+    slug: string;
+    title: string;
+    editionNumber: number;
+    editionDate?: Date | string | null;
+  }>;
   locale?: Locale | string;
 }
 
 const SOCIAL_KEYS = ["instagram", "x", "tiktok", "facebook", "linkedin"] as const;
 const RESEND_TIMEOUT_MS = 10_000;
+const SLUG_PATTERN = /^[a-z0-9-]+$/;
 
 /**
  * Email recipients are lower-trust than the admin who wrote the source data.
@@ -67,6 +75,46 @@ function normalizeSponsors(
   return safe.length > 0 ? safe : undefined;
 }
 
+// Re-validates athlete + edition slugs at the render boundary. Slugs come from
+// the DB but we mirror the strictness of buildEditionUrl in the newsletter
+// service so a stray value can never produce a malformed URL in a Halo email.
+function buildRecentEditions(
+  baseUrl: string,
+  athleteSlug: string,
+  locale: Locale,
+  editions: SendWelcomeEmailInput["recentEditions"],
+): WelcomeRecentEdition[] | undefined {
+  if (!editions || editions.length === 0) return undefined;
+  if (!SLUG_PATTERN.test(athleteSlug)) return undefined;
+
+  const formatter = new Intl.DateTimeFormat(locale, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+  const safe: WelcomeRecentEdition[] = [];
+  for (const edition of editions) {
+    if (!SLUG_PATTERN.test(edition.slug)) continue;
+    const url = new URL(`/${athleteSlug}`, baseUrl);
+    url.searchParams.set("edition", edition.slug);
+    const rawDate = edition.editionDate
+      ? new Date(edition.editionDate)
+      : undefined;
+    const formattedDate =
+      rawDate && !Number.isNaN(rawDate.getTime())
+        ? formatter.format(rawDate)
+        : undefined;
+    safe.push({
+      title: edition.title,
+      editionNumber: edition.editionNumber,
+      formattedDate,
+      url: url.toString(),
+    });
+  }
+  return safe.length > 0 ? safe : undefined;
+}
+
 // Replaces {{fanFirstName}} / {{athleteFirstName}} placeholders in the
 // athlete-authored welcome message. Mirrors the newsletter merge-tag UX, but
 // since Resend has no native merge syntax we substitute server-side here.
@@ -95,6 +143,7 @@ export async function sendWelcomeEmail(input: SendWelcomeEmailInput) {
     socialLinks,
     welcomeMessage,
     sponsors,
+    recentEditions,
   } = input;
   const locale: Locale = isLocale(input.locale) ? input.locale : DEFAULT_LOCALE;
   const t = await getTranslations({ locale, namespace: "Emails.Welcome" });
@@ -113,9 +162,9 @@ export async function sendWelcomeEmail(input: SendWelcomeEmailInput) {
 
   const result = await Promise.race([
     resendClient.emails.send({
-      from: getRequiredEnv("RESEND_FROM_EMAIL"),
+      from: `"${athleteName.replace(/["\\]/g, "")}" <${getRequiredEnv("RESEND_FROM_EMAIL")}>`,
       to: email,
-      subject: t("preview", { athleteFirstName }),
+      subject: t("subject"),
       react: WelcomeEmail({
         profileUrl: `${baseUrl}/${athleteSlug}`,
         athleteFirstName,
@@ -123,16 +172,21 @@ export async function sendWelcomeEmail(input: SendWelcomeEmailInput) {
         welcomeMessage: personalizedMessage,
         sponsors: normalizeSponsors(sponsors),
         socialLinks: normalizeSocialLinks(socialLinks),
+        recentEditions: buildRecentEditions(
+          baseUrl,
+          athleteSlug,
+          locale,
+          recentEditions,
+        ),
         messages: {
           preview: t("preview", { athleteFirstName }),
-          greetingHeading: firstName
-            ? t("greetingHeading", { fanFirstName: firstName })
-            : t("greetingHeadingFallback", { athleteFirstName }),
           fallbackBody: t("fallbackBody", { athleteFirstName }),
           partnersLabel: t("partnersLabel"),
           followSocial: t("followSocial", { athleteFirstName }),
           unsubscribeLabel: t("unsubscribeLabel"),
           footerNote: t("footerNote", { athleteName }),
+          previousEditionsLabel: t("previousEditionsLabel"),
+          editionLabel: t("editionLabel"),
         },
       }),
     }),

@@ -74,6 +74,7 @@ export function emptyWeekRecapBlock(
     case "match_card":
       return {
         kind: "match_card",
+        format: "singles",
         result: "W",
         roundName: "",
         opponentName: undefined,
@@ -140,6 +141,16 @@ export function emptyComingUpBlock(kind: ComingUpBlock["kind"]): ComingUpBlock {
 export function emptyMonetisationBlock(
   kind: MonetisationBlock["kind"],
 ): MonetisationBlock {
+  if (kind === "phase_timeline") {
+    return {
+      kind: "phase_timeline",
+      id: mintBlockId(),
+      phases: [
+        { label: "", title: "", description: "" },
+        { label: "", title: "", description: "" },
+      ],
+    };
+  }
   const base = {
     id: mintBlockId(),
     title: "",

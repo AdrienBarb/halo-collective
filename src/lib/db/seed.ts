@@ -6,6 +6,10 @@ import { extname, join } from "node:path";
 import { NewsletterStatus, Sport, type Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
 import { supabaseStorage } from "@/lib/storage/client";
+import {
+  MEDIA_BUCKET,
+  getMediaBucketConfig,
+} from "@/lib/storage/bucketConfig";
 import { ensureAthleteList } from "@/lib/brevo/lists";
 import type {
   EditionModeValue,
@@ -18,20 +22,27 @@ if (!process.env.DATABASE_URL) {
 
 // ── Supabase asset uploader ──────────────────────────────────────────
 
-const MEDIA_BUCKET = "media";
 const SEED_PREFIX = "seed";
 const assetUrlCache = new Map<string, string>();
 let bucketEnsured = false;
 
 async function ensureMediaBucket(): Promise<void> {
   if (bucketEnsured) return;
+  const config = getMediaBucketConfig();
   const { data } = await supabaseStorage.storage.getBucket(MEDIA_BUCKET);
   if (!data) {
-    const { error } = await supabaseStorage.storage.createBucket(MEDIA_BUCKET, {
-      public: true,
-    });
+    const { error } = await supabaseStorage.storage.createBucket(
+      MEDIA_BUCKET,
+      config,
+    );
     if (error && !/already exists/i.test(error.message)) throw error;
-    console.log(`  ↑ created bucket ${MEDIA_BUCKET} (public)`);
+    console.log(`  ↑ created bucket ${MEDIA_BUCKET} (public, hardened)`);
+  } else {
+    const { error } = await supabaseStorage.storage.updateBucket(
+      MEDIA_BUCKET,
+      config,
+    );
+    if (error) throw error;
   }
   bucketEnsured = true;
 }
@@ -321,6 +332,7 @@ const newsletters: NewsletterSeed[] = [
           { kind: "hero_metric", value: "4-1", label: "V / D" },
           {
             kind: "match_card",
+            format: "singles",
             result: "EXEMPT",
             roundName: "Simple · 1er Tour",
             date: "4 Mars",
@@ -328,6 +340,7 @@ const newsletters: NewsletterSeed[] = [
           },
           {
             kind: "match_card",
+            format: "singles",
             result: "W",
             roundName: "Simple · 2e Tour",
             opponentName: "J.M. Cerundolo",
@@ -338,6 +351,7 @@ const newsletters: NewsletterSeed[] = [
           },
           {
             kind: "match_card",
+            format: "singles",
             result: "L",
             roundName: "Simple · 3e Tour",
             opponentName: "C. Alcaraz",
@@ -352,6 +366,7 @@ const newsletters: NewsletterSeed[] = [
           },
           {
             kind: "match_card",
+            format: "doubles",
             result: "W",
             roundName: "Double · 1er Tour",
             opponentName: "Medvedev / Tien",
@@ -363,6 +378,7 @@ const newsletters: NewsletterSeed[] = [
           },
           {
             kind: "match_card",
+            format: "doubles",
             result: "W",
             roundName: "Double · 2e Tour",
             opponentName: "Djokovic / Tsitsipas",
@@ -374,6 +390,7 @@ const newsletters: NewsletterSeed[] = [
           },
           {
             kind: "match_card",
+            format: "doubles",
             result: "W",
             roundName: "Double · Quart de finale",
             opponentName: "Khachanov / Rublev",
@@ -383,6 +400,7 @@ const newsletters: NewsletterSeed[] = [
           },
           {
             kind: "match_card",
+            format: "doubles",
             result: "W",
             roundName: "Double · Demi-finale",
             opponentName: "Goransson / Bhambri",
@@ -394,6 +412,7 @@ const newsletters: NewsletterSeed[] = [
           },
           {
             kind: "match_card",
+            format: "doubles",
             result: "L",
             roundName: "Double · Finale 🥈",
             opponentName: "Andreozzi / Guinard",
@@ -603,6 +622,7 @@ const newsletters: NewsletterSeed[] = [
           { kind: "hero_metric", value: "0-1", label: "V / D" },
           {
             kind: "match_card",
+            format: "singles",
             result: "EXEMPT",
             roundName: "1er Tour",
             date: "19 Mars",
@@ -610,6 +630,7 @@ const newsletters: NewsletterSeed[] = [
           },
           {
             kind: "match_card",
+            format: "singles",
             result: "L",
             roundName: "2e Tour",
             opponentName: "T. Atmane",

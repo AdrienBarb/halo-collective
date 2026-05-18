@@ -16,7 +16,8 @@
     "db:studio": "prisma studio",
     "db:seed": "tsx src/lib/db/seed.ts",
     "email:dev": "email dev --dir src/lib/emails --port 3030",
-    "storage:test": "tsx scripts/test-upload-media.ts"
+    "storage:test": "tsx scripts/test-upload-media.ts",
+    "storage:configure": "tsx scripts/configure-media-bucket.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.95.2",

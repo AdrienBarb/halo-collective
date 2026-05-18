@@ -27,14 +27,22 @@ export interface WelcomeSponsor {
   websiteUrl: string;
 }
 
+export interface WelcomeRecentEdition {
+  title: string;
+  editionNumber: number;
+  formattedDate?: string;
+  url: string;
+}
+
 export interface WelcomeMessages {
   preview: string;
-  greetingHeading: string;
   fallbackBody: string;
   partnersLabel: string;
   followSocial: string;
   unsubscribeLabel: string;
   footerNote: string;
+  previousEditionsLabel: string;
+  editionLabel: string;
 }
 
 interface WelcomeEmailProps {
@@ -44,6 +52,7 @@ interface WelcomeEmailProps {
   welcomeMessage?: string;
   sponsors?: WelcomeSponsor[];
   socialLinks?: WelcomeSocialLinks;
+  recentEditions?: WelcomeRecentEdition[];
   unsubscribeUrl?: string;
   messages: WelcomeMessages;
 }
@@ -63,11 +72,27 @@ const SOCIAL_META: Array<{
   alt: string;
   icon: string;
 }> = [
-  { key: "instagram", alt: "Instagram", icon: `${SOCIAL_ICON_BASE}/instagram_32px.png` },
-  { key: "x", alt: "X / Twitter", icon: `${SOCIAL_ICON_BASE}/twitter_32px.png` },
+  {
+    key: "instagram",
+    alt: "Instagram",
+    icon: `${SOCIAL_ICON_BASE}/instagram_32px.png`,
+  },
+  {
+    key: "x",
+    alt: "X / Twitter",
+    icon: `${SOCIAL_ICON_BASE}/twitter_32px.png`,
+  },
   { key: "tiktok", alt: "TikTok", icon: `${SOCIAL_ICON_BASE}/tiktok_32px.png` },
-  { key: "facebook", alt: "Facebook", icon: `${SOCIAL_ICON_BASE}/facebook_32px.png` },
-  { key: "linkedin", alt: "LinkedIn", icon: `${SOCIAL_ICON_BASE}/linkedin_32px.png` },
+  {
+    key: "facebook",
+    alt: "Facebook",
+    icon: `${SOCIAL_ICON_BASE}/facebook_32px.png`,
+  },
+  {
+    key: "linkedin",
+    alt: "LinkedIn",
+    icon: `${SOCIAL_ICON_BASE}/linkedin_32px.png`,
+  },
 ];
 
 const EYEBROW_LABEL: CSSProperties = {
@@ -86,10 +111,10 @@ const FOOTER_LABEL: CSSProperties = {
 
 const BODY_PARAGRAPH: CSSProperties = {
   margin: 0,
-  marginBottom: 16,
+  marginBottom: 18,
   fontFamily: fonts.serif,
-  fontSize: 16,
-  lineHeight: 1.85,
+  fontSize: 18,
+  lineHeight: 1.75,
   color: palette.textBody,
   whiteSpace: "pre-line",
 };
@@ -122,7 +147,13 @@ function CoverHero({ src, alt }: { src: string; alt: string }) {
   );
 }
 
-function SponsorsStrip({ sponsors, label }: { sponsors: WelcomeSponsor[]; label: string }) {
+function SponsorsStrip({
+  sponsors,
+  label,
+}: {
+  sponsors: WelcomeSponsor[];
+  label: string;
+}) {
   return (
     <Section
       style={{
@@ -199,37 +230,129 @@ function SponsorsStrip({ sponsors, label }: { sponsors: WelcomeSponsor[]; label:
 }
 
 function BodyCard({
-  heading,
   paragraphs,
   signatureName,
 }: {
-  heading: string;
   paragraphs: string[];
   signatureName: string;
 }) {
   return (
     <Section style={{ backgroundColor: CARD_BG, padding: "32px 32px 28px" }}>
-      <Text
-        style={{
-          margin: 0,
-          marginBottom: 20,
-          fontFamily: fonts.serif,
-          fontSize: 18,
-          fontWeight: 700,
-          lineHeight: 1.3,
-          color: palette.panelDark,
-        }}
-      >
-        {heading}
-      </Text>
-
       {paragraphs.map((p, i) => (
         <Text key={i} style={BODY_PARAGRAPH}>
           {p}
         </Text>
       ))}
 
-      <Text style={{ ...BODY_PARAGRAPH, marginTop: 4, marginBottom: 0 }}>— {signatureName}</Text>
+      <Text style={{ ...BODY_PARAGRAPH, marginTop: 4, marginBottom: 0 }}>
+        {signatureName}
+      </Text>
+    </Section>
+  );
+}
+
+function RecentEditionsSection({
+  editions,
+  label,
+  editionLabel,
+}: {
+  editions: WelcomeRecentEdition[];
+  label: string;
+  editionLabel: string;
+}) {
+  return (
+    <Section
+      style={{
+        backgroundColor: CARD_BG,
+        padding: "8px 32px 28px",
+      }}
+    >
+      <Text
+        style={{
+          ...EYEBROW_LABEL,
+          marginBottom: 8,
+          fontSize: 10,
+          letterSpacing: "0.22em",
+        }}
+      >
+        {label}
+      </Text>
+      {editions.map((edition) => {
+        const meta = edition.formattedDate
+          ? `${editionLabel} #${edition.editionNumber} · ${edition.formattedDate}`
+          : `${editionLabel} #${edition.editionNumber}`;
+        return (
+          <Link
+            key={edition.url}
+            href={edition.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ textDecoration: "none", display: "block" }}
+          >
+            <table
+              role="presentation"
+              cellPadding={0}
+              cellSpacing={0}
+              border={0}
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                borderTop: `1px solid ${HAIRLINE}`,
+              }}
+            >
+              <tbody>
+                <tr>
+                  <td style={{ verticalAlign: "middle", padding: "14px 0" }}>
+                    <Text
+                      style={{
+                        margin: 0,
+                        color: palette.textMuted,
+                        fontFamily: fonts.mono,
+                        fontSize: 10,
+                        letterSpacing: "0.14em",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {meta}
+                    </Text>
+                    <Text
+                      style={{
+                        margin: "4px 0 0",
+                        color: palette.textPrimary,
+                        fontFamily: fonts.serif,
+                        fontSize: 16,
+                        lineHeight: 1.35,
+                      }}
+                    >
+                      {edition.title}
+                    </Text>
+                  </td>
+                  <td
+                    style={{
+                      width: 1,
+                      verticalAlign: "middle",
+                      paddingLeft: 12,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        margin: 0,
+                        color: palette.accent,
+                        fontFamily: fonts.mono,
+                        fontSize: 14,
+                        fontWeight: 700,
+                      }}
+                    >
+                      →
+                    </Text>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </Link>
+        );
+      })}
     </Section>
   );
 }
@@ -238,7 +361,12 @@ function SocialRow({
   socials,
   label,
 }: {
-  socials: Array<{ key: keyof WelcomeSocialLinks; alt: string; icon: string; url: string }>;
+  socials: Array<{
+    key: keyof WelcomeSocialLinks;
+    alt: string;
+    icon: string;
+    url: string;
+  }>;
   label: string;
 }) {
   return (
@@ -249,7 +377,14 @@ function SocialRow({
         borderTop: `1px solid ${HAIRLINE}`,
       }}
     >
-      <Text style={{ ...FOOTER_LABEL, marginBottom: 12, fontSize: 10, letterSpacing: "0.18em" }}>
+      <Text
+        style={{
+          ...FOOTER_LABEL,
+          marginBottom: 12,
+          fontSize: 10,
+          letterSpacing: "0.18em",
+        }}
+      >
         {label}
       </Text>
       <table
@@ -351,6 +486,7 @@ export const WelcomeEmail = ({
   welcomeMessage,
   sponsors,
   socialLinks,
+  recentEditions,
   unsubscribeUrl,
   messages,
 }: WelcomeEmailProps) => {
@@ -364,6 +500,7 @@ export const WelcomeEmail = ({
   });
 
   const sponsorList = sponsors ?? [];
+  const editionList = recentEditions ?? [];
   const unsubscribeHref = unsubscribeUrl || profileUrl;
 
   return (
@@ -390,17 +527,29 @@ export const WelcomeEmail = ({
             padding: 0,
           }}
         >
-          {coverImageUrl ? <CoverHero src={coverImageUrl} alt={athleteFirstName} /> : null}
+          {coverImageUrl ? (
+            <CoverHero src={coverImageUrl} alt={athleteFirstName} />
+          ) : null}
 
           {sponsorList.length > 0 ? (
-            <SponsorsStrip sponsors={sponsorList} label={messages.partnersLabel} />
+            <SponsorsStrip
+              sponsors={sponsorList}
+              label={messages.partnersLabel}
+            />
           ) : null}
 
           <BodyCard
-            heading={messages.greetingHeading}
             paragraphs={paragraphs}
             signatureName={athleteFirstName}
           />
+
+          {editionList.length > 0 ? (
+            <RecentEditionsSection
+              editions={editionList}
+              label={messages.previousEditionsLabel}
+              editionLabel={messages.editionLabel}
+            />
+          ) : null}
 
           {socials.length > 0 ? (
             <SocialRow socials={socials} label={messages.followSocial} />
@@ -411,10 +560,6 @@ export const WelcomeEmail = ({
             unsubscribeLabel={messages.unsubscribeLabel}
             unsubscribeHref={unsubscribeHref}
           />
-
-          <Section style={{ height: 24, backgroundColor: CONTAINER_BG, fontSize: 0, lineHeight: 0 }}>
-            &nbsp;
-          </Section>
         </Container>
       </Body>
     </Html>
@@ -455,16 +600,37 @@ WelcomeEmail.PreviewProps = {
     instagram: "https://www.instagram.com/arthurrinder",
     x: "https://x.com/arthurrinder",
   },
+  recentEditions: [
+    {
+      title: "Monte Carlo Comeback",
+      editionNumber: 5,
+      formattedDate: "Apr 12, 2026",
+      url: "https://halocollective.co/arthur-rinderknech?edition=monte-carlo-comeback",
+    },
+    {
+      title: "Indian Wells: behind the scenes",
+      editionNumber: 4,
+      formattedDate: "Mar 22, 2026",
+      url: "https://halocollective.co/arthur-rinderknech?edition=indian-wells-behind-the-scenes",
+    },
+    {
+      title: "Pre-season: the work nobody sees",
+      editionNumber: 3,
+      formattedDate: "Feb 14, 2026",
+      url: "https://halocollective.co/arthur-rinderknech?edition=pre-season-the-work-nobody-sees",
+    },
+  ],
   messages: {
     preview: "You're in. Welcome to Arthur's circle.",
-    greetingHeading: "Welcome Adrien!",
     fallbackBody:
-      "Thanks for stepping inside. The next edition will land here the moment I publish it — until then, the back catalogue lives on my profile.",
+      "Thanks for stepping inside. The next edition will land here the moment I publish it. Until then, the back catalogue lives on my profile.",
     partnersLabel: "Partners",
     followSocial: "Follow Arthur on socials",
     unsubscribeLabel: "Unsubscribe",
     footerNote:
       "You're receiving this because you subscribed to Arthur Rinderknech's newsletter on Halo Collective.",
+    previousEditionsLabel: "Previous editions",
+    editionLabel: "Edition",
   },
 } satisfies WelcomeEmailProps;
 

@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import toast from "react-hot-toast";
+import { useDirectUpload } from "@/lib/hooks/useDirectUpload";
 
 interface AudioUploaderProps {
   url?: string | null;
@@ -41,37 +42,25 @@ export default function AudioUploader({
   onClear,
 }: AudioUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const { upload, isUploading } = useDirectUpload();
 
   const handleFile = useCallback(
     async (file: File) => {
-      setIsUploading(true);
       try {
         const duration = await readAudioDuration(file);
-
-        const formData = new FormData();
-        formData.append("file", file);
-        const res = await fetch("/api/admin/upload-audio", {
-          method: "POST",
-          body: formData,
+        const { url: uploadedUrl } = await upload(file, {
+          kind: "audio",
+          signEndpoint: "/api/admin/upload-audio",
         });
-        if (!res.ok) {
-          const data = (await res.json().catch(() => ({}))) as {
-            error?: string;
-          };
-          throw new Error(data.error ?? "Upload failed");
-        }
-        const data = (await res.json()) as { url: string };
-        onChange({ url: data.url, durationSec: duration });
+        onChange({ url: uploadedUrl, durationSec: duration });
         toast.success("Voice note uploaded");
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "Upload failed");
       } finally {
-        setIsUploading(false);
         if (inputRef.current) inputRef.current.value = "";
       }
     },
-    [onChange],
+    [onChange, upload],
   );
 
   return (

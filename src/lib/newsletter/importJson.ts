@@ -3,6 +3,7 @@ import { SECTION_ORDER } from "@/lib/newsletter/sectionDefaults";
 import type { NewsletterFormInput } from "@/lib/schemas/newsletter";
 import {
   ID_BEARING_KINDS,
+  optionalSectionTitle,
   type SectionTypeValue,
 } from "@/lib/schemas/newsletterSection";
 
@@ -21,6 +22,8 @@ export interface ImportWarning {
 }
 
 export interface ParsedNewsletterSection {
+  eyebrow: string | null;
+  title: string | null;
   blocks: unknown[];
 }
 
@@ -249,7 +252,7 @@ const SANITISERS: Record<string, Sanitiser> = {
     return block;
   },
 
-  // MONETISATION (7 kinds, same anatomy)
+  // MONETISATION (7 commerce kinds, same anatomy)
   ...Object.fromEntries(
     [
       "kit",
@@ -269,6 +272,24 @@ const SANITISERS: Record<string, Sanitiser> = {
       },
     ]),
   ),
+  phase_timeline(block) {
+    if (!Array.isArray(block.phases)) return undefined;
+    const cleaned = block.phases
+      .map((p) => {
+        if (!p || typeof p !== "object" || Array.isArray(p)) return null;
+        const item = { ...(p as Record<string, unknown>) };
+        const label = asString(item.label);
+        const title = asString(item.title);
+        const description = asString(item.description);
+        if (!label || !title || !description) return null;
+        return { label, title, description };
+      })
+      .filter((p): p is { label: string; title: string; description: string } => p !== null);
+    if (cleaned.length === 0) return undefined;
+    block.phases = cleaned;
+    ensureBlockId(block);
+    return block;
+  },
 
   // FAN_ENGAGEMENT
   poll: (block) => (ensureBlockId(block), block),
@@ -411,15 +432,42 @@ function buildSections(
   for (const type of SECTION_ORDER) {
     const raw = incoming[type];
     let blocks: unknown[] = [];
+    let titleRaw: unknown = undefined;
+    let eyebrowRaw: unknown = undefined;
     if (raw && typeof raw === "object" && !Array.isArray(raw)) {
       const wrapper = raw as Record<string, unknown>;
       if (Array.isArray(wrapper.blocks)) {
         blocks = wrapper.blocks;
       }
+      titleRaw = wrapper.title;
+      eyebrowRaw = wrapper.eyebrow;
     } else if (Array.isArray(raw)) {
       blocks = raw;
     }
-    map[type] = { blocks: sanitizeSectionBlocks(type, blocks, warnings) };
+    // Sanitise the title through the same chokepoint as the persisted
+    // write path — falls back to null on any failure rather than
+    // surfacing a Zod error from the importer.
+    const titleParsed = optionalSectionTitle.safeParse(titleRaw);
+    const title = titleParsed.success ? titleParsed.data : null;
+    if (titleRaw != null && titleRaw !== "" && !titleParsed.success) {
+      warnings.push({
+        section: type,
+        reason: "Custom subtitle dropped (failed validation, e.g., > 120 chars or line break).",
+      });
+    }
+    const eyebrowParsed = optionalSectionTitle.safeParse(eyebrowRaw);
+    const eyebrow = eyebrowParsed.success ? eyebrowParsed.data : null;
+    if (eyebrowRaw != null && eyebrowRaw !== "" && !eyebrowParsed.success) {
+      warnings.push({
+        section: type,
+        reason: "Custom title dropped (failed validation, e.g., > 120 chars or line break).",
+      });
+    }
+    map[type] = {
+      eyebrow,
+      title,
+      blocks: sanitizeSectionBlocks(type, blocks, warnings),
+    };
   }
   return map;
 }
@@ -482,6 +530,7 @@ export const NEWSLETTER_JSON_EXAMPLE = `{
   "countryRankSnapshot": 2,
   "sections": {
     "ATHLETE_REVIEW": {
+      "title": "Three matches, one lesson",
       "blocks": [
         { "kind": "text", "body": "Three matches, two wins, one tough loss. Here's how it felt..." }
       ]

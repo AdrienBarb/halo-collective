@@ -122,6 +122,11 @@ const heroMetric = z
 const matchCard = z
   .object({
     kind: z.literal("match_card"),
+    format: z
+      .enum(["singles", "doubles"])
+      .describe(
+        "Match format: 'singles' (1v1) or 'doubles' (2v2). Required on every match_card. Use 'singles' when in doubt (the source rarely says 'singles' explicitly). Use 'doubles' whenever the source mentions a partner, a '/' in the opponent name (e.g. 'Medvedev / Tien'), or any explicit doubles cue. Used to group matches under separate 'Simples' / 'Doubles' headers in the recap.",
+      ),
     result: z.enum(["W", "L", "BYE", "EXEMPT"]).describe("Match outcome."),
     roundName: z
       .string()
@@ -318,6 +323,23 @@ const fanExperience = z
   })
   .describe("Fan event, meet-and-greet, or clinic.");
 
+const phaseItem = z.object({
+  label: z.string().describe("Left-column tag, e.g., 'PHASE 1', 'WEEK 1-2'."),
+  title: z.string().describe("Short headline for the phase."),
+  description: z.string().describe("1-2 sentences describing the phase."),
+});
+
+const phaseTimeline = z
+  .object({
+    kind: z.literal("phase_timeline"),
+    phases: z
+      .array(phaseItem)
+      .describe("Ordered phases (2-10) — recovery plan, season prep, programme steps."),
+  })
+  .describe(
+    "Standalone phase/programme timeline. No title/body/cta — the section title acts as the heading.",
+  );
+
 const monetisationBlock = z.discriminatedUnion("kind", [
   kit,
   partnerContent,
@@ -326,6 +348,7 @@ const monetisationBlock = z.discriminatedUnion("kind", [
   athleteProduct,
   donation,
   fanExperience,
+  phaseTimeline,
 ]);
 
 // ── FAN_ENGAGEMENT blocks ─────────────────────────────────────────────
@@ -455,6 +478,9 @@ export const newsletterImportSchema = z.object({
     .object({
       ATHLETE_REVIEW: z
         .object({
+          title: looseString.describe(
+            "Optional custom section header (≤ 120 chars). Omit to use the default 'My week'.",
+          ),
           blocks: z
             .array(athleteReviewBlock)
             .describe("Athlete's first-person debrief. Lead with a `text` block."),
@@ -462,6 +488,9 @@ export const newsletterImportSchema = z.object({
         .optional(),
       WEEK_RECAP: z
         .object({
+          title: looseString.describe(
+            "Optional custom section header (≤ 120 chars). Omit to use the default 'What happened this week'.",
+          ),
           blocks: z
             .array(weekRecapBlock)
             .describe(
@@ -471,11 +500,17 @@ export const newsletterImportSchema = z.object({
         .optional(),
       COMING_UP: z
         .object({
+          title: looseString.describe(
+            "Optional custom section header (≤ 120 chars). Omit to use the default 'What's coming next'.",
+          ),
           blocks: z.array(comingUpBlock).describe("What's next: schedule items, previews, CTAs."),
         })
         .optional(),
       MONETISATION: z
         .object({
+          title: looseString.describe(
+            "Optional custom section header (≤ 120 chars). Omit to use the default 'What I'm into right now'.",
+          ),
           blocks: z
             .array(monetisationBlock)
             .describe("Commerce / sponsor / kit blocks. Omit if the source has no monetisation hooks."),
@@ -483,6 +518,9 @@ export const newsletterImportSchema = z.object({
         .optional(),
       FAN_ENGAGEMENT: z
         .object({
+          title: looseString.describe(
+            "Optional custom section header (≤ 120 chars). Omit to use the default 'Your turn'.",
+          ),
           blocks: z
             .array(fanEngagementBlock)
             .describe("Polls, quizzes, Q&A. A poll is a good default to drive replies."),

@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import type { MediaBlock } from "@/lib/schemas/newsletterSection";
 import AudioUploader from "@/components/admin/AudioUploader";
+import VideoUploader from "@/components/admin/VideoUploader";
 import CompactImageField from "@/components/admin/sections/CompactImageField";
 import {
   FieldGroup,
@@ -9,6 +11,15 @@ import {
   TextField,
 } from "@/components/admin/sections/FormAtoms";
 import { emptyMediaBlock } from "@/components/admin/sections/blockDefaults";
+
+type VideoMode = "upload" | "url";
+
+function initialVideoMode(value: MediaBlock | undefined): VideoMode {
+  if (value?.kind !== "video" || !value.url) return "upload";
+  // Supabase public storage URLs include this path segment — treat them as
+  // uploads. External URLs (YouTube, Vimeo, etc.) land on the URL tab.
+  return value.url.includes("/storage/v1/object/public/") ? "upload" : "url";
+}
 
 interface MediaBlockInputProps {
   value: MediaBlock | undefined;
@@ -39,6 +50,16 @@ export default function MediaBlockInput({
   const visibleOptions = required
     ? OPTIONS.filter((opt) => opt.kind !== "none")
     : OPTIONS;
+  const [videoMode, setVideoMode] = useState<VideoMode>(() =>
+    initialVideoMode(value),
+  );
+  // Re-derive the sub-toggle when the parent swaps the media kind so an editor
+  // toggling video → image → video doesn't carry a stale Upload/URL choice.
+  const [prevKind, setPrevKind] = useState(value?.kind);
+  if (value?.kind !== prevKind) {
+    setPrevKind(value?.kind);
+    if (value?.kind === "video") setVideoMode(initialVideoMode(value));
+  }
 
   function setKind(next: Kind) {
     if (next === kind) return;
@@ -155,14 +176,50 @@ export default function MediaBlockInput({
             aspect="wide"
             height={88}
           />
-          <TextField
-            label="Video URL"
-            placeholder="https://www.youtube.com/watch?v=…"
-            help="YouTube, Vimeo, or any embeddable URL."
-            type="url"
-            value={value.url}
-            onChange={(v) => onChange({ ...value, url: v })}
-          />
+
+          <div
+            role="radiogroup"
+            aria-label="Video source"
+            className="inline-flex overflow-hidden rounded-xs border border-line bg-cream"
+          >
+            {(["upload", "url"] as const).map((mode) => {
+              const active = videoMode === mode;
+              return (
+                <button
+                  key={mode}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => setVideoMode(mode)}
+                  className={[
+                    "min-h-9 px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] transition-colors",
+                    active
+                      ? "bg-ink text-cream"
+                      : "text-ink-3 hover:bg-cream-3 hover:text-ink",
+                  ].join(" ")}
+                >
+                  {mode === "upload" ? "Upload" : "URL"}
+                </button>
+              );
+            })}
+          </div>
+
+          {videoMode === "upload" ? (
+            <VideoUploader
+              url={value.url || null}
+              onChange={({ url }) => onChange({ ...value, url })}
+              onClear={() => onChange({ ...value, url: "" })}
+            />
+          ) : (
+            <TextField
+              label="Video URL"
+              placeholder="https://www.youtube.com/watch?v=…"
+              help="YouTube, Vimeo, or any embeddable URL."
+              type="url"
+              value={value.url}
+              onChange={(v) => onChange({ ...value, url: v })}
+            />
+          )}
         </div>
       ) : null}
 

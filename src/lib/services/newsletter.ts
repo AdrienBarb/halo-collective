@@ -10,13 +10,23 @@ import type {
   EditionModeValue,
   SectionTypeValue,
 } from "@/lib/schemas/newsletterSection";
-import { validateSectionBlocks } from "@/lib/schemas/newsletterSection";
+import {
+  optionalSectionTitle,
+  validateSectionBlocks,
+} from "@/lib/schemas/newsletterSection";
 import {
   BadRequestError,
   ConflictError,
   NotFoundError,
 } from "@/lib/errors/AppError";
-import { createCampaign, sendCampaignNow } from "@/lib/brevo/campaigns";
+import {
+  campaignStatusMeansSent,
+  createCampaign,
+  findCampaignByNewsletterId,
+  getCampaignStatus,
+  isCampaignAlreadyInitiatedError,
+  sendCampaignNow,
+} from "@/lib/brevo/campaigns";
 import { getRequiredEnv } from "@/lib/utils/env";
 import config from "@/lib/config";
 import { render } from "@react-email/render";
@@ -80,6 +90,8 @@ function logPrismaUniqueViolation(
 interface SectionRowInput {
   type: SectionTypeValue;
   order: number;
+  eyebrow: string | null;
+  title: string | null;
   blocks: Prisma.InputJsonValue;
 }
 
@@ -91,12 +103,19 @@ interface SectionRowInput {
  * is centralised here.
  */
 function buildSectionRows(
-  sections: Array<{ type: SectionTypeValue; blocks: unknown }>,
+  sections: Array<{
+    type: SectionTypeValue;
+    blocks: unknown;
+    eyebrow?: string | null;
+    title?: string | null;
+  }>,
   mode: EditionModeValue,
 ): SectionRowInput[] {
   return sections.map((s, index) => ({
     type: s.type,
     order: index,
+    eyebrow: s.eyebrow ?? null,
+    title: s.title ?? null,
     // .parse() output (including Zod defaults) is what we persist —
     // keeps stored JSON canonical with the schema.
     blocks: validateSectionBlocks(s.type, mode, s.blocks) as Prisma.InputJsonValue,
@@ -148,10 +167,32 @@ export const listPublishedByAthleteId = cache(async (athleteId: string) => {
       status: NewsletterStatus.PUBLISHED,
       publishedAt: { not: null },
     },
-    orderBy: { publishedAt: { sort: "desc", nulls: "last" } },
+    orderBy: { editionNumber: "desc" },
     include: { sections: { orderBy: { order: "asc" } } },
   });
 });
+
+export async function listRecentPublishedEditionsByAthleteId(
+  athleteId: string,
+  limit: number,
+) {
+  return prisma.newsletter.findMany({
+    where: {
+      athleteId,
+      status: NewsletterStatus.PUBLISHED,
+      publishedAt: { not: null },
+    },
+    orderBy: { editionNumber: "desc" },
+    take: limit,
+    select: {
+      slug: true,
+      title: true,
+      editionNumber: true,
+      editionDate: true,
+      publishedAt: true,
+    },
+  });
+}
 
 export const getPublishedNewsletterBySlugs = cache(
   async (athleteSlug: string, editionSlug: string) => {
@@ -294,10 +335,21 @@ export async function updateNewsletter(
   // when the editor doesn't change it in this update.
   const existing = await prisma.newsletter.findUnique({
     where: { id },
-    select: { editionMode: true },
+    select: { editionMode: true, status: true },
   });
   if (!existing) {
     throw new NotFoundError("Newsletter not found");
+  }
+  // Edits to a SENDING row would wipe `renderedHtml` mid-flight and
+  // strand the publish. Edits to a PUBLISHED row are FINE — the public
+  // web page renders from live section data, so the edit just updates
+  // the web version. The email already shipped is immutable on Brevo's
+  // side; no re-send happens (republish hits `republishWithoutResending`
+  // because `brevoCampaignId` is set).
+  if (existing.status === NewsletterStatus.SENDING) {
+    throw new ConflictError(
+      "Newsletter is currently being sent — wait for it to complete before editing",
+    );
   }
   const editionMode: EditionModeValue =
     input.editionMode ?? (existing.editionMode as EditionModeValue);
@@ -373,9 +425,17 @@ export async function cloneFromPreviousEdition(athleteId: string) {
           editionMode,
           s.blocks,
         );
+        // Re-validate the title through the same chokepoint as new
+        // writes — falls back to null on any failure so a legacy or
+        // out-of-band-written row can't propagate a malformed title
+        // into a fresh edition.
+        const eyebrowParsed = optionalSectionTitle.safeParse(s.eyebrow);
+        const titleParsed = optionalSectionTitle.safeParse(s.title);
         sectionsToCreate.push({
           type: s.type as SectionTypeValue,
           order: nextOrder++,
+          eyebrow: eyebrowParsed.success ? eyebrowParsed.data : null,
+          title: titleParsed.success ? titleParsed.data : null,
           blocks: blocks as Prisma.InputJsonValue,
         });
       } catch (validationError) {
@@ -546,6 +606,8 @@ export interface NewsletterEmailRenderInput {
     id: string;
     type: SectionTypeValue;
     order: number;
+    eyebrow: string | null;
+    title: string | null;
     blocks: unknown;
   }>;
 }
@@ -675,6 +737,8 @@ async function renderNewsletterEmail(
     id: s.id,
     type: s.type as SectionTypeValue,
     order: s.order,
+    eyebrow: s.eyebrow,
+    title: s.title,
     blocks: s.blocks,
   }));
   return renderEmailHtml(newsletter.athlete, input);
@@ -714,31 +778,31 @@ async function claimForSending(
   }
 }
 
+/**
+ * Flip the row to PUBLISHED. Conditional: only succeeds if the row is
+ * still SENDING and `brevoCampaignId` matches the campaignId this
+ * executor is finishing. Without the condition, a losing executor
+ * could overwrite the winning executor's campaignId here — defeating
+ * the `claimCampaignId` lock below.
+ */
 async function markPublished(
   id: string,
   campaignId: number,
-): Promise<NewsletterWithAthlete> {
+): Promise<boolean> {
   const now = new Date();
-  return prisma.newsletter.update({
-    where: { id },
+  const { count } = await prisma.newsletter.updateMany({
+    where: {
+      id,
+      status: NewsletterStatus.SENDING,
+      brevoCampaignId: String(campaignId),
+    },
     data: {
       status: NewsletterStatus.PUBLISHED,
       publishedAt: now,
       brevoSentAt: now,
-      brevoCampaignId: String(campaignId),
-    },
-    include: {
-      athlete: {
-        include: {
-          sponsors: {
-            orderBy: { order: "asc" },
-            select: { name: true, logoUrl: true, websiteUrl: true },
-          },
-        },
-      },
-      sections: { orderBy: { order: "asc" } },
     },
   });
+  return count === 1;
 }
 
 // Re-publishing a previously-sent edition deliberately does NOT
@@ -763,7 +827,14 @@ async function republishWithoutResending(
   });
 }
 
-export async function publishNewsletter(id: string) {
+/**
+ * Sync, fast phase of publish (~1-2s). Validates, renders HTML,
+ * atomically flips DRAFT → SENDING with the rendered archive stored.
+ * The HTTP route awaits this and returns to the admin; the heavy
+ * Brevo work happens afterwards via `executePublishFromSending`
+ * (typically scheduled via Next.js `after()`).
+ */
+export async function enqueuePublish(id: string) {
   const newsletter = await loadNewsletterWithAthlete(id);
 
   if (newsletter.status === NewsletterStatus.PUBLISHED) {
@@ -771,7 +842,7 @@ export async function publishNewsletter(id: string) {
   }
   if (newsletter.status === NewsletterStatus.SENDING) {
     throw new ConflictError(
-      "Publish in progress or stuck — check Brevo and reset the row manually",
+      "Publish already in progress — wait for it to complete",
     );
   }
   if (newsletter.sections.length === 0) {
@@ -780,8 +851,13 @@ export async function publishNewsletter(id: string) {
     );
   }
 
+  // Re-publishing a previously-sent edition: don't re-send to Brevo,
+  // just put the row back on the public site.
   if (newsletter.brevoCampaignId) {
-    return republishWithoutResending(id, newsletter.publishedAt);
+    return {
+      mode: "republished" as const,
+      newsletter: await republishWithoutResending(id, newsletter.publishedAt),
+    };
   }
 
   if (newsletter.athlete.brevoListId === null) {
@@ -790,46 +866,317 @@ export async function publishNewsletter(id: string) {
     );
   }
 
-  const brevoConfig = loadBrevoConfig();
-  const athleteName = `${newsletter.athlete.firstName} ${newsletter.athlete.lastName}`;
   const renderedHtml = await renderNewsletterEmail(newsletter);
 
   await claimForSending(id, renderedHtml);
   logBrevo("claimed", { newsletterId: id });
 
-  // Defense-in-depth: schema already rejects CRLF, but strip survivors
-  // before handing the string to Brevo as `subject`.
-  const rawSubject = newsletter.emailSubject ?? newsletter.title;
-  const subject = rawSubject.replace(/[\r\n\t]+/g, " ").slice(0, 200);
-  const campaignId = await createCampaign({
-    name: `${athleteName} — Edition #${newsletter.editionNumber} (${newsletter.slug})`,
-    subject,
-    htmlContent: renderedHtml,
-    sender: { name: athleteName, email: brevoConfig.senderEmail },
-    listIds: [newsletter.athlete.brevoListId],
-    replyTo: brevoConfig.replyToEmail,
-  });
-  logBrevo("campaign_created", { newsletterId: id, campaignId });
+  // Synthesize the post-claim view rather than re-reading the row.
+  // status/renderedHtml are the only fields claimForSending wrote, and
+  // the route only needs slugs + status to respond.
+  return {
+    mode: "queued" as const,
+    newsletter: {
+      ...newsletter,
+      status: NewsletterStatus.SENDING,
+      renderedHtml,
+    } satisfies NewsletterWithAthlete,
+  };
+}
 
-  await prisma.newsletter.update({
-    where: { id },
+function buildCampaignName(
+  newsletter: NewsletterWithAthlete,
+  athleteName: string,
+): string {
+  // The `[nl:<id>]` marker must come FIRST so it survives Brevo's
+  // name-field truncation. The recovery path scans Brevo campaign
+  // names for this marker; losing it = double-send risk.
+  return `[nl:${newsletter.id}] ${athleteName} — Edition #${newsletter.editionNumber} (${newsletter.slug})`;
+}
+
+interface CampaignClaim {
+  won: boolean;
+  canonicalId: number;
+}
+
+/**
+ * Race-safe persist of brevoCampaignId. The conditional `updateMany`
+ * only succeeds if no other executor has set the id yet; if we lose
+ * the race we re-read and return the winner's id. Callers MUST check
+ * `won`: when `won === false` we created an orphan campaign on Brevo
+ * (the winner is sending a different campaignId) and must NOT proceed
+ * to sendNow with our id, or both campaigns ship.
+ */
+async function claimCampaignId(
+  newsletterId: string,
+  campaignId: number,
+): Promise<CampaignClaim> {
+  const { count } = await prisma.newsletter.updateMany({
+    where: { id: newsletterId, brevoCampaignId: null },
     data: { brevoCampaignId: String(campaignId) },
   });
-
-  await sendCampaignNow(campaignId);
-  logBrevo("campaign_sent", { newsletterId: id, campaignId });
-
-  try {
-    return await markPublished(id, campaignId);
-  } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2025"
-    ) {
-      throw new NotFoundError("Newsletter not found");
-    }
-    throw error;
+  if (count === 1) {
+    return { won: true, canonicalId: campaignId };
   }
+  const row = await prisma.newsletter.findUnique({
+    where: { id: newsletterId },
+    select: { brevoCampaignId: true },
+  });
+  if (!row?.brevoCampaignId) {
+    // updateMany found no row to update but no id is set — should be
+    // impossible unless the row was deleted between operations.
+    throw new ConflictError("Newsletter row vanished mid-publish");
+  }
+  return { won: false, canonicalId: Number(row.brevoCampaignId) };
+}
+
+interface PrecheckedNewsletter {
+  newsletter: NewsletterWithAthlete;
+  renderedHtml: string;
+  brevoListId: number;
+}
+
+/**
+ * Throw on states that can't progress. Reverts the row to DRAFT when
+ * the state is permanently bad (missing html, missing brevoListId) so
+ * the admin can fix the underlying issue and retry — without this the
+ * row would sit in SENDING forever with no UI recovery affordance.
+ */
+async function precheckSendingRow(
+  id: string,
+): Promise<PrecheckedNewsletter | null> {
+  const newsletter = await loadNewsletterWithAthlete(id);
+
+  if (newsletter.status !== NewsletterStatus.SENDING) {
+    logBrevo("execute_skip_not_sending", {
+      newsletterId: id,
+      status: newsletter.status,
+    });
+    return null;
+  }
+  if (!newsletter.renderedHtml) {
+    // Reachable only when the row was put into SENDING outside the
+    // normal `enqueuePublish` path (manual DB edit, seed, etc.).
+    // Revert rather than leave the admin stranded on a row they
+    // can't edit (updateNewsletter blocks SENDING) and can't retry.
+    logBrevo("execute_missing_html_revert", { newsletterId: id });
+    await revertStuckRowToDraft(id, "missing_rendered_html");
+    return null;
+  }
+  if (newsletter.athlete.brevoListId === null) {
+    logBrevo("execute_missing_brevo_list_revert", { newsletterId: id });
+    await revertStuckRowToDraft(id, "missing_brevo_list");
+    return null;
+  }
+  return {
+    newsletter,
+    renderedHtml: newsletter.renderedHtml,
+    brevoListId: newsletter.athlete.brevoListId,
+  };
+}
+
+/**
+ * Verify an orphan Brevo campaign actually belongs to us before
+ * adopting it as the canonical campaign for this newsletter. Without
+ * these checks, a campaign manually created in the Brevo dashboard
+ * carrying our marker (intentionally or by accident) would be adopted
+ * and could be sent to the athlete's list under their identity.
+ */
+function orphanIsAdoptable(
+  candidate: NonNullable<Awaited<ReturnType<typeof findCampaignByNewsletterId>>>,
+  expected: { senderEmail: string; brevoListId: number },
+): boolean {
+  if (candidate.sender?.email?.toLowerCase() !== expected.senderEmail.toLowerCase()) {
+    return false;
+  }
+  const lists = candidate.recipients?.listIds ?? [];
+  if (!lists.includes(expected.brevoListId)) {
+    return false;
+  }
+  // Adopt regardless of status (`draft`, `queued`, `sent`...). If the
+  // orphan is past `draft`, the subsequent sendNow short-circuits via
+  // `campaignStatusMeansSent` and we proceed to markPublished.
+  return true;
+}
+
+/**
+ * Acquire a campaignId for this newsletter. Either:
+ *   (a) row already has one persisted → return it (we're resuming);
+ *   (b) Brevo already has an orphan campaign carrying our marker →
+ *       adopt it (we crashed between createCampaign and DB write);
+ *   (c) neither → create a fresh one on Brevo.
+ *
+ * Then race-safely persist via `claimCampaignId`. If the persist loses
+ * the race, returns null — caller MUST abort (we created an orphan but
+ * cannot send it without double-sending against the winner).
+ */
+async function resolveOrCreateCampaign(
+  pre: PrecheckedNewsletter,
+  brevoConfig: BrevoConfig,
+): Promise<number | null> {
+  const { newsletter, renderedHtml, brevoListId } = pre;
+  const athleteName = `${newsletter.athlete.firstName} ${newsletter.athlete.lastName}`;
+
+  if (newsletter.brevoCampaignId) {
+    return Number(newsletter.brevoCampaignId);
+  }
+
+  let candidateId: number;
+  const orphan = await findCampaignByNewsletterId(newsletter.id);
+  if (orphan && orphanIsAdoptable(orphan, {
+    senderEmail: brevoConfig.senderEmail,
+    brevoListId,
+  })) {
+    candidateId = orphan.id;
+    logBrevo("orphan_campaign_adopted", {
+      newsletterId: newsletter.id,
+      campaignId: candidateId,
+      brevoStatus: orphan.status,
+    });
+  } else {
+    if (orphan) {
+      logBrevo("orphan_campaign_rejected", {
+        newsletterId: newsletter.id,
+        candidateId: orphan.id,
+        brevoStatus: orphan.status,
+      });
+    }
+    const rawSubject = newsletter.emailSubject ?? newsletter.title;
+    const subject = rawSubject.replace(/[\r\n\t]+/g, " ").slice(0, 200);
+    candidateId = await createCampaign({
+      name: buildCampaignName(newsletter, athleteName),
+      subject,
+      htmlContent: renderedHtml,
+      sender: { name: athleteName, email: brevoConfig.senderEmail },
+      listIds: [brevoListId],
+      replyTo: brevoConfig.replyToEmail,
+    });
+    logBrevo("campaign_created", {
+      newsletterId: newsletter.id,
+      campaignId: candidateId,
+    });
+  }
+
+  const claim = await claimCampaignId(newsletter.id, candidateId);
+  if (!claim.won) {
+    // Concurrent executor already persisted a different id. Our
+    // candidate is now an orphan on Brevo — log loudly so an operator
+    // can clean it up, but bail before sending it.
+    logBrevo("campaign_id_race_lost_orphaned", {
+      newsletterId: newsletter.id,
+      ourCampaignId: candidateId,
+      canonicalCampaignId: claim.canonicalId,
+    });
+    return null;
+  }
+  return claim.canonicalId;
+}
+
+/**
+ * Send the campaign if it hasn't been sent yet. Idempotent: skips
+ * sendNow if Brevo already shows the campaign past `draft`, and
+ * swallows the narrow `campaign_already_*` family of 400s as a
+ * concurrent-send race we won the second time. Re-verifies via
+ * `getCampaignStatus` after swallowing to ensure the send actually
+ * happened — without that recheck, an over-broad error swallow could
+ * mark PUBLISHED a newsletter that never went out.
+ */
+async function ensureSent(
+  newsletterId: string,
+  campaignId: number,
+): Promise<void> {
+  const status = await getCampaignStatus(campaignId);
+  if (campaignStatusMeansSent(status)) {
+    logBrevo("send_already_initiated", {
+      newsletterId,
+      campaignId,
+      brevoStatus: status,
+    });
+    return;
+  }
+  try {
+    await sendCampaignNow(campaignId);
+    logBrevo("campaign_sent", { newsletterId, campaignId });
+  } catch (error) {
+    if (!isCampaignAlreadyInitiatedError(error)) throw error;
+    logBrevo("send_rejected_already_initiated", { newsletterId, campaignId });
+    // Verify the send actually happened on Brevo's side before we
+    // mark the row PUBLISHED downstream.
+    const recheck = await getCampaignStatus(campaignId);
+    if (!campaignStatusMeansSent(recheck)) {
+      throw new Error(
+        `Brevo rejected sendNow as 'already initiated' but campaign status is '${recheck}'`,
+      );
+    }
+  }
+}
+
+async function revertStuckRowToDraft(
+  id: string,
+  reason: string,
+): Promise<void> {
+  const { count } = await prisma.newsletter.updateMany({
+    where: { id, status: NewsletterStatus.SENDING },
+    data: {
+      status: NewsletterStatus.DRAFT,
+      brevoCampaignId: null,
+      renderedHtml: null,
+    },
+  });
+  logBrevo("reverted_to_draft", { newsletterId: id, reason, reverted: count });
+}
+
+/**
+ * Idempotent worker — safe to call repeatedly for the same id.
+ *
+ * Returns true when the row ended up PUBLISHED, false when the
+ * function deliberately did nothing (already published, wrong state,
+ * lost a race). Throws on Brevo errors or unexpected DB state.
+ *
+ * Concurrent-safety story:
+ *   - Two executors are only possible in pathological cases (manual
+ *     retry while `after()` is still alive) since the route refuses
+ *     to start a publish on a row already in SENDING and the retry
+ *     endpoint gates on `updatedAt`.
+ *   - When two executors race here, `claimCampaignId` ensures only
+ *     one's campaignId is persisted, and the loser bails before
+ *     calling sendNow — at most one campaign ever ships to subscribers.
+ *   - `markPublished` is a conditional update that only flips the row
+ *     to PUBLISHED when our campaignId matches the persisted one, so
+ *     the loser cannot misattribute a publish either.
+ */
+export async function executePublishFromSending(
+  id: string,
+): Promise<boolean> {
+  const pre = await precheckSendingRow(id);
+  if (!pre) return false;
+
+  const brevoConfig = loadBrevoConfig();
+
+  const campaignId = await resolveOrCreateCampaign(pre, brevoConfig);
+  if (campaignId === null) return false;
+
+  await ensureSent(id, campaignId);
+
+  const published = await markPublished(id, campaignId);
+  if (!published) {
+    // Conditional update missed — either the row was already flipped
+    // (recovery race) or our campaignId mismatches the canonical one.
+    // Re-read to log the actual state, but treat as no-op success
+    // from this executor's perspective.
+    const current = await prisma.newsletter.findUnique({
+      where: { id },
+      select: { status: true, brevoCampaignId: true },
+    });
+    logBrevo("mark_published_noop", {
+      newsletterId: id,
+      ourCampaignId: campaignId,
+      currentStatus: current?.status ?? null,
+      currentCampaignId: current?.brevoCampaignId ?? null,
+    });
+    return current?.status === NewsletterStatus.PUBLISHED;
+  }
+  return true;
 }
 
 export async function unpublishNewsletter(id: string) {

@@ -1,28 +1,38 @@
 import { Link, Section, Text } from "@react-email/components";
 import type { MatchCardBlock as MatchCardBlockType } from "@/lib/schemas/newsletterSection";
-import { getNewsletterLabels } from "@/lib/newsletter/labels";
+import {
+  getNewsletterLabels,
+  type NewsletterLocale,
+} from "@/lib/newsletter/labels";
 import { parseYouTubeId } from "@/lib/newsletter/youtube";
 import { palette, fonts } from "@/lib/emails/_brand/theme";
 
 interface MatchCardBlockProps {
   match: MatchCardBlockType;
+  locale?: NewsletterLocale;
 }
 
 const RESULT_STYLES: Record<
   MatchCardBlockType["result"],
-  { background: string; color: string; letter: string }
+  { background: string; color: string }
 > = {
-  W: { background: palette.accent, color: palette.surface, letter: "W" },
-  L: { background: palette.loss, color: palette.surface, letter: "L" },
-  BYE: { background: palette.panelMuted, color: palette.textMuted, letter: "—" },
-  EXEMPT: { background: palette.panelMuted, color: palette.textMuted, letter: "—" },
+  W: { background: palette.accent, color: palette.surface },
+  L: { background: palette.loss, color: palette.surface },
+  BYE: { background: palette.panelMuted, color: palette.textMuted },
+  EXEMPT: { background: palette.panelMuted, color: palette.textMuted },
 };
 
-export default function MatchCardBlock({ match }: MatchCardBlockProps) {
+export default function MatchCardBlock({ match, locale }: MatchCardBlockProps) {
   const style = RESULT_STYLES[match.result];
   const showOpponent =
     match.opponentName && match.result !== "BYE" && match.result !== "EXEMPT";
-  const labels = getNewsletterLabels();
+  const labels = getNewsletterLabels(locale);
+  const resultLetter =
+    match.result === "W"
+      ? labels.matchResultLetters.win
+      : match.result === "L"
+        ? labels.matchResultLetters.loss
+        : "—";
   const isYouTube = parseYouTubeId(match.highlightUrl) !== null;
   const highlightsLabel = isYouTube
     ? labels.ctas.watchOnYoutube
@@ -67,7 +77,7 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
                           textAlign: "center",
                         }}
                       >
-                        {style.letter}
+                        {resultLetter}
                       </div>
                     </td>
                     <td style={{ verticalAlign: "middle" }}>

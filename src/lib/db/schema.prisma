@@ -18,7 +18,7 @@ model User {
   countryCode   String?
   phone         String?
   role          UserRole  @default(USER)
-  locale        String    @default("en")
+  locale        String    @default("fr")
   trackingParams Json?    @map("tracking_params")
   onboardingCompleted  Boolean  @default(false) @map("onboarding_completed")
   interestSports       String[] @default([])    @map("interest_sports")
@@ -175,6 +175,8 @@ model NewsletterSection {
   newsletterId String
   order        Int
   type         SectionType
+  eyebrow      String?
+  title        String?
   blocks       Json
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt

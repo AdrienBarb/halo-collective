@@ -57,7 +57,9 @@ import {
   parseNewsletterImport,
   type ParsedNewsletterImport,
 } from "@/lib/newsletter/importJson";
-import { CLAUDE_BRIEF_PROMPT } from "@/lib/newsletter/claudeBriefPrompt";
+import { getNewsletterLabels, getSectionTitle } from "@/lib/newsletter/labels";
+import { DEFAULT_LOCALE } from "@/i18n/locales";
+import { CLAUDE_BRIEF_PROJECT_SYSTEM_PROMPT } from "@/lib/newsletter/claudeBriefPrompt";
 import {
   Dialog,
   DialogContent,
@@ -133,6 +135,39 @@ function buildSectionBlocksMap(
   return map;
 }
 
+type SectionTitlesMap = Record<SectionTypeValue, string>;
+type SectionEyebrowsMap = Record<SectionTypeValue, string>;
+
+function buildSectionTitlesMap(
+  initial: NewsletterSection[] | undefined,
+): SectionTitlesMap {
+  const byType = new Map<SectionTypeValue, NewsletterSection>();
+  for (const s of initial ?? []) {
+    const t = s.type as SectionTypeValue;
+    if (!byType.has(t)) byType.set(t, s);
+  }
+  const map = {} as SectionTitlesMap;
+  for (const type of SECTION_ORDER) {
+    map[type] = byType.get(type)?.title ?? "";
+  }
+  return map;
+}
+
+function buildSectionEyebrowsMap(
+  initial: NewsletterSection[] | undefined,
+): SectionEyebrowsMap {
+  const byType = new Map<SectionTypeValue, NewsletterSection>();
+  for (const s of initial ?? []) {
+    const t = s.type as SectionTypeValue;
+    if (!byType.has(t)) byType.set(t, s);
+  }
+  const map = {} as SectionEyebrowsMap;
+  for (const type of SECTION_ORDER) {
+    map[type] = byType.get(type)?.eyebrow ?? "";
+  }
+  return map;
+}
+
 export default function NewsletterForm({
   athleteId,
   athletes,
@@ -169,6 +204,12 @@ export default function NewsletterForm({
   const [sections, setSections] = useState<SectionBlocksMap>(() =>
     buildSectionBlocksMap(initialData?.sections),
   );
+  const [sectionTitles, setSectionTitles] = useState<SectionTitlesMap>(() =>
+    buildSectionTitlesMap(initialData?.sections),
+  );
+  const [sectionEyebrows, setSectionEyebrows] = useState<SectionEyebrowsMap>(() =>
+    buildSectionEyebrowsMap(initialData?.sections),
+  );
 
   const editionMode = (useWatch({
     control: form.control,
@@ -184,10 +225,16 @@ export default function NewsletterForm({
   function applyImport(parsed: ParsedNewsletterImport) {
     form.reset(parsed.header);
     const nextSections = {} as SectionBlocksMap;
+    const nextTitles = {} as SectionTitlesMap;
+    const nextEyebrows = {} as SectionEyebrowsMap;
     for (const type of SECTION_ORDER) {
       nextSections[type] = parsed.sections[type].blocks;
+      nextTitles[type] = parsed.sections[type].title ?? "";
+      nextEyebrows[type] = parsed.sections[type].eyebrow ?? "";
     }
     setSections(nextSections);
+    setSectionTitles(nextTitles);
+    setSectionEyebrows(nextEyebrows);
     setImportError(null);
     const blockCount = Object.values(nextSections).reduce(
       (sum, blocks) => sum + blocks.length,
@@ -276,8 +323,10 @@ export default function NewsletterForm({
 
   async function handleCopyClaudePrompt() {
     try {
-      await navigator.clipboard.writeText(CLAUDE_BRIEF_PROMPT);
-      toast.success("Claude prompt copied — paste it into a new Claude.ai chat");
+      await navigator.clipboard.writeText(CLAUDE_BRIEF_PROJECT_SYSTEM_PROMPT);
+      toast.success(
+        "System prompt copied — paste it into your Claude.ai Project's custom instructions",
+      );
     } catch {
       toast.error("Could not copy the prompt");
     }
@@ -326,6 +375,8 @@ export default function NewsletterForm({
         countryRankSnapshot: data.countryRankSnapshot ?? undefined,
       });
       setSections(buildSectionBlocksMap(data.sections));
+      setSectionTitles(buildSectionTitlesMap(data.sections));
+      setSectionEyebrows(buildSectionEyebrowsMap(data.sections));
       router.refresh();
     },
     onError: (error: Error & { response?: { data?: { error?: string } } }) => {
@@ -371,10 +422,7 @@ export default function NewsletterForm({
       athleteId,
       newsletterId: isEdit ? initialData?.id : undefined,
       header: form.getValues(),
-      sections: SECTION_ORDER.map((type) => ({
-        type,
-        blocks: sections[type] ?? [],
-      })),
+      sections: buildSectionPayloads(),
       testEmail: trimmed,
     });
   }
@@ -383,9 +431,27 @@ export default function NewsletterForm({
     setSections((prev) => ({ ...prev, [type]: blocks }));
   }
 
+  // Single chokepoint for the section payload shape — keeps test-send,
+  // preview, and submit identical so an admin signing off on a preview
+  // sees what publish will actually render.
+  const buildSectionPayloads = (
+    blocksOverrides?: Partial<Record<SectionTypeValue, unknown[]>>,
+  ): Array<{
+    type: SectionTypeValue;
+    eyebrow: string | null;
+    title: string | null;
+    blocks: unknown[];
+  }> =>
+    SECTION_ORDER.map((type) => ({
+      type,
+      eyebrow: sectionEyebrows[type]?.trim() || null,
+      title: sectionTitles[type]?.trim() || null,
+      blocks: blocksOverrides?.[type] ?? sections[type] ?? [],
+    }));
+
   function onSubmit(values: HeaderValues) {
     const mode = (values.editionMode ?? "WEEKLY") as EditionModeValue;
-    const ordered: Array<{ type: SectionTypeValue; blocks: unknown[] }> = [];
+    const validatedBlocks: Partial<Record<SectionTypeValue, unknown[]>> = {};
     for (const type of SECTION_ORDER) {
       const result = validateSectionDraft(
         { type, blocks: sections[type] },
@@ -400,8 +466,9 @@ export default function NewsletterForm({
         }
         return;
       }
-      ordered.push({ type, blocks: result.blocks });
+      validatedBlocks[type] = result.blocks;
     }
+    const ordered = buildSectionPayloads(validatedBlocks);
     if (isEdit) {
       update.mutate({ ...values, sections: ordered });
     } else {
@@ -430,15 +497,17 @@ export default function NewsletterForm({
       toast.error("Pick an athlete first");
       return;
     }
+    // handlePreview only runs on click — Date.now() here is not a
+    // render call. The lint heuristic widened after F2 introduced
+    // a state-closing helper; suppress narrowly rather than restructure.
+    // eslint-disable-next-line react-hooks/purity
+    const stashedAt = Date.now();
     const payload = {
       athleteId,
       newsletterId: isEdit ? initialData?.id : undefined,
       header: form.getValues(),
-      sections: SECTION_ORDER.map((type) => ({
-        type,
-        blocks: sections[type] ?? [],
-      })),
-      stashedAt: Date.now(),
+      sections: buildSectionPayloads(),
+      stashedAt,
     };
     try {
       window.localStorage.setItem(
@@ -524,9 +593,9 @@ export default function NewsletterForm({
                       type="button"
                       variant="outline"
                       onClick={handleCopyClaudePrompt}
-                      title="Copy the prompt to paste into a new Claude.ai chat. Claude will turn your raw material into a brief you can paste back here."
+                      title="Copy the system prompt to install in your Claude.ai Project. Once installed, paste raw material in any conversation in that project and Claude returns a brief you can paste back here."
                     >
-                      Copy Claude prompt
+                      Copy Claude system prompt
                     </Button>
                     <Button
                       type="button"
@@ -1002,6 +1071,15 @@ export default function NewsletterForm({
             {/* ─── The 5 fixed sections ─── */}
             {SECTION_ORDER.map((type, idx) => {
               const number = (idx + 1).toString().padStart(2, "0");
+              // No titleTemplate currently consumes the tournament name
+              // (only `tournamentLabelTemplate` does). Passing null
+              // avoids re-rendering all 5 section editors on every
+              // tournamentName keystroke. Re-subscribe via useWatch if
+              // a future titleTemplate interpolates `{tournament}`.
+              const placeholder =
+                getSectionTitle(type, null, DEFAULT_LOCALE) ?? "";
+              const eyebrowPlaceholder =
+                getNewsletterLabels(DEFAULT_LOCALE).sections[type].eyebrow;
               return (
                 <SectionCard
                   key={type}
@@ -1009,6 +1087,16 @@ export default function NewsletterForm({
                   number={number}
                   name={SECTION_LABELS[type]}
                   description={SECTION_DESCRIPTIONS[type]}
+                  eyebrow={sectionEyebrows[type]}
+                  eyebrowPlaceholder={eyebrowPlaceholder}
+                  onEyebrowChange={(value) =>
+                    setSectionEyebrows((prev) => ({ ...prev, [type]: value }))
+                  }
+                  title={sectionTitles[type]}
+                  titlePlaceholder={placeholder}
+                  onTitleChange={(value) =>
+                    setSectionTitles((prev) => ({ ...prev, [type]: value }))
+                  }
                 >
                   {type === "ATHLETE_REVIEW" ? (
                     <AthleteReviewFields

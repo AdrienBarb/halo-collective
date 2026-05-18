@@ -27,6 +27,8 @@ export interface RawSection {
   id: string;
   type: SectionTypeValue;
   order: number;
+  eyebrow: string | null;
+  title: string | null;
   blocks: unknown;
 }
 
@@ -130,22 +132,30 @@ export default function SectionRenderer({
     ? rawLocale
     : DEFAULT_LOCALE;
   const labels = getNewsletterLabels(locale);
-  const eyebrow = labels.sections[section.type].eyebrow;
+  const eyebrow =
+    section.eyebrow?.trim() || labels.sections[section.type].eyebrow;
   const number = (index + 1).toString().padStart(2, "0");
-  const title = getSectionTitle(section.type, tournamentName, locale);
+  // Explicit string|null annotation: the `{title ? ...}` guard below
+  // depends on this being nullable — locks the contract even if
+  // getSectionTitle ever returns a non-nullable string.
+  const title: string | null =
+    section.title?.trim() ||
+    getSectionTitle(section.type, tournamentName, locale);
 
   return (
     <section className="overflow-hidden rounded-2xl border border-line bg-cream-2">
-      <header className="relative space-y-3 bg-banner px-6 py-6 md:px-8 md:py-7">
+      <header className="relative space-y-2.5 bg-banner px-5 py-5 md:space-y-3 md:px-8 md:py-7">
         <span
           aria-hidden
           className="absolute inset-x-0 top-0 h-[3px] bg-accent-gold"
         />
-        <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.28em] text-accent-warm">
-          {number} &nbsp;·&nbsp; {eyebrow}
+        <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-accent-warm md:text-[13px] md:tracking-[0.28em]">
+          <span>{number}</span>
+          <span aria-hidden className="mx-1.5 md:mx-2">·</span>
+          <span>{eyebrow}</span>
         </div>
         {title ? (
-          <h2 className="font-serif text-[28px] font-medium leading-[1.1] tracking-[-0.02em] text-cream md:text-[32px]">
+          <h2 className="font-serif text-[24px] font-medium leading-[1.1] tracking-[-0.02em] text-cream md:text-[36px]">
             {title}
           </h2>
         ) : null}

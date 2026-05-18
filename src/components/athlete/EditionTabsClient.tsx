@@ -48,7 +48,7 @@ export default function EditionTabsClient({
   const rawLocale = useLocale();
   const locale = isLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const [editionParam, setEdition] = useQueryState("edition", {
-    shallow: false,
+    shallow: true,
   });
   const selectedSlug =
     editions.find((e) => e.slug === editionParam)?.slug ?? defaultSlug;
@@ -105,8 +105,8 @@ export default function EditionTabsClient({
   }
 
   return (
-    <section className="border-b border-line px-6 py-8">
-      <div className="mb-4 flex items-baseline justify-between">
+    <section className="border-b border-line px-6 py-5">
+      <div className="mb-3 flex items-baseline justify-between">
         <div className="flex items-baseline gap-3">
           <h3 className="font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink">
             {t("title")}
@@ -136,7 +136,7 @@ export default function EditionTabsClient({
       <div
         ref={scrollerRef}
         onScroll={updateScrollState}
-        className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 scroll-px-1 motion-safe:scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-1 scroll-px-1 motion-safe:scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
       >
         {editions.map((edition) => {
           const isActive = edition.slug === selectedSlug;
@@ -152,10 +152,8 @@ export default function EditionTabsClient({
               data-slug={edition.slug}
               onClick={() => selectEdition(edition.slug)}
               aria-pressed={isActive}
-              className={`group relative aspect-[5/4] w-[62%] shrink-0 cursor-pointer snap-start overflow-hidden rounded-2xl border bg-[linear-gradient(135deg,#5a6478_0%,#2c3340_100%)] text-left transition-[transform,box-shadow,border-color] duration-200 ease-out motion-safe:hover:-translate-y-[2px] motion-safe:hover:[box-shadow:0_10px_28px_rgba(0,0,0,0.12)] sm:w-[44%] md:w-[32%] ${
-                isActive
-                  ? "border-accent-gold [box-shadow:0_0_0_2px_var(--color-accent-gold,#c9a86b)_inset]"
-                  : "border-line"
+              className={`group relative aspect-[5/4] w-[62%] shrink-0 cursor-pointer snap-start overflow-hidden rounded-2xl border border-line bg-[linear-gradient(135deg,#5a6478_0%,#2c3340_100%)] text-left transition-opacity duration-200 ease-out sm:w-[44%] md:w-[32%] ${
+                isActive ? "opacity-100" : "opacity-50 hover:opacity-80"
               }`}
             >
               {edition.heroImageUrl ? (
@@ -175,6 +173,12 @@ export default function EditionTabsClient({
               <div className="absolute left-4 top-4 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-white">
                 {meta}
               </div>
+              {isActive ? (
+                <span
+                  aria-label={t("reading")}
+                  className="absolute right-3 top-3 h-2 w-2 rounded-full bg-accent-gold shadow-[0_0_0_2px_rgba(255,255,255,0.6)] motion-safe:animate-pulse"
+                />
+              ) : null}
               <div className="absolute bottom-4 left-4 right-4">
                 <h4 className="font-serif text-[18px] font-semibold leading-[1.15] tracking-[-0.015em] text-white md:text-[20px]">
                   {edition.title}

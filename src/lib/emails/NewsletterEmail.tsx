@@ -140,6 +140,7 @@ export const NewsletterEmail = ({
           tournamentName={tournamentName}
           editionUrl={editionUrl}
           askQuestionUrl={askQuestionUrl}
+          locale={locale}
         />
       ))}
 
@@ -160,6 +161,8 @@ const samplePreviewSections: EmailRawSection[] = [
     id: "preview-athlete-review",
     type: "ATHLETE_REVIEW" satisfies SectionTypeValue,
     order: 0,
+    eyebrow: null,
+    title: null,
     blocks: [
       {
         kind: "text",
@@ -172,12 +175,15 @@ const samplePreviewSections: EmailRawSection[] = [
     id: "preview-week-recap",
     type: "WEEK_RECAP" satisfies SectionTypeValue,
     order: 1,
+    eyebrow: null,
+    title: null,
     blocks: [
       { kind: "hero_metric", value: "1-1", label: "W/L" },
       { kind: "hero_metric", value: "78%", label: "1st serve" },
       { kind: "hero_metric", value: "12", label: "Aces" },
       {
         kind: "match_card",
+        format: "singles",
         result: "W",
         roundName: "Round 1",
         opponentName: "J. Doe",
@@ -192,6 +198,9 @@ const samplePreviewSections: EmailRawSection[] = [
     id: "preview-coming-up",
     type: "COMING_UP" satisfies SectionTypeValue,
     order: 2,
+    // Custom eyebrow + default title — exercises independent override.
+    eyebrow: "Next stop",
+    title: null,
     blocks: [
       {
         kind: "text",
@@ -202,6 +211,44 @@ const samplePreviewSections: EmailRawSection[] = [
         dateRange: "Apr 22–28",
         title: "Madrid Open",
         description: "Singles main draw, qualifier TBD.",
+      },
+    ],
+  },
+  {
+    id: "preview-monetisation",
+    type: "MONETISATION" satisfies SectionTypeValue,
+    order: 3,
+    // Non-null eyebrow + title exercise the override path in email:dev preview.
+    eyebrow: "My current picks",
+    title: "What I'm playing with",
+    blocks: [
+      {
+        kind: "kit",
+        id: "11111111-1111-4111-8111-111111111111",
+        title: "My match-day racket",
+        body: "The frame I trust on big points.",
+        cta: { label: "See the kit", url: "https://example.com/kit" },
+        price: "€249",
+      },
+    ],
+  },
+  {
+    id: "preview-fan-engagement",
+    type: "FAN_ENGAGEMENT" satisfies SectionTypeValue,
+    order: 4,
+    // Null eyebrow + title exercise the fallback to the static labels.
+    eyebrow: null,
+    title: null,
+    blocks: [
+      {
+        kind: "poll",
+        id: "22222222-2222-4222-8222-222222222222",
+        question: "Which surface is my best chance this season?",
+        options: [
+          { label: "Clay", emoji: "🟠", isHighlighted: false },
+          { label: "Hard", emoji: "⚪", isHighlighted: false },
+          { label: "Grass", emoji: "🟢", isHighlighted: false },
+        ],
       },
     ],
   },

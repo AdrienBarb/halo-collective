@@ -49,6 +49,13 @@ export interface NewsletterLabels {
     partners: string;
     exclusiveMember: string;
   };
+  mediaRecap: {
+    header: string;
+    /** Use `{count}` placeholder */
+    articleSingularTemplate: string;
+    /** Use `{count}` placeholder */
+    articlePluralTemplate: string;
+  };
   engagementInteractive: {
     signInToParticipate: string;
     subscribeToParticipate: string;
@@ -76,6 +83,11 @@ export interface NewsletterLabels {
   questionIntro: string;
   /** Use `{tournament}` as a placeholder. */
   tournamentLabelTemplate: string;
+  /** Single letter badges in match result rings (W/L) — localized. */
+  matchResultLetters: {
+    win: string;
+    loss: string;
+  };
 }
 
 const EN: NewsletterLabels = {
@@ -139,6 +151,11 @@ const EN: NewsletterLabels = {
     partners: "My partners",
     exclusiveMember: "Exclusive member",
   },
+  mediaRecap: {
+    header: "What they wrote",
+    articleSingularTemplate: "{count} article",
+    articlePluralTemplate: "{count} articles",
+  },
   engagementInteractive: {
     signInToParticipate: "Sign in to participate",
     subscribeToParticipate: "Subscribe to participate",
@@ -162,8 +179,10 @@ const EN: NewsletterLabels = {
   },
   reassuranceText:
     "I'll pick 3 fan questions and answer them in the next newsletter.",
-  questionIntro: "Vote to help me prioritise — I'll respond in the next edition.",
+  questionIntro:
+    "Vote to help me prioritise — I'll respond in the next edition.",
   tournamentLabelTemplate: "My week at {tournament}",
+  matchResultLetters: { win: "W", loss: "L" },
 };
 
 const FR: NewsletterLabels = {
@@ -218,7 +237,7 @@ const FR: NewsletterLabels = {
     prediction: "Pronostic",
     quiz: "Quiz",
     prize_draw: "Tirage au sort",
-    qa: "Pose-moi tes questions",
+    qa: "La parole est à toi",
     survey: "Mini-sondage",
     challenge: "Défi",
   },
@@ -226,6 +245,11 @@ const FR: NewsletterLabels = {
     press: "Ce qu'on a écrit sur moi",
     partners: "Mes partenaires",
     exclusiveMember: "Membre exclusif",
+  },
+  mediaRecap: {
+    header: "Ce qu'on a écrit sur moi",
+    articleSingularTemplate: "{count} article",
+    articlePluralTemplate: "{count} articles",
   },
   engagementInteractive: {
     signInToParticipate: "Connecte-toi pour participer",
@@ -253,12 +277,13 @@ const FR: NewsletterLabels = {
   questionIntro:
     "Vote pour m'aider à prioriser — je réponds dans la prochaine édition.",
   tournamentLabelTemplate: "Ma semaine à {tournament}",
+  matchResultLetters: { win: "V", loss: "D" },
 };
 
 const REGISTRY: Record<NewsletterLocale, NewsletterLabels> = { en: EN, fr: FR };
 
 export function getNewsletterLabels(
-  locale: NewsletterLocale = "en",
+  locale: NewsletterLocale = "en"
 ): NewsletterLabels {
   return REGISTRY[locale] ?? EN;
 }
@@ -270,7 +295,7 @@ export function getNewsletterLabels(
  */
 export function applyTournamentTemplate(
   template: string,
-  tournamentName: string | null | undefined,
+  tournamentName: string | null | undefined
 ): string | null {
   if (!template.includes("{tournament}")) return template;
   const name = tournamentName?.trim();
@@ -282,17 +307,23 @@ export function applyTournamentTemplate(
 export function getSectionTitle(
   type: SectionTypeValue,
   tournamentName: string | null | undefined,
-  locale: NewsletterLocale = "en",
+  locale: NewsletterLocale = "en"
 ): string | null {
   const labels = getNewsletterLabels(locale);
-  return applyTournamentTemplate(labels.sections[type].titleTemplate, tournamentName);
+  return applyTournamentTemplate(
+    labels.sections[type].titleTemplate,
+    tournamentName
+  );
 }
 
 /** Derive the athlete-voice "My week in X" line shown in the identity block. */
 export function getTournamentLabel(
   tournamentName: string | null | undefined,
-  locale: NewsletterLocale = "en",
+  locale: NewsletterLocale = "en"
 ): string | null {
   const labels = getNewsletterLabels(locale);
-  return applyTournamentTemplate(labels.tournamentLabelTemplate, tournamentName);
+  return applyTournamentTemplate(
+    labels.tournamentLabelTemplate,
+    tournamentName
+  );
 }

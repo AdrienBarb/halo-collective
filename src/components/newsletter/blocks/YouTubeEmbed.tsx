@@ -6,18 +6,11 @@ import { Play } from "lucide-react";
 
 interface YouTubeEmbedProps {
   videoId: string;
-  thumbnailUrl?: string | null;
   label: string;
 }
 
-export default function YouTubeEmbed({
-  videoId,
-  thumbnailUrl,
-  label,
-}: YouTubeEmbedProps) {
+export default function YouTubeEmbed({ videoId, label }: YouTubeEmbedProps) {
   const [playing, setPlaying] = useState(false);
-  const poster =
-    thumbnailUrl ?? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 
   if (playing) {
     return (
@@ -41,7 +34,7 @@ export default function YouTubeEmbed({
       className="relative flex aspect-video w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-ink"
     >
       <Image
-        src={poster}
+        src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
         alt=""
         fill
         sizes="(max-width: 820px) 100vw, 820px"

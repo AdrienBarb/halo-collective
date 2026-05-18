@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useId, useRef, useState } from "react";
+import { useCallback, useId, useRef } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { FieldLabel, FieldHelp } from "@/components/admin/sections/FormAtoms";
+import { useDirectUpload } from "@/lib/hooks/useDirectUpload";
 import { cn } from "@/lib/utils";
 
 const ACCEPT = "image/jpeg,image/png,image/webp,image/avif,image/svg+xml";
@@ -32,37 +33,26 @@ export default function CompactImageField({
   className,
 }: CompactImageFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const { upload, isUploading } = useDirectUpload();
   const id = useId();
   const width = aspect === "square" ? height : Math.round(height * (16 / 9));
 
   const handleFile = useCallback(
     async (file: File) => {
-      setIsUploading(true);
       try {
-        const formData = new FormData();
-        formData.append("file", file);
-        const res = await fetch("/api/admin/upload", {
-          method: "POST",
-          body: formData,
+        const { url: uploadedUrl } = await upload(file, {
+          kind: "image",
+          signEndpoint: "/api/admin/upload",
         });
-        if (!res.ok) {
-          const data = (await res.json().catch(() => ({}))) as {
-            error?: string;
-          };
-          throw new Error(data.error ?? "Upload failed");
-        }
-        const data = (await res.json()) as { url: string };
-        onChange(data.url);
+        onChange(uploadedUrl);
         toast.success("Uploaded");
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "Upload failed");
       } finally {
-        setIsUploading(false);
         if (inputRef.current) inputRef.current.value = "";
       }
     },
-    [onChange],
+    [onChange, upload],
   );
 
   return (

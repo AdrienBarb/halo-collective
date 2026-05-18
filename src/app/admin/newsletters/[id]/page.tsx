@@ -61,6 +61,7 @@ export default async function EditNewsletterPage({
             <PublishToggle
               newsletterId={newsletter.id}
               status={newsletter.status}
+              updatedAt={newsletter.updatedAt.toISOString()}
             />
           </div>
         </div>

@@ -14,6 +14,7 @@ import {
 import {
   getNewsletterLabels,
   getSectionTitle,
+  type NewsletterLocale,
 } from "@/lib/newsletter/labels";
 import { palette, fonts } from "@/lib/emails/_brand/theme";
 import AthleteReviewSection from "@/lib/emails/sections/AthleteReviewSection";
@@ -26,6 +27,8 @@ export interface EmailRawSection {
   id: string;
   type: SectionTypeValue;
   order: number;
+  eyebrow: string | null;
+  title: string | null;
   blocks: unknown;
 }
 
@@ -38,6 +41,7 @@ interface SectionRendererProps {
   editionUrl: string;
   /** Feedback form URL — used by Q&A "Ask me anything" CTA. */
   askQuestionUrl?: string | null;
+  locale: NewsletterLocale;
 }
 
 function renderBody(
@@ -45,6 +49,7 @@ function renderBody(
   mode: EditionModeValue,
   editionUrl: string,
   askQuestionUrl: string | null | undefined,
+  locale: NewsletterLocale,
 ): React.ReactNode {
   const parsed = safeParseSectionBlocks(section.type, mode, section.blocks);
   if (!parsed.success) return null;
@@ -60,6 +65,7 @@ function renderBody(
           blocks={
             parsed.data as Array<WeekRecapTournamentBlock | WeekRecapWeeklyBlock>
           }
+          locale={locale}
         />
       );
     case "COMING_UP":
@@ -86,16 +92,26 @@ export default function SectionRenderer({
   tournamentName,
   editionUrl,
   askQuestionUrl,
+  locale,
 }: SectionRendererProps) {
   if (!isSectionMeaningful(section.type, section.blocks)) return null;
 
-  const body = renderBody(section, editionMode, editionUrl, askQuestionUrl);
+  const body = renderBody(
+    section,
+    editionMode,
+    editionUrl,
+    askQuestionUrl,
+    locale,
+  );
   if (body === null) return null;
 
-  const labels = getNewsletterLabels();
-  const eyebrow = labels.sections[section.type].eyebrow;
+  const labels = getNewsletterLabels(locale);
+  const eyebrow =
+    section.eyebrow?.trim() || labels.sections[section.type].eyebrow;
   const number = (index + 1).toString().padStart(2, "0");
-  const title = getSectionTitle(section.type, tournamentName);
+  // Explicit string|null annotation — same reasoning as the web renderer.
+  const title: string | null =
+    section.title?.trim() || getSectionTitle(section.type, tournamentName, locale);
 
   return (
     <Section style={{ marginTop: 8 }}>

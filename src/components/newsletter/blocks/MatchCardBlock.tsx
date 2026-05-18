@@ -5,6 +5,7 @@ import {
   type NewsletterLocale,
 } from "@/lib/newsletter/labels";
 import { parseYouTubeId } from "@/lib/newsletter/youtube";
+import YouTubeEmbed from "@/components/newsletter/blocks/YouTubeEmbed";
 import { DEFAULT_LOCALE, isLocale } from "@/i18n/locales";
 
 interface MatchCardBlockProps {
@@ -26,13 +27,21 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
     ? rawLocale
     : DEFAULT_LOCALE;
   const labels = getNewsletterLabels(locale);
-  const isYouTube = parseYouTubeId(match.highlightUrl) !== null;
-  const highlightsLabel = isYouTube
+  const youtubeId = parseYouTubeId(match.highlightUrl);
+  const highlightsLabel = youtubeId
     ? labels.ctas.watchOnYoutube
     : labels.ctas.highlights;
+  const resultLetter =
+    match.result === "W"
+      ? labels.matchResultLetters.win
+      : match.result === "L"
+        ? labels.matchResultLetters.loss
+        : match.result === "EXEMPT"
+          ? "—"
+          : match.result;
 
   const metaRight = [match.roundName, match.date].filter(Boolean).join(" · ");
-  const headline = showOpponent ? match.opponentName : match.result;
+  const headline = showOpponent ? match.opponentName : resultLetter;
   const subline = showOpponent
     ? match.opponentRank
       ? `${match.opponentRank}${match.opponentCountry ? ` · ${match.opponentCountry}` : ""}`
@@ -45,7 +54,7 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
         <span
           className={`inline-flex h-6 min-w-[28px] items-center justify-center rounded-md px-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.12em] ${BADGE_STYLES[match.result]}`}
         >
-          {match.result === "EXEMPT" ? "—" : match.result}
+          {resultLetter}
         </span>
         {metaRight ? (
           <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
@@ -79,7 +88,11 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
         </p>
       ) : null}
 
-      {match.highlightUrl ? (
+      {youtubeId ? (
+        <div className="mt-4">
+          <YouTubeEmbed videoId={youtubeId} label={highlightsLabel} />
+        </div>
+      ) : match.highlightUrl ? (
         <div className="mt-4">
           <a
             href={match.highlightUrl}

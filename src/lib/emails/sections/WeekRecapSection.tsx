@@ -1,8 +1,10 @@
-import { Section } from "@react-email/components";
+import { Section, Text } from "@react-email/components";
 import type {
   WeekRecapTournamentBlock,
   WeekRecapWeeklyBlock,
 } from "@/lib/schemas/newsletterSection";
+import type { NewsletterLocale } from "@/lib/newsletter/labels";
+import { palette, fonts } from "@/lib/emails/_brand/theme";
 import HeroMetricBlock from "@/lib/emails/blocks/HeroMetricBlock";
 import MatchCardBlock from "@/lib/emails/blocks/MatchCardBlock";
 import MediaLinkRow from "@/lib/emails/blocks/MediaLinkRow";
@@ -19,18 +21,32 @@ type WeekRecapBlock = WeekRecapTournamentBlock | WeekRecapWeeklyBlock;
 
 interface WeekRecapSectionProps {
   blocks: WeekRecapBlock[];
+  locale: NewsletterLocale;
 }
 
-const GROUPABLE_KINDS = new Set(["hero_metric", "media_link"]);
+const GROUPABLE_KINDS = new Set(["hero_metric", "media_link", "match_card"]);
 
-function groupRuns<T extends { kind: string }>(blocks: T[]): T[][] {
-  const groups: T[][] = [];
+const MATCH_FORMAT_LABELS: Record<"singles" | "doubles", string> = {
+  singles: "Simples",
+  doubles: "Doubles",
+};
+
+// Group key: match_card runs are split by format so singles and doubles
+// land in separate groups even when interleaved. Other groupable kinds
+// just key on `kind`.
+function groupKeyOf(block: WeekRecapBlock): string {
+  if (block.kind === "match_card") return `match_card:${block.format}`;
+  return block.kind;
+}
+
+function groupRuns(blocks: WeekRecapBlock[]): WeekRecapBlock[][] {
+  const groups: WeekRecapBlock[][] = [];
   for (const block of blocks) {
     const last = groups[groups.length - 1];
     if (
       last &&
       GROUPABLE_KINDS.has(block.kind) &&
-      last[0].kind === block.kind
+      groupKeyOf(last[0]) === groupKeyOf(block)
     ) {
       last.push(block);
     } else {
@@ -40,12 +56,33 @@ function groupRuns<T extends { kind: string }>(blocks: T[]): T[][] {
   return groups;
 }
 
-function renderBlock(block: WeekRecapBlock, key: number): React.ReactNode {
+function MatchFormatHeader({ format }: { format: "singles" | "doubles" }) {
+  return (
+    <Text
+      style={{
+        margin: "0 0 4px",
+        color: palette.textMuted,
+        fontFamily: fonts.mono,
+        fontSize: 10,
+        letterSpacing: "0.18em",
+        textTransform: "uppercase",
+      }}
+    >
+      {MATCH_FORMAT_LABELS[format]}
+    </Text>
+  );
+}
+
+function renderBlock(
+  block: WeekRecapBlock,
+  key: number,
+  locale: NewsletterLocale,
+): React.ReactNode {
   switch (block.kind) {
     case "tournament_summary":
       return <TournamentSummaryBlock key={key} summary={block} />;
     case "match_card":
-      return <MatchCardBlock key={key} match={block} />;
+      return null; // handled by grouping
     case "media_link":
       return <MediaLinkRow key={key} link={block} />;
     case "training_update":
@@ -57,7 +94,7 @@ function renderBlock(block: WeekRecapBlock, key: number): React.ReactNode {
     case "social_recap":
       return <SocialRecapBlock key={key} block={block} />;
     case "media_recap":
-      return <MediaRecapBlock key={key} block={block} />;
+      return <MediaRecapBlock key={key} block={block} locale={locale} />;
     case "stats_update":
       return <StatsUpdateBlock key={key} block={block} />;
     case "quote":
@@ -67,8 +104,17 @@ function renderBlock(block: WeekRecapBlock, key: number): React.ReactNode {
   }
 }
 
-export default function WeekRecapSection({ blocks }: WeekRecapSectionProps) {
+export default function WeekRecapSection({
+  blocks,
+  locale,
+}: WeekRecapSectionProps) {
   const groups = groupRuns(blocks);
+  // Only label match groups when both formats are present in the section
+  // — a singles-only or doubles-only recap reads cleaner without a header.
+  const matchFormatsPresent = new Set(
+    blocks.flatMap((b) => (b.kind === "match_card" ? [b.format] : [])),
+  );
+  const showMatchFormatHeaders = matchFormatsPresent.size > 1;
   return (
     <Section>
       {groups.map((group, gi) => {
@@ -108,7 +154,7 @@ export default function WeekRecapSection({ blocks }: WeekRecapSectionProps) {
         if (group[0].kind === "media_link") {
           return (
             <Section key={gi} style={{ marginBottom: 16 }}>
-              <MediaLinkGroupHeader />
+              <MediaLinkGroupHeader locale={locale} />
               {group.map((link, li) => (
                 <MediaLinkRow
                   key={li}
@@ -118,8 +164,29 @@ export default function WeekRecapSection({ blocks }: WeekRecapSectionProps) {
             </Section>
           );
         }
+        if (group[0].kind === "match_card") {
+          const head = group[0] as Extract<WeekRecapBlock, { kind: "match_card" }>;
+          return (
+            <Section key={gi} style={{ marginBottom: 8 }}>
+              {showMatchFormatHeaders && (
+                <MatchFormatHeader format={head.format} />
+              )}
+              {group.map((match, mi) => (
+                <MatchCardBlock
+                  key={mi}
+                  match={
+                    match as Extract<WeekRecapBlock, { kind: "match_card" }>
+                  }
+                  locale={locale}
+                />
+              ))}
+            </Section>
+          );
+        }
         return (
-          <Section key={gi}>{group.map((b, bi) => renderBlock(b, bi))}</Section>
+          <Section key={gi}>
+            {group.map((b, bi) => renderBlock(b, bi, locale))}
+          </Section>
         );
       })}
     </Section>

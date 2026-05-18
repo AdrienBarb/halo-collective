@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import { useDirectUpload } from "@/lib/hooks/useDirectUpload";
 
 interface HeroUploaderProps {
   value?: string | null;
@@ -26,36 +27,25 @@ export default function HeroUploader({
   aspectClassName = "aspect-[16/9]",
 }: HeroUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const { upload, isUploading } = useDirectUpload();
   const [isDragging, setIsDragging] = useState(false);
 
   const handleFile = useCallback(
     async (file: File) => {
-      setIsUploading(true);
       try {
-        const formData = new FormData();
-        formData.append("file", file);
-        const res = await fetch("/api/admin/upload", {
-          method: "POST",
-          body: formData,
+        const { url: uploadedUrl } = await upload(file, {
+          kind: "image",
+          signEndpoint: "/api/admin/upload",
         });
-        if (!res.ok) {
-          const data = (await res.json().catch(() => ({}))) as {
-            error?: string;
-          };
-          throw new Error(data.error ?? "Upload failed");
-        }
-        const data = (await res.json()) as { url: string };
-        onChange(data.url);
+        onChange(uploadedUrl);
         toast.success("Cover uploaded");
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "Upload failed");
       } finally {
-        setIsUploading(false);
         if (inputRef.current) inputRef.current.value = "";
       }
     },
-    [onChange],
+    [onChange, upload],
   );
 
   return (

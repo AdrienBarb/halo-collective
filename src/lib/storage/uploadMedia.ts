@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { supabaseStorage } from "./client";
+import { MEDIA_BUCKET } from "./bucketConfig";
 
-const MEDIA_BUCKET = "media";
 const SAFE_PATH_SEGMENT = /^[A-Za-z0-9._-]+$/;
 
 type UploadInput = {

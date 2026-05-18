@@ -14,6 +14,7 @@ import { renderNewsletterPreviewEmailMjml } from "@/lib/services/newsletterMjml"
 import { getAthleteBySlug } from "@/lib/services/athlete";
 import {
   editionModeSchema,
+  optionalSectionTitle,
   sectionTypeSchema,
   type EditionModeValue,
   type SectionTypeValue,
@@ -50,6 +51,11 @@ export const draftPayloadSchema = z.object({
   sections: z.array(
     z.object({
       type: sectionTypeSchema,
+      // Reuse the persisted-write schema so preview/test-send and publish
+      // normalise titles identically — the toRenderInput invariant says
+      // the preview MUST match what Brevo would send.
+      eyebrow: optionalSectionTitle,
+      title: optionalSectionTitle,
       blocks: z.unknown(),
     }),
   ),
@@ -108,6 +114,8 @@ export async function buildDraftPreview(
     newsletterId,
     order: i,
     type: s.type as SectionTypeValue,
+    eyebrow: s.eyebrow ?? null,
+    title: s.title ?? null,
     blocks: s.blocks as NewsletterSection["blocks"],
     createdAt: now,
     updatedAt: now,
@@ -154,6 +162,8 @@ export async function buildDraftPreview(
     id: s.id,
     type: s.type as SectionTypeValue,
     order: s.order,
+    eyebrow: s.eyebrow,
+    title: s.title,
     blocks: s.blocks,
   }));
   const emailHtml =

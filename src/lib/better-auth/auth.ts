@@ -12,6 +12,7 @@ import {
 import { createContact as createHubspotContact } from "@/lib/hubspot/contacts";
 import { ATTRIBUTION_COOKIE } from "@/lib/constants/attribution";
 import { resolveCountryName } from "@/lib/utils/resolveCountryName";
+import { LOCALE_COOKIE, isLocale } from "@/i18n/locales";
 
 const baseURL =
   process.env.BETTER_AUTH_URL ||
@@ -38,6 +39,23 @@ async function persistTrackingParams(
   await prisma.user.update({
     where: { id: userId },
     data: { trackingParams },
+  });
+}
+
+async function readLocaleCookie(): Promise<string | null> {
+  try {
+    const store = await cookies();
+    const raw = store.get(LOCALE_COOKIE)?.value;
+    return isLocale(raw) ? raw : null;
+  } catch {
+    return null;
+  }
+}
+
+async function persistLocale(userId: string, locale: string): Promise<void> {
+  await prisma.user.update({
+    where: { id: userId },
+    data: { locale },
   });
 }
 
@@ -136,7 +154,7 @@ export const auth = betterAuth({
       countryCode: { type: "string", required: false, input: true },
       phone: { type: "string", required: false, input: true },
       role: { type: "string", required: false, input: false, defaultValue: "USER" },
-      locale: { type: "string", required: false, input: false, defaultValue: "en" },
+      locale: { type: "string", required: false, input: false, defaultValue: "fr" },
       onboardingCompleted: { type: "boolean", required: false, input: false, defaultValue: false },
     },
   },
@@ -145,7 +163,10 @@ export const auth = betterAuth({
       create: {
         after: async (user) => {
           try {
-            const trackingParams = await readAttributionCookie();
+            const [trackingParams, cookieLocale] = await Promise.all([
+              readAttributionCookie(),
+              readLocaleCookie(),
+            ]);
 
             // Re-fetch to get the typed user with additionalFields populated
             // (matches the sendResetPassword pattern above and avoids unsafe
@@ -170,6 +191,24 @@ export const auth = betterAuth({
                 console.error(
                   JSON.stringify({
                     scope: "auth.persist_tracking_failed",
+                    userId: user.id,
+                    error: String(error),
+                  }),
+                );
+              }
+            }
+
+            // Inherit the locale the visitor already chose in the language
+            // switcher. Without this, the additionalFields default ("en")
+            // wins and syncLocaleFromUser() overwrites the FR cookie right
+            // after signup, snapping the UI back to English.
+            if (cookieLocale) {
+              try {
+                await persistLocale(user.id, cookieLocale);
+              } catch (error: unknown) {
+                console.error(
+                  JSON.stringify({
+                    scope: "auth.persist_locale_failed",
                     userId: user.id,
                     error: String(error),
                   }),

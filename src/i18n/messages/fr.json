@@ -121,17 +121,18 @@
     "Editions": {
       "title": "Éditions",
       "previous": "Édition précédente",
-      "next": "Édition suivante"
+      "next": "Édition suivante",
+      "reading": "En cours"
     },
     "Subscribe": {
       "tickBoxError": "Cochez la case pour recevoir la newsletter",
       "eyebrow": "Rejoindre la newsletter",
-      "title": "Entrez dans la saison de {athleteFirstName}",
+      "title": "Entrer dans la saison de {athleteFirstName}",
       "lead": "Chaque semaine, {athleteFirstName} partage ses résultats, les coulisses des tournois, sa routine hebdomadaire, son équipement et d'autres contenus exclusifs.",
       "newsletterHeading": "La newsletter de {athleteFirstName}",
-      "newsletterConsent": "J'accepte de recevoir les e-mails de {athleteFirstName} : résultats, coulisses, routine hebdomadaire, équipement et contenu exclusif.",
+      "newsletterConsent": "J'accepte de recevoir les actus, coulisses et contenus exclusifs de {athleteFirstName}.",
       "partnerOffersHeading": "Offres partenaires",
-      "partnerOffersConsent": "J'accepte de recevoir, occasionnellement, les offres, actualités et avantages des partenaires sélectionnés par {athleteFirstName}.",
+      "partnerOffersConsent": "J'accepte de recevoir les offres et avantages des partenaires de {athleteFirstName}.",
       "finePrint": "En vous inscrivant, vous acceptez de recevoir les communications choisies. Vous pouvez vous désabonner à tout moment en un clic.",
       "subscribing": "Inscription…",
       "subscribeCta": "S'abonner à la newsletter →",
@@ -186,15 +187,16 @@
       "button": "Réinitialiser le mot de passe"
     },
     "Welcome": {
+      "subject": "Bienvenue dans ma team",
       "preview": "C'est confirmé. Bienvenue dans le cercle de {athleteFirstName}.",
-      "greetingHeading": "Bienvenue {fanFirstName} !",
-      "greetingHeadingFallback": "Bienvenue dans le cercle de {athleteFirstName}.",
       "fanFirstNameFallback": "toi",
-      "fallbackBody": "Merci d'avoir rejoint le cercle. La prochaine édition arrivera ici dès que {athleteFirstName} la publiera — en attendant, le catalogue est disponible sur le profil.",
+      "fallbackBody": "Merci d'avoir rejoint le cercle. La prochaine édition arrivera ici dès que {athleteFirstName} la publiera. En attendant, le catalogue est disponible sur le profil.",
       "partnersLabel": "Partenaires",
       "followSocial": "Retrouvez {athleteFirstName} sur les réseaux",
       "unsubscribeLabel": "Se désabonner",
-      "footerNote": "Vous recevez cet e-mail parce que vous vous êtes abonné·e à la newsletter de {athleteName} sur Halo Collective. Vous pouvez vous désabonner à tout moment."
+      "footerNote": "Vous recevez cet e-mail parce que vous vous êtes abonné·e à la newsletter de {athleteName} sur Halo Collective. Vous pouvez vous désabonner à tout moment.",
+      "previousEditionsLabel": "Éditions précédentes",
+      "editionLabel": "Édition"
     },
     "Newsletter": {
       "editionLabel": "Édition n°{n}",

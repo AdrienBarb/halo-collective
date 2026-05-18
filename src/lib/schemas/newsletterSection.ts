@@ -28,6 +28,26 @@ const promptText = (min = 1) =>
 const labelText = (min = 1) =>
   z.string().trim().min(min).max(LABEL, `Must be ${LABEL} characters or fewer`);
 
+// Optional per-section custom title. Trimmed; empty → null so renderers
+// can fall back to the static default from `lib/newsletter/labels.ts`.
+// Same line-break/tab rejection as the newsletter title because this
+// string also lands in HTML email headers where stray CRs would corrupt
+// downstream Brevo headers if ever surfaced there.
+export const optionalSectionTitle = z
+  .union([z.string(), z.null(), z.undefined()])
+  .optional()
+  .transform((v) => {
+    if (v == null) return null;
+    const trimmed = v.trim();
+    return trimmed === "" ? null : trimmed;
+  })
+  .refine((v) => v == null || v.length <= LABEL, {
+    message: `Must be ${LABEL} characters or fewer`,
+  })
+  .refine((v) => v == null || /^[^\r\n\t]+$/.test(v), {
+    message: "Cannot contain line breaks or tabs",
+  });
+
 const cappedMediaUrl = mediaUrl.max(URL_MAX);
 const cappedOptionalMediaUrl = optionalMediaUrl;
 const cappedSafeUrl = safeUrl.max(URL_MAX);
@@ -67,6 +87,7 @@ const blockId = z.string().uuid({ message: "Block id must be a UUID" });
 const MAX_BLOCKS_PER_SECTION = 50;
 const MAX_OPTIONS_PER_BLOCK = 20;
 const MAX_LINKS_PER_BLOCK = 20;
+const MAX_PHASES_PER_BLOCK = 10;
 
 // ── Shared MediaBlock primitive ───────────────────────────────────────
 
@@ -147,6 +168,9 @@ const heroMetricBlockSchema = z.object({
 
 const matchCardBlockSchema = z.object({
   kind: z.literal("match_card"),
+  // .default lets old persisted blocks (pre-format) parse as "singles"
+  // so no DB migration is needed — Zod backfills on read.
+  format: z.enum(["singles", "doubles"]).default("singles"),
   result: z.enum(["W", "L", "BYE", "EXEMPT"]),
   roundName: shortText(),
   opponentName: optionalTrimmedString,
@@ -311,6 +335,24 @@ const fanExperienceBlockSchema = z.object({
   ...monetisationBaseFields,
 });
 
+// A single phase inside a phase_timeline block. `label` is the left
+// column tag (e.g. "PHASE 1", "SEM. 1-2"); `title` is the short headline;
+// `description` is one or two sentences of detail.
+const phaseItemSchema = z.object({
+  label: shortText(),
+  title: shortText(),
+  description: bodyText(),
+});
+
+// Standalone visual block (no title/body/cta) that lists ordered phases
+// — used for recovery plans, season prep, multi-step programmes inside
+// the MONETISATION section.
+const phaseTimelineBlockSchema = z.object({
+  kind: z.literal("phase_timeline"),
+  id: blockId,
+  phases: z.array(phaseItemSchema).min(2).max(MAX_PHASES_PER_BLOCK),
+});
+
 export const monetisationBlockSchema = z.discriminatedUnion("kind", [
   kitBlockSchema,
   partnerContentBlockSchema,
@@ -319,6 +361,7 @@ export const monetisationBlockSchema = z.discriminatedUnion("kind", [
   athleteProductBlockSchema,
   donationBlockSchema,
   fanExperienceBlockSchema,
+  phaseTimelineBlockSchema,
 ]);
 
 // ── FAN_ENGAGEMENT blocks ─────────────────────────────────────────────
@@ -490,6 +533,8 @@ export function isSectionMeaningful(
 
 export const addSectionSchema = z.object({
   type: sectionTypeSchema,
+  eyebrow: optionalSectionTitle,
+  title: optionalSectionTitle,
   blocks: z.unknown(),
   order: z.number().int().nonnegative().optional(),
 });
@@ -538,6 +583,8 @@ export type PaidContentBlock = z.output<typeof paidContentBlockSchema>;
 export type AthleteProductBlock = z.output<typeof athleteProductBlockSchema>;
 export type DonationBlock = z.output<typeof donationBlockSchema>;
 export type FanExperienceBlock = z.output<typeof fanExperienceBlockSchema>;
+export type PhaseItem = z.output<typeof phaseItemSchema>;
+export type PhaseTimelineBlock = z.output<typeof phaseTimelineBlockSchema>;
 export type MonetisationBlock = z.output<typeof monetisationBlockSchema>;
 
 export type PollBlock = z.output<typeof pollBlockSchema>;

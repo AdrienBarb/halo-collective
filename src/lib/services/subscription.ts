@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db/prisma";
 import { ensureAthleteList } from "@/lib/brevo/lists";
 import { upsertContact } from "@/lib/brevo/contacts";
 import { getAthleteBySlug } from "@/lib/services/athlete";
+import { listRecentPublishedEditionsByAthleteId } from "@/lib/services/newsletter";
 import { sendWelcomeEmail } from "@/lib/resend/sendWelcomeEmail";
 import { NotFoundError } from "@/lib/errors/AppError";
 import { updateContactByEmail } from "@/lib/hubspot/contacts";
@@ -167,6 +168,14 @@ export async function createSubscription(
   }
 
   if (isNewSubscriber) {
+    // Surface the most recent published editions so new fans can read the
+    // back-catalogue from the welcome email. Failure here must not block the
+    // welcome — fall back to an empty list.
+    const recentEditions = await listRecentPublishedEditionsByAthleteId(
+      athlete.id,
+      3,
+    ).catch(() => []);
+
     // Fire-and-forget: a Resend hiccup must not 502 the subscribe.
     sendWelcomeEmail({
       email: user.email,
@@ -182,6 +191,12 @@ export async function createSubscription(
         name: s.name,
         logoUrl: s.logoUrl,
         websiteUrl: s.websiteUrl,
+      })),
+      recentEditions: recentEditions.map((e) => ({
+        slug: e.slug,
+        title: e.title,
+        editionNumber: e.editionNumber,
+        editionDate: e.publishedAt,
       })),
       locale: user.locale,
     }).catch((error: unknown) => {
