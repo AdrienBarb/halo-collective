@@ -1,9 +1,18 @@
 import { Fragment } from "react";
-import { MjmlColumn, MjmlSection, MjmlText } from "@faire/mjml-react";
+import {
+  MjmlColumn,
+  MjmlSection,
+  MjmlSpacer,
+  MjmlText,
+} from "@faire/mjml-react";
 import {
   isSectionMeaningful,
   safeParseSectionBlocks,
+  type AthleteReviewBlock,
+  type ComingUpBlock,
   type EditionModeValue,
+  type FanEngagementBlock,
+  type MonetisationBlock,
   type SectionTypeValue,
   type WeekRecapTournamentBlock,
   type WeekRecapWeeklyBlock,
@@ -11,14 +20,21 @@ import {
 import {
   getNewsletterLabels,
   getSectionTitle,
+  type NewsletterLocale,
 } from "@/lib/newsletter/labels";
 import { palette, fonts } from "@/lib/emails/_brand/theme";
+import AthleteReviewSection from "@/lib/emails/mjml/sections/AthleteReviewSection";
+import ComingUpSection from "@/lib/emails/mjml/sections/ComingUpSection";
+import FanEngagementSection from "@/lib/emails/mjml/sections/FanEngagementSection";
+import MonetisationSection from "@/lib/emails/mjml/sections/MonetisationSection";
 import WeekRecapSection from "@/lib/emails/mjml/sections/WeekRecapSection";
 
 export interface EmailRawSection {
   id: string;
   type: SectionTypeValue;
   order: number;
+  eyebrow: string | null;
+  title: string | null;
   blocks: unknown;
 }
 
@@ -27,49 +43,64 @@ interface SectionRendererProps {
   index: number;
   editionMode: EditionModeValue;
   tournamentName?: string | null;
-}
-
-function PortPlaceholder({ type }: { type: SectionTypeValue }) {
-  return (
-    <MjmlSection
-      backgroundColor={palette.panelMuted}
-      cssClass="force-light-bg"
-      padding="20px 32px"
-    >
-      <MjmlColumn>
-        <MjmlText
-          color={palette.textMuted}
-          fontFamily={fonts.mono}
-          fontSize="11px"
-          letterSpacing="0.18em"
-          textTransform="uppercase"
-          padding="0"
-        >
-          [Section type &ldquo;{type}&rdquo; not yet ported to MJML]
-        </MjmlText>
-      </MjmlColumn>
-    </MjmlSection>
-  );
+  /** Web reader URL for this edition — used by vote / prize-draw / quiz / survey CTAs. */
+  editionUrl: string;
+  /** Feedback form URL — used by Q&A "Ask me anything" CTA. */
+  askQuestionUrl?: string | null;
+  locale: NewsletterLocale;
 }
 
 function renderBody(
   section: EmailRawSection,
   mode: EditionModeValue,
+  editionUrl: string,
+  askQuestionUrl: string | null | undefined,
+  locale: NewsletterLocale,
 ): React.ReactNode {
   const parsed = safeParseSectionBlocks(section.type, mode, section.blocks);
   if (!parsed.success) return null;
 
-  if (section.type === "WEEK_RECAP") {
-    return (
-      <WeekRecapSection
-        blocks={
-          parsed.data as Array<WeekRecapTournamentBlock | WeekRecapWeeklyBlock>
-        }
-      />
-    );
+  switch (section.type) {
+    case "ATHLETE_REVIEW":
+      return (
+        <AthleteReviewSection
+          blocks={parsed.data as AthleteReviewBlock[]}
+          locale={locale}
+        />
+      );
+    case "WEEK_RECAP":
+      return (
+        <WeekRecapSection
+          blocks={
+            parsed.data as Array<WeekRecapTournamentBlock | WeekRecapWeeklyBlock>
+          }
+          locale={locale}
+        />
+      );
+    case "COMING_UP":
+      return (
+        <ComingUpSection
+          blocks={parsed.data as ComingUpBlock[]}
+          locale={locale}
+        />
+      );
+    case "MONETISATION":
+      return (
+        <MonetisationSection
+          blocks={parsed.data as MonetisationBlock[]}
+          locale={locale}
+        />
+      );
+    case "FAN_ENGAGEMENT":
+      return (
+        <FanEngagementSection
+          blocks={parsed.data as FanEngagementBlock[]}
+          editionUrl={editionUrl}
+          askQuestionUrl={askQuestionUrl ?? undefined}
+          locale={locale}
+        />
+      );
   }
-
-  return <PortPlaceholder type={section.type} />;
 }
 
 export default function SectionRenderer({
@@ -77,16 +108,28 @@ export default function SectionRenderer({
   index,
   editionMode,
   tournamentName,
+  editionUrl,
+  askQuestionUrl,
+  locale,
 }: SectionRendererProps) {
   if (!isSectionMeaningful(section.type, section.blocks)) return null;
 
-  const body = renderBody(section, editionMode);
+  const body = renderBody(
+    section,
+    editionMode,
+    editionUrl,
+    askQuestionUrl,
+    locale,
+  );
   if (body === null) return null;
 
-  const labels = getNewsletterLabels();
-  const eyebrow = labels.sections[section.type].eyebrow;
+  const labels = getNewsletterLabels(locale);
+  const eyebrow =
+    section.eyebrow?.trim() || labels.sections[section.type].eyebrow;
   const number = (index + 1).toString().padStart(2, "0");
-  const title = getSectionTitle(section.type, tournamentName);
+  const title: string | null =
+    section.title?.trim() ||
+    getSectionTitle(section.type, tournamentName, locale);
 
   return (
     <Fragment>
@@ -127,9 +170,11 @@ export default function SectionRenderer({
       <MjmlSection
         backgroundColor={palette.panel}
         cssClass="force-light-bg"
-        padding="24px 0 0"
+        padding="0"
       >
-        <MjmlColumn padding="0" />
+        <MjmlColumn padding="0">
+          <MjmlSpacer height="24px" />
+        </MjmlColumn>
       </MjmlSection>
 
       {body}
@@ -137,9 +182,11 @@ export default function SectionRenderer({
       <MjmlSection
         backgroundColor={palette.panel}
         cssClass="force-light-bg"
-        padding="0 0 8px"
+        padding="0"
       >
-        <MjmlColumn padding="0" />
+        <MjmlColumn padding="0">
+          <MjmlSpacer height="8px" />
+        </MjmlColumn>
       </MjmlSection>
     </Fragment>
   );

@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import {
   MjmlColumn,
   MjmlImage,
@@ -68,6 +67,7 @@ export const NewsletterEmail = ({
   editionMode,
   athleteName,
   editionUrl,
+  askQuestionUrl,
   editionNumber,
   editionDate,
   countryName,
@@ -137,6 +137,9 @@ export const NewsletterEmail = ({
           index={index}
           editionMode={editionMode}
           tournamentName={tournamentName}
+          editionUrl={editionUrl}
+          askQuestionUrl={askQuestionUrl}
+          locale={locale}
         />
       ))}
 
@@ -160,6 +163,8 @@ const samplePreviewSections: EmailRawSection[] = [
     id: "preview-week-recap",
     type: "WEEK_RECAP" satisfies SectionTypeValue,
     order: 0,
+    eyebrow: null,
+    title: null,
     blocks: [
       { kind: "hero_metric", value: "1-1", label: "W/L" },
       { kind: "hero_metric", value: "78%", label: "1st serve" },

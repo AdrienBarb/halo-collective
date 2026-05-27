@@ -35,8 +35,8 @@ A modern, production-ready Next.js SaaS boilerplate with authentication, databas
 - **TanStack Query (React Query)** - Server state management
 
 ### Email
-- **Resend** - Email delivery service
-- **React Email** - Build emails with React
+- **Resend** + **React Email** - Transactional emails (OTP, password reset, welcome, waitlist)
+- **Brevo** + **MJML** (`@faire/mjml-react`) - Newsletter rendering and campaign delivery
 - Pre-built email templates
 
 ### Analytics
@@ -55,7 +55,7 @@ A modern, production-ready Next.js SaaS boilerplate with authentication, databas
 
 - Authentication with Better-auth (Magic Link + Email/Password)
 - Database with Prisma + PostgreSQL (Supabase)
-- Email sending with Resend + React Email
+- Transactional email with Resend + React Email; newsletter rendering with Brevo + MJML
 - Waitlist functionality with rate limiting
 - Payment processing with Stripe
 - Centralized error handling

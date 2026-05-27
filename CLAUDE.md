@@ -31,7 +31,8 @@ When building features, ask: *does this help an agent close a sponsorship, or he
 - **Prisma 7** + PostgreSQL (Supabase) — uses `@prisma/adapter-pg` driver adapter
 - **Better Auth** for authentication (email/password + magic links)
 - **Stripe** (v22, API `2026-04-22.dahlia`) for payments
-- **Resend** + React Email for transactional emails
+- **Resend** + React Email for transactional emails (OTP, password reset, welcome, waitlist)
+- **Brevo** + **MJML** (`@faire/mjml-react`) for the newsletter render and send pipeline
 - **React Query** (via `useApi` hook) for client-side data fetching
 - **Zustand** for client-side global state
 - **react-hook-form** + Zod for form handling and validation
@@ -74,7 +75,7 @@ src/
 │   ├── better-auth/      # Auth setup
 │   ├── constants/        # App constants
 │   ├── db/               # Prisma client + schema
-│   ├── emails/           # React Email templates
+│   ├── emails/           # React Email transactional templates + emails/mjml/ MJML newsletter renderer
 │   ├── errors/           # errorHandler
 │   ├── hooks/            # useApi, etc.
 │   ├── resend/           # Resend client

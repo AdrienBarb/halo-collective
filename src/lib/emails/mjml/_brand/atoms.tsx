@@ -31,9 +31,11 @@ export function EmailButton({
 export function EmailCtaButton({
   href,
   children,
+  padding,
 }: {
   href: string;
   children: ReactNode;
+  padding?: string;
 }) {
   return (
     <MjmlButton
@@ -48,6 +50,7 @@ export function EmailCtaButton({
       innerPadding="14px 20px"
       width="100%"
       align="center"
+      padding={padding}
     >
       {children}
     </MjmlButton>

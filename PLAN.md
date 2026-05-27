@@ -18,7 +18,7 @@ Everything else (more section types, SEO polish, sponsor logos, slider animation
 - **Fully relational schema, no JSON payloads** for section data — typed, migratable, queryable.
 - **Snapshot rendered HTML at publish time** on the `Newsletter` row. Historical editions never re-render. Lets us change the renderer freely later.
 - **Hardcoded section order** in the renderer (debrief → recap → next → gear). No `displayOrder` on sections — every newsletter has the same shape. Add ordering only when a real need appears.
-- **Two render paths, one data source**: web (RSC) and email (React Email) consume the same section rows.
+- **Two render paths, one data source**: web (RSC) and email (MJML via `@faire/mjml-react`) consume the same section rows.
 - **Publish = send immediately** in v1. No scheduling, no draft autosave.
 - **Admin is plain forms**. No WYSIWYG, no live preview. A "Preview email" button opens the rendered HTML in a new tab.
 - **Tennis-only in v1**. `Sport` enum exists so the second sport doesn't need an awkward migration, but `Match` / scoring fields stay tennis-shaped.
@@ -129,8 +129,8 @@ GearItem
 
 This goes **before** sections — with the dumb body-text newsletter. If Brevo has surprises, we want them with the simplest possible payload.
 
-- React Email template `<NewsletterEmail title hero body />`.
-- Server-side `renderToHtml()` at publish time → snapshot on `Newsletter.renderedHtml`.
+- MJML template `<NewsletterEmail title hero body />` at `src/lib/emails/mjml/NewsletterEmail.tsx` (originally shipped as React Email; migrated to MJML for cross-client parity).
+- Server-side `renderMjmlEmail()` at publish time → snapshot on `Newsletter.renderedHtml`.
 - Brevo client wrapper in `src/lib/brevo/`:
   - upsert contact (hardcode your own email as the test "subscriber")
   - create campaign with snapshot HTML

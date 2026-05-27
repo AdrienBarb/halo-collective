@@ -29,9 +29,7 @@ import {
 } from "@/lib/brevo/campaigns";
 import { getRequiredEnv } from "@/lib/utils/env";
 import config from "@/lib/config";
-import { render } from "@react-email/render";
 import { getTranslations } from "next-intl/server";
-import { NewsletterEmail } from "@/lib/emails/NewsletterEmail";
 import { DEFAULT_LOCALE } from "@/i18n/locales";
 import { toSlug } from "@/lib/newsletter/slug";
 
@@ -635,9 +633,6 @@ function safeUrl(url: string | null | undefined): string {
   return /^https?:\/\//i.test(url) ? url : "#";
 }
 
-// Shared between the React Email render path and the MJML preview path
-// (src/lib/services/newsletterMjml.ts) — keeps shell/identity message
-// keys + URL building in lockstep so the two engines can't drift.
 export async function buildNewsletterEmailProps(
   athlete: AthleteForEmail,
   input: NewsletterEmailRenderInput,
@@ -654,7 +649,10 @@ export async function buildNewsletterEmailProps(
   });
   return {
     title: input.title,
-    heroImageUrl: safeUrl(input.heroImageUrl),
+    // Preserve null so the MJML template's `heroImageUrl ?` guard skips the
+    // hero image section — safeUrl() collapses null to "#", which is truthy
+    // and would render <img src="#"> in real inboxes.
+    heroImageUrl: input.heroImageUrl ? safeUrl(input.heroImageUrl) : null,
     editionMode: input.editionMode,
     athleteName,
     editionUrl,
@@ -692,12 +690,22 @@ export async function buildNewsletterEmailProps(
   } as const;
 }
 
+// MJML is the sole newsletter renderer. The dynamic import keeps mjml-core
+// (~3MB: html-minifier, juice, parsers) out of the *static* dependency graph
+// of every module that imports newsletter.ts — test-send, publish, draft
+// preview, and the admin API routes that touch this file. A top-level import
+// previously broke the publish-path build with Turbopack EBADF; keep this
+// boundary dynamic.
 async function renderEmailHtml(
   athlete: AthleteForEmail,
   input: NewsletterEmailRenderInput,
 ): Promise<string> {
   const props = await buildNewsletterEmailProps(athlete, input);
-  return render(NewsletterEmail(props));
+  const { renderMjmlEmail } = await import("@/lib/emails/mjml/render");
+  const { NewsletterEmail } = await import(
+    "@/lib/emails/mjml/NewsletterEmail"
+  );
+  return renderMjmlEmail(NewsletterEmail(props)).html;
 }
 
 /**
@@ -750,11 +758,6 @@ export async function renderNewsletterPreviewEmail(
 ): Promise<string> {
   return renderEmailHtml(athlete, input);
 }
-
-// MJML render path lives in src/lib/services/newsletterMjml.ts to keep
-// mjml-core (~3MB: html-minifier, juice, parsers) out of newsletter.ts's
-// transitive imports. See the EBADF incident: top-level mjml imports here
-// broke the publish-path /api/admin/newsletters/test-send build.
 
 async function claimForSending(
   id: string,

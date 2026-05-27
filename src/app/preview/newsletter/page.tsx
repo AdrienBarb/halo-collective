@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import type {
   Athlete,
   Newsletter,
@@ -16,8 +15,6 @@ import {
   NEWSLETTER_PREVIEW_STORAGE_KEY,
 } from "@/lib/newsletter/preview";
 import { cn } from "@/lib/utils";
-
-type Engine = "react-email" | "mjml";
 
 interface PreviewPayload {
   athleteId: string;
@@ -47,9 +44,9 @@ type PayloadState =
   | { kind: "invalid" };
 
 function readStashedPayload(): PayloadState {
-  // Don't remove the entry on read — keeping it lets the user toggle the
-  // ?engine=mjml query param via the toolbar without losing the payload
-  // (the editor overwrites the entry on each new "Preview" click anyway).
+  // Don't remove the entry on read — the editor overwrites it on each new
+  // "Preview" click anyway, and keeping it lets the user navigate away and
+  // back without losing the payload.
   let raw: string | null = null;
   try {
     raw = window.localStorage.getItem(NEWSLETTER_PREVIEW_STORAGE_KEY);
@@ -71,9 +68,6 @@ export default function NewsletterPreviewPage() {
   const [payloadState, setPayloadState] = useState<PayloadState>({
     kind: "loading",
   });
-  const searchParams = useSearchParams();
-  const engine: Engine =
-    searchParams?.get("engine") === "mjml" ? "mjml" : "react-email";
 
   // Defer the localStorage read to mount: reading it during render or in
   // useState's initializer would diverge between SSR ("missing") and
@@ -85,9 +79,9 @@ export default function NewsletterPreviewPage() {
 
   useEffect(() => {
     if (payloadState.kind !== "ready") return;
-    preview.mutate({ ...payloadState.payload, engine });
+    preview.mutate(payloadState.payload);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [payloadState, engine]);
+  }, [payloadState]);
 
   const backHref =
     payloadState.kind === "ready" && payloadState.payload.newsletterId
@@ -115,7 +109,6 @@ export default function NewsletterPreviewPage() {
         onChange={setView}
         backHref={backHref}
         disabled={disabled}
-        engine={engine}
       />
       {payloadState.kind === "missing" ? (
         <EmptyState />
@@ -190,32 +183,18 @@ function PreviewToolbar({
   onChange,
   backHref,
   disabled,
-  engine,
 }: {
   view: ViewMode;
   onChange: (v: ViewMode) => void;
   backHref: string;
   disabled: boolean;
-  engine: Engine;
 }) {
-  const otherEngine: Engine = engine === "mjml" ? "react-email" : "mjml";
   return (
     <div className="sticky top-0 z-50 border-b border-line bg-ink text-cream">
       <div className="mx-auto flex max-w-[820px] flex-wrap items-center justify-between gap-3 px-4 py-2">
         <div className="flex items-center gap-3">
           <span className="rounded-full bg-accent-gold px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink">
             Preview
-          </span>
-          <span
-            className={cn(
-              "rounded-full px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.22em]",
-              engine === "mjml"
-                ? "bg-cream text-ink"
-                : "bg-cream/15 text-cream",
-            )}
-            title={`Renderer: ${engine}`}
-          >
-            {engine === "mjml" ? "MJML" : "React Email"}
           </span>
           <div
             role="tablist"
@@ -249,12 +228,6 @@ function PreviewToolbar({
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <Link
-            href={`?engine=${otherEngine}`}
-            className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-cream/70 transition-colors hover:text-cream"
-          >
-            Switch → {otherEngine === "mjml" ? "MJML" : "React Email"}
-          </Link>
           <Link
             href={backHref}
             className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-cream/80 transition-colors hover:text-cream"

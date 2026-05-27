@@ -4,30 +4,46 @@ import {
   MjmlText,
 } from "@faire/mjml-react";
 import type { MatchCardBlock as MatchCardBlockType } from "@/lib/schemas/newsletterSection";
-import { getNewsletterLabels } from "@/lib/newsletter/labels";
+import {
+  getNewsletterLabels,
+  type NewsletterLocale,
+} from "@/lib/newsletter/labels";
 import { parseYouTubeId } from "@/lib/newsletter/youtube";
 import { palette, fonts } from "@/lib/emails/_brand/theme";
 import { safeHttpUrl } from "@/lib/emails/mjml/_brand/url";
+import {
+  escapeHtml,
+  singleQuoteFontStack,
+} from "@/lib/emails/mjml/_brand/html";
 
 interface MatchCardBlockProps {
   match: MatchCardBlockType;
+  locale?: NewsletterLocale;
 }
 
-const RESULT_STYLES: Record<
+function getResultStyles(
+  locale: NewsletterLocale,
+): Record<
   MatchCardBlockType["result"],
   { background: string; color: string; letter: string }
-> = {
-  W: { background: palette.accent, color: palette.surface, letter: "W" },
-  L: { background: palette.loss, color: palette.surface, letter: "L" },
-  BYE: { background: palette.panelMuted, color: palette.textMuted, letter: "—" },
-  EXEMPT: { background: palette.panelMuted, color: palette.textMuted, letter: "—" },
-};
+> {
+  const letters = getNewsletterLabels(locale).matchResultLetters;
+  return {
+    W: { background: palette.accent, color: palette.surface, letter: letters.win },
+    L: { background: palette.loss, color: palette.surface, letter: letters.loss },
+    BYE: { background: palette.panelMuted, color: palette.textMuted, letter: "—" },
+    EXEMPT: { background: palette.panelMuted, color: palette.textMuted, letter: "—" },
+  };
+}
 
-export default function MatchCardBlock({ match }: MatchCardBlockProps) {
-  const style = RESULT_STYLES[match.result];
+export default function MatchCardBlock({
+  match,
+  locale = "en",
+}: MatchCardBlockProps) {
+  const style = getResultStyles(locale)[match.result];
   const showOpponent =
     match.opponentName && match.result !== "BYE" && match.result !== "EXEMPT";
-  const labels = getNewsletterLabels();
+  const labels = getNewsletterLabels(locale);
   const isYouTube = parseYouTubeId(match.highlightUrl) !== null;
   const highlightsLabel = isYouTube
     ? labels.ctas.watchOnYoutube
@@ -161,20 +177,4 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
       </MjmlColumn>
     </MjmlSection>
   );
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-// Font stacks like `"SF Mono", Menlo, ...` contain literal double quotes
-// that explode when embedded in an HTML `style="..."` attribute string.
-// Switch to single quotes — both forms are valid CSS font-family syntax.
-function singleQuoteFontStack(stack: string): string {
-  return stack.replace(/"/g, "'");
 }
