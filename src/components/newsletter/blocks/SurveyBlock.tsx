@@ -65,7 +65,7 @@ export default function SurveyBlock({
 
   return (
     <div className="space-y-4">
-      <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-action">
+      <div className="font-sans text-[10px] uppercase tracking-[0.18em] text-action">
         {labels.engagementEyebrows.survey}
       </div>
       <h4 className="text-base font-bold text-ink">{block.title}</h4>
@@ -81,7 +81,7 @@ export default function SurveyBlock({
           href={externalUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex w-full cursor-pointer items-center justify-center rounded bg-action px-4 py-3 text-sm font-bold uppercase tracking-wide text-cream"
+          className="inline-flex w-full cursor-pointer items-center justify-center rounded bg-action px-4 py-3 font-display text-[13px] font-bold uppercase tracking-[0.12em] text-cream"
         >
           {labels.ctas.learnMore}
         </a>
@@ -89,7 +89,7 @@ export default function SurveyBlock({
         <div className="h-24 animate-pulse rounded bg-line/30" aria-hidden />
       ) : submitted ? (
         <div className="space-y-2 rounded border border-line bg-cream-2 px-4 py-3">
-          <div className="font-mono text-[10px] uppercase tracking-wide text-emerald-700">
+          <div className="font-sans text-[10px] uppercase tracking-wide text-emerald-700">
             {labels.engagementInteractive.yourAnswerRecorded}
           </div>
           <p className="text-sm text-ink">{submitted}</p>

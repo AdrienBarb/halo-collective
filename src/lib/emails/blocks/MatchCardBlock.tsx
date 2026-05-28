@@ -71,9 +71,10 @@ export default function MatchCardBlock({ match, locale }: MatchCardBlockProps) {
                           borderRadius: 10,
                           backgroundColor: style.background,
                           color: style.color,
-                          fontFamily: fonts.mono,
-                          fontSize: 10,
-                          fontWeight: 700,
+                          fontFamily: fonts.display,
+                          fontSize: 12,
+                          fontWeight: 800,
+                          fontStyle: "italic",
                           textAlign: "center",
                         }}
                       >
@@ -121,10 +122,12 @@ export default function MatchCardBlock({ match, locale }: MatchCardBlockProps) {
                 <Text
                   style={{
                     margin: "6px 0 0",
-                    color: palette.textBody,
-                    fontFamily: fonts.mono,
-                    fontSize: 12,
-                    fontWeight: 600,
+                    color: palette.textPrimary,
+                    fontFamily: fonts.display,
+                    fontSize: 18,
+                    fontWeight: 800,
+                    fontStyle: "italic",
+                    letterSpacing: "-0.005em",
                   }}
                 >
                   {match.score}
@@ -136,9 +139,9 @@ export default function MatchCardBlock({ match, locale }: MatchCardBlockProps) {
                     display: "inline-block",
                     backgroundColor: palette.panelMuted,
                     color: palette.textMuted,
-                    fontFamily: fonts.mono,
+                    fontFamily: fonts.sans,
                     fontSize: 10,
-                    fontWeight: 700,
+                    fontWeight: 500,
                     letterSpacing: "0.12em",
                     textTransform: "uppercase",
                     padding: "2px 6px",
@@ -152,8 +155,9 @@ export default function MatchCardBlock({ match, locale }: MatchCardBlockProps) {
                 style={{
                   margin: "6px 0 0",
                   color: palette.textMuted,
-                  fontFamily: fonts.mono,
+                  fontFamily: fonts.sans,
                   fontSize: 10,
+                  fontWeight: 500,
                   letterSpacing: "0.12em",
                   textTransform: "uppercase",
                 }}
@@ -180,10 +184,10 @@ export default function MatchCardBlock({ match, locale }: MatchCardBlockProps) {
                     display: "inline-block",
                     backgroundColor: palette.panelDark,
                     color: palette.accent,
-                    fontFamily: fonts.mono,
-                    fontSize: 10,
+                    fontFamily: fonts.display,
+                    fontSize: 12,
                     fontWeight: 700,
-                    letterSpacing: "0.12em",
+                    letterSpacing: "0.1em",
                     textTransform: "uppercase",
                     textDecoration: "none",
                     padding: "8px 12px",
@@ -203,9 +207,9 @@ export default function MatchCardBlock({ match, locale }: MatchCardBlockProps) {
           style={{
             margin: "12px 0 0",
             color: palette.textBody,
-            fontFamily: fonts.serif,
+            fontFamily: fonts.sans,
             fontSize: 14,
-            fontStyle: "italic",
+            fontWeight: 400,
             lineHeight: 1.6,
           }}
         >

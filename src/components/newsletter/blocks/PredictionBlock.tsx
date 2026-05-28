@@ -71,10 +71,10 @@ export default function PredictionBlock({
 
   return (
     <div className="space-y-4">
-      <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-action">
+      <div className="font-sans text-[10px] uppercase tracking-[0.18em] text-action">
         {labels.engagementEyebrows.prediction}
       </div>
-      <p className="font-serif text-lg italic leading-snug text-ink">
+      <p className="font-display text-lg italic leading-snug text-ink">
         {block.prompt}
       </p>
       {!hasOptions ? null : isLoading && !data ? (
@@ -110,7 +110,7 @@ export default function PredictionBlock({
                         {opt.emoji ? <span aria-hidden>{opt.emoji}</span> : null}
                         <span>{opt.label}</span>
                       </span>
-                      <span className="font-mono text-xs text-ink-2">{pct}%</span>
+                      <span className="font-sans text-xs text-ink-2">{pct}%</span>
                     </div>
                   </li>
                 );
@@ -136,7 +136,7 @@ export default function PredictionBlock({
               );
             })}
           </ul>
-          <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-wide text-ink-3">
+          <div className="flex items-center justify-between font-sans text-[10px] uppercase tracking-wide text-ink-3">
             <span>
               {labels.engagementInteractive.votesCountTemplate.replace(
                 "{count}",

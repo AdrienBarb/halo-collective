@@ -35,10 +35,10 @@ interface AuthFormProps {
 }
 
 const buttonClass =
-  "w-full cursor-pointer rounded-md bg-accent-warm py-3 font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink transition hover:bg-accent-gold disabled:cursor-not-allowed disabled:opacity-60";
+  "w-full cursor-pointer rounded-md bg-accent-warm py-3 font-sans text-[12px] font-medium uppercase tracking-[0.22em] text-ink transition hover:bg-accent-gold disabled:cursor-not-allowed disabled:opacity-60";
 
 const googleButtonClass =
-  "w-full cursor-pointer rounded-md border border-line bg-cream py-3 font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink transition hover:bg-cream-3 disabled:cursor-not-allowed disabled:opacity-60 flex items-center justify-center gap-3";
+  "w-full cursor-pointer rounded-md border border-line bg-cream py-3 font-sans text-[12px] font-medium uppercase tracking-[0.22em] text-ink transition hover:bg-cream-3 disabled:cursor-not-allowed disabled:opacity-60 flex items-center justify-center gap-3";
 
 function GoogleIcon() {
   return (
@@ -170,7 +170,7 @@ export default function AuthForm({
           <div className="w-full border-t border-line" />
         </div>
         <div className="relative flex justify-center">
-          <span className="bg-cream-2 px-3 font-mono text-[10px] uppercase tracking-[0.22em] text-ink-3">
+          <span className="bg-cream-2 px-3 font-sans text-[10px] uppercase tracking-[0.22em] text-ink-3">
             {t("or")}
           </span>
         </div>
@@ -225,7 +225,7 @@ export default function AuthForm({
                 name="firstName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
+                    <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-ink-3">
                       {t("firstName")}
                     </FormLabel>
                     <FormControl>
@@ -245,7 +245,7 @@ export default function AuthForm({
                 name="lastName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
+                    <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-ink-3">
                       {t("lastName")}
                     </FormLabel>
                     <FormControl>
@@ -267,7 +267,7 @@ export default function AuthForm({
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
+                  <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-ink-3">
                     {t("email")}
                   </FormLabel>
                   <FormControl>
@@ -289,7 +289,7 @@ export default function AuthForm({
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
+                  <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-ink-3">
                     {t("password")}
                   </FormLabel>
                   <FormControl>
@@ -343,7 +343,7 @@ export default function AuthForm({
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
+                <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-ink-3">
                   {t("email")}
                 </FormLabel>
                 <FormControl>
@@ -365,11 +365,11 @@ export default function AuthForm({
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="flex items-center justify-between font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
+                <FormLabel className="flex items-center justify-between font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-ink-3">
                   <span>{t("password")}</span>
                   <Link
                     href="/forgot-password"
-                    className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3 underline-offset-2 hover:text-ink hover:underline"
+                    className="font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-ink-3 underline-offset-2 hover:text-ink hover:underline"
                   >
                     {t("forgot")}
                   </Link>

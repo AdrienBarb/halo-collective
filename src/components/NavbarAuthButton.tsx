@@ -30,7 +30,7 @@ export default function NavbarAuthButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="cursor-pointer rounded-md border border-line bg-cream-2 px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-ink transition hover:bg-cream-3"
+        className="cursor-pointer rounded-md border border-line bg-cream-2 px-4 py-2 font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-ink transition hover:bg-cream-3"
       >
         {t("signIn")}
       </button>

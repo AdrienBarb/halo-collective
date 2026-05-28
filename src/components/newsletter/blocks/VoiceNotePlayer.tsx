@@ -94,7 +94,7 @@ export default function VoiceNotePlayer({ media }: VoiceNotePlayerProps) {
           </span>
         ) : null}
         {meta ? (
-          <span className="mt-1 block truncate font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3">
+          <span className="mt-1 block truncate font-sans text-[11px] uppercase tracking-[0.18em] text-ink-3">
             {meta}
           </span>
         ) : null}

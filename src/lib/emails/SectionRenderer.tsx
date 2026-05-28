@@ -127,10 +127,10 @@ export default function SectionRenderer({
           style={{
             margin: 0,
             color: palette.textOnDark,
-            fontFamily: fonts.display,
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: "0.25em",
+            fontFamily: fonts.sans,
+            fontSize: 11,
+            fontWeight: 600,
+            letterSpacing: "0.22em",
             textTransform: "uppercase",
           }}
         >
@@ -143,9 +143,11 @@ export default function SectionRenderer({
               margin: "6px 0 0",
               color: palette.textOnDark,
               fontFamily: fonts.display,
-              fontSize: 20,
-              fontWeight: 900,
-              lineHeight: 1.2,
+              fontSize: 24,
+              fontWeight: 700,
+              letterSpacing: "-0.005em",
+              textTransform: "uppercase",
+              lineHeight: 1.1,
             }}
           >
             {title}

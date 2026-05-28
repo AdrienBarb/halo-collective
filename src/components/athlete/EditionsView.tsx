@@ -154,7 +154,7 @@ export function EditionsCover({
 
 function FrostedBadge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center rounded-full border border-white/20 bg-ink/55 px-2.5 py-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-cream backdrop-blur-md">
+    <span className="inline-flex items-center rounded-full border border-white/20 bg-ink/55 px-2.5 py-1.5 font-sans text-[10px] font-medium uppercase tracking-[0.16em] text-cream backdrop-blur-md">
       {children}
     </span>
   );

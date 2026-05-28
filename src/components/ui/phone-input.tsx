@@ -84,7 +84,7 @@ function CountrySelect({
           type="button"
           variant="outline"
           className={cn(
-            "flex h-10 gap-2 rounded-e-none rounded-s-md border-input bg-cream-2 px-3 font-mono text-[12px] tracking-[0.05em] text-ink hover:bg-cream-3 focus:z-10",
+            "flex h-10 gap-2 rounded-e-none rounded-s-md border-input bg-cream-2 px-3 font-sans text-[12px] tabular-nums tracking-[0.05em] text-ink hover:bg-cream-3 focus:z-10",
           )}
           disabled={disabled}
         >
@@ -150,7 +150,7 @@ function CountrySelectOption({
     >
       <FlagComponent country={country} countryName={countryName} />
       <span className="flex-1 text-[14px] text-ink">{countryName}</span>
-      <span className="font-mono text-[11px] tracking-[0.05em] text-ink-3">
+      <span className="font-sans text-[11px] tabular-nums tracking-[0.05em] text-ink-3">
         {`+${RPNInput.getCountryCallingCode(country)}`}
       </span>
       <CheckIcon

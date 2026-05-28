@@ -187,11 +187,12 @@ function AthleteName({
         style={{
           margin: "0 0 6px",
           fontFamily: fonts.display,
-          fontSize: 36,
-          fontWeight: 900,
+          fontSize: 38,
+          fontWeight: 800,
+          fontStyle: "italic",
           color: palette.textPrimary,
-          lineHeight: 1.1,
-          letterSpacing: "-1px",
+          lineHeight: 1.05,
+          letterSpacing: "-0.01em",
           textTransform: "uppercase",
         }}
       >
@@ -252,8 +253,9 @@ function RankTiles({
               <span
                 style={{
                   fontFamily: fonts.display,
-                  fontSize: 18,
-                  fontWeight: 900,
+                  fontSize: 20,
+                  fontWeight: 800,
+                  fontStyle: "italic",
                   color: palette.textOnDark,
                 }}
               >
@@ -293,8 +295,9 @@ function RankTiles({
               <span
                 style={{
                   fontFamily: fonts.display,
-                  fontSize: 18,
-                  fontWeight: 900,
+                  fontSize: 20,
+                  fontWeight: 800,
+                  fontStyle: "italic",
                   color: palette.textOnAccent,
                 }}
               >

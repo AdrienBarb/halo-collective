@@ -26,7 +26,7 @@ export default async function SubscriptionsPage() {
   return (
     <div className="mx-auto max-w-[1100px] space-y-6 px-5 py-10">
       <div>
-        <h1 className="font-serif text-[28px] font-semibold tracking-[-0.01em] text-ink">
+        <h1 className="font-display text-[28px] font-semibold tracking-[-0.01em] text-ink">
           {t("title")}
         </h1>
         <p className="mt-1 text-[13px] text-ink-3">{t("subhead")}</p>
@@ -34,7 +34,7 @@ export default async function SubscriptionsPage() {
 
       {subscriptions.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-line bg-cream-2 px-6 py-14 text-center">
-          <p className="font-serif text-[20px] text-ink">{t("emptyTitle")}</p>
+          <p className="font-display text-[20px] text-ink">{t("emptyTitle")}</p>
           <p className="mt-1 text-[13px] text-ink-3">{t("emptyBody")}</p>
           {isLandingHidden() ? null : (
             <Button asChild className="mt-5">

@@ -25,7 +25,7 @@ export function FieldLabel({
     <label
       htmlFor={htmlFor}
       className={cn(
-        "block font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3",
+        "block font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3",
         className,
       )}
     >

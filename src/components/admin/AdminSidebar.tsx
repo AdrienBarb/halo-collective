@@ -18,7 +18,7 @@ export default function AdminSidebar() {
       <div className="border-b border-line px-6 py-5">
         <Link
           href="/admin"
-          className="font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink"
+          className="font-sans text-[12px] font-medium uppercase tracking-[0.22em] text-ink"
         >
           Halo · Admin
         </Link>
@@ -34,7 +34,7 @@ export default function AdminSidebar() {
                 <Link
                   href={item.href}
                   className={cn(
-                    "block rounded-sm px-3 py-2 font-mono text-[11px] uppercase tracking-[0.2em] transition-colors",
+                    "block rounded-sm px-3 py-2 font-sans text-[11px] uppercase tracking-[0.2em] transition-colors",
                     isActive
                       ? "bg-cream-3 text-ink"
                       : "text-ink-2 hover:bg-cream-3 hover:text-ink",
@@ -54,7 +54,7 @@ export default function AdminSidebar() {
             href="/"
             target="_blank"
             rel="noreferrer"
-            className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-3 transition-colors hover:text-ink"
+            className="font-sans text-[10px] uppercase tracking-[0.22em] text-ink-3 transition-colors hover:text-ink"
           >
             View site ↗
           </Link>

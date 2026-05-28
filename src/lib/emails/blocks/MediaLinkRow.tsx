@@ -35,7 +35,7 @@ export default function MediaLinkRow({ link }: MediaLinkRowProps) {
                   style={{
                     margin: 0,
                     color: palette.textMuted,
-                    fontFamily: fonts.mono,
+                    fontFamily: fonts.sans,
                     fontSize: 10,
                     letterSpacing: "0.12em",
                     textTransform: "uppercase",
@@ -66,7 +66,7 @@ export default function MediaLinkRow({ link }: MediaLinkRowProps) {
                   style={{
                     margin: 0,
                     color: palette.accent,
-                    fontFamily: fonts.mono,
+                    fontFamily: fonts.sans,
                     fontSize: 10,
                     fontWeight: 700,
                     letterSpacing: "0.12em",

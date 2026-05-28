@@ -191,7 +191,7 @@ function PreviewToolbar({
     <div className="sticky top-0 z-50 border-b border-line bg-ink text-cream">
       <div className="mx-auto flex max-w-[820px] flex-wrap items-center justify-between gap-3 px-4 py-2">
         <div className="flex items-center gap-3">
-          <span className="rounded-full bg-accent-gold px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink">
+          <span className="rounded-full bg-accent-gold px-2 py-0.5 font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink">
             Preview
           </span>
           <div
@@ -213,7 +213,7 @@ function PreviewToolbar({
                   disabled={disabled}
                   onClick={() => onChange(opt)}
                   className={cn(
-                    "min-h-8 px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] transition-colors",
+                    "min-h-8 px-3 py-1 font-sans text-[10px] font-medium uppercase tracking-[0.18em] transition-colors",
                     active
                       ? "bg-cream text-ink"
                       : "text-cream/70 hover:text-cream",
@@ -227,7 +227,7 @@ function PreviewToolbar({
         </div>
         <Link
           href={backHref}
-          className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-cream/80 transition-colors hover:text-cream"
+          className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-cream/80 transition-colors hover:text-cream"
         >
           ← Back to editor
         </Link>
@@ -239,7 +239,7 @@ function PreviewToolbar({
 function LoadingState() {
   return (
     <div className="mx-auto max-w-[820px] px-6 py-20 text-center">
-      <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-3">
+      <p className="font-sans text-[11px] uppercase tracking-[0.22em] text-ink-3">
         Rendering preview…
       </p>
     </div>
@@ -249,7 +249,7 @@ function LoadingState() {
 function EmptyState() {
   return (
     <div className="mx-auto max-w-[640px] px-6 py-20 text-center">
-      <p className="font-serif text-[22px] text-ink">No preview data.</p>
+      <p className="font-display text-[22px] text-ink">No preview data.</p>
       <p className="mt-2 text-[14px] text-ink-3">
         Open this page from the newsletter editor&apos;s Preview button.
       </p>
@@ -260,8 +260,8 @@ function EmptyState() {
 function ErrorState({ message }: { message: string }) {
   return (
     <div className="mx-auto max-w-[640px] px-6 py-20 text-center">
-      <p className="font-serif text-[22px] text-ink">Preview failed</p>
-      <p className="mt-2 break-words font-mono text-[12px] text-ink-3">
+      <p className="font-display text-[22px] text-ink">Preview failed</p>
+      <p className="mt-2 break-words font-sans text-[12px] text-ink-3">
         {message}
       </p>
     </div>

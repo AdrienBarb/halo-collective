@@ -58,7 +58,7 @@ export default function MonetisationItemBlock({
                 style={{
                   margin: 0,
                   color: palette.accent,
-                  fontFamily: fonts.mono,
+                  fontFamily: fonts.sans,
                   fontSize: 10,
                   fontWeight: 700,
                   letterSpacing: "0.18em",
@@ -81,7 +81,7 @@ export default function MonetisationItemBlock({
                   style={{
                     margin: 0,
                     color: palette.textMuted,
-                    fontFamily: fonts.mono,
+                    fontFamily: fonts.sans,
                     fontSize: 10,
                     letterSpacing: "0.12em",
                     textTransform: "uppercase",

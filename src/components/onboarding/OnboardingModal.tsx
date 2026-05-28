@@ -56,7 +56,7 @@ interface OnboardingModalProps {
 }
 
 const primaryButtonClass =
-  "cursor-pointer rounded-md bg-accent-warm px-6 py-3 font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink transition hover:bg-accent-gold disabled:cursor-not-allowed disabled:opacity-60";
+  "cursor-pointer rounded-md bg-accent-warm px-6 py-3 font-display text-[14px] font-bold uppercase tracking-[0.12em] text-ink transition hover:bg-accent-gold disabled:cursor-not-allowed disabled:opacity-60";
 
 export default function OnboardingModal({
   open,
@@ -110,7 +110,7 @@ export default function OnboardingModal({
         onInteractOutside={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <DialogTitle className="font-serif text-[24px] font-semibold tracking-[-0.015em] text-ink">
+          <DialogTitle className="font-display text-[24px] font-semibold tracking-[-0.015em] text-ink">
             Tell us what you&apos;re into
           </DialogTitle>
           <DialogDescription className="text-[13px] leading-relaxed text-ink-3">

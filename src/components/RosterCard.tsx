@@ -51,11 +51,11 @@ export default function RosterCard({ athlete }: RosterCardProps) {
         ))}
       </div>
       <div className="px-5 pb-5 pt-[18px]">
-        <h3 className="m-0 font-serif text-[22px] font-semibold leading-[1.1] tracking-[-0.015em] text-ink">
+        <h3 className="m-0 font-display text-[22px] font-extrabold italic uppercase leading-[1.05] tracking-[-0.01em] text-ink">
           {fullName}
         </h3>
         {rankLabel ? (
-          <div className="mt-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-ink-3">
+          <div className="mt-1.5 font-display text-[14px] font-extrabold italic uppercase tracking-[0.02em] text-ink-3">
             {rankLabel}
           </div>
         ) : null}

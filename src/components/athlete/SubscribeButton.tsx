@@ -105,16 +105,16 @@ export default function SubscribeButton({
                   unoptimized
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center font-serif text-2xl font-semibold text-cream">
+                <div className="flex h-full w-full items-center justify-center font-display text-2xl font-semibold text-cream">
                   {(athleteFirstName[0] ?? "") + (athleteLastName?.[0] ?? "")}
                 </div>
               )}
             </div>
           ) : null}
-          <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-accent-gold">
+          <div className="font-sans text-[11px] font-medium uppercase tracking-[0.22em] text-accent-gold">
             {t("eyebrow")}
           </div>
-          <h2 className="mt-2 font-serif text-[28px] font-semibold leading-tight tracking-[-0.015em] text-cream md:text-[34px]">
+          <h2 className="mt-2 font-display text-[28px] font-bold uppercase leading-tight tracking-[-0.005em] text-cream md:text-[34px]">
             {t("title", { athleteFirstName })}
           </h2>
         </div>
@@ -136,7 +136,7 @@ export default function SubscribeButton({
                 className="mt-1 h-4 w-4 accent-loss"
               />
               <div>
-                <div className="font-serif text-[16px] font-semibold text-ink">
+                <div className="font-display text-[16px] font-semibold text-ink">
                   {t("newsletterHeading", { athleteFirstName })}
                 </div>
                 <p className="mt-1 text-[13px] leading-relaxed text-ink-3">
@@ -157,7 +157,7 @@ export default function SubscribeButton({
                 className="mt-1 h-4 w-4 accent-loss"
               />
               <div>
-                <div className="font-serif text-[16px] font-semibold text-ink">
+                <div className="font-display text-[16px] font-semibold text-ink">
                   {t("partnerOffersHeading")}
                 </div>
                 <p className="mt-1 text-[13px] leading-relaxed text-ink-3">
@@ -177,7 +177,7 @@ export default function SubscribeButton({
             type="button"
             onClick={onSubscribeClick}
             disabled={submitting}
-            className="mt-4 w-full cursor-pointer rounded-md bg-accent-warm py-4 font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink transition hover:bg-accent-gold disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-4 w-full cursor-pointer rounded-md bg-accent-warm py-4 font-display text-[14px] font-bold uppercase tracking-[0.12em] text-ink transition hover:bg-accent-gold disabled:cursor-not-allowed disabled:opacity-60"
           >
             {submitting ? t("subscribing") : t("subscribeCta")}
           </button>

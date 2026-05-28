@@ -69,7 +69,7 @@ export default function AccountMenu({
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={t("account")}
-        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-line bg-cream-2 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-ink transition hover:bg-cream-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
+        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-line bg-cream-2 font-sans text-[11px] font-medium uppercase tracking-[0.08em] text-ink transition hover:bg-cream-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold"
       >
         {initials(firstName, lastName, email)}
       </DropdownMenuTrigger>
@@ -78,7 +78,7 @@ export default function AccountMenu({
         className="min-w-[220px] border-line bg-cream-2"
       >
         <DropdownMenuLabel>
-          <div className="font-serif text-[14px] font-semibold text-ink">
+          <div className="font-display text-[14px] font-semibold text-ink">
             {display}
           </div>
           <div className="mt-0.5 text-[12px] text-ink-3">{email}</div>

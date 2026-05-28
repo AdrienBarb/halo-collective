@@ -52,12 +52,12 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
     <article className="rounded-xl border border-line bg-cream px-4 py-4">
       <div className="flex items-center justify-between gap-3">
         <span
-          className={`inline-flex h-6 min-w-[28px] items-center justify-center rounded-md px-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.12em] ${BADGE_STYLES[match.result]}`}
+          className={`inline-flex h-6 min-w-[28px] items-center justify-center rounded-md px-1.5 font-sans text-[10px] font-bold uppercase tracking-[0.12em] ${BADGE_STYLES[match.result]}`}
         >
           {resultLetter}
         </span>
         {metaRight ? (
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+          <span className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
             {metaRight}
           </span>
         ) : null}
@@ -66,14 +66,14 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
       <div className="mt-3 flex items-baseline gap-2">
         <span className="text-[14px] font-semibold text-ink">{headline}</span>
         {subline ? (
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+          <span className="font-sans text-[10px] uppercase tracking-[0.18em] text-ink-3">
             {subline}
           </span>
         ) : null}
       </div>
 
       {match.score ? (
-        <div className="mt-1 font-serif text-[32px] font-medium leading-[1.05] tracking-[-0.015em] text-ink">
+        <div className="mt-1 font-display text-[32px] font-extrabold italic leading-[1.05] tracking-[-0.005em] text-ink">
           {match.score.split(/\s+/).map((set, i) => (
             <span key={i} className="mr-4 inline-block">
               {set}
@@ -98,7 +98,7 @@ export default function MatchCardBlock({ match }: MatchCardBlockProps) {
             href={match.highlightUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-md bg-action px-3 py-1.5 font-mono text-[11px] font-bold uppercase tracking-[0.1em] text-cream"
+            className="inline-flex items-center gap-1.5 rounded-md bg-action px-3 py-1.5 font-display text-[13px] font-bold uppercase tracking-[0.1em] text-cream"
           >
             ▶ {highlightsLabel} →
           </a>

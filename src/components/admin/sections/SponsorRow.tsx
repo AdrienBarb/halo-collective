@@ -74,7 +74,7 @@ export default function SponsorRow({
         name={`sponsors.${index}.name` as const}
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+            <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
               Name
             </FormLabel>
             <FormControl>
@@ -131,7 +131,7 @@ export default function SponsorRow({
         name={`sponsors.${index}.websiteUrl` as const}
         render={({ field }) => (
           <FormItem className="col-start-2">
-            <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+            <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
               Website
             </FormLabel>
             <FormControl>

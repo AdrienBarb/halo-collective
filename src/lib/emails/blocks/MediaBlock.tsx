@@ -90,7 +90,7 @@ export default function MediaBlock({
             style={{
               margin: poster ? "12px 0 0" : 0,
               color: palette.accent,
-              fontFamily: fonts.mono,
+              fontFamily: fonts.sans,
               fontSize: 13,
               fontWeight: 700,
               letterSpacing: "0.18em",
@@ -140,7 +140,7 @@ export default function MediaBlock({
                     textAlign: "center",
                     lineHeight: "36px",
                     fontSize: 14,
-                    fontFamily: fonts.mono,
+                    fontFamily: fonts.sans,
                   }}
                 >
                   ▶
@@ -165,7 +165,7 @@ export default function MediaBlock({
                     style={{
                       margin: "4px 0 0",
                       color: palette.textMuted,
-                      fontFamily: fonts.mono,
+                      fontFamily: fonts.sans,
                       fontSize: 10,
                       letterSpacing: "0.18em",
                       textTransform: "uppercase",

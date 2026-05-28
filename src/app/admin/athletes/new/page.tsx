@@ -9,7 +9,7 @@ export default function NewAthletePage() {
       <div>
         <Link
           href="/admin/athletes"
-          className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3 hover:text-ink"
+          className="font-sans text-[11px] uppercase tracking-[0.18em] text-ink-3 hover:text-ink"
         >
           ← Athletes
         </Link>

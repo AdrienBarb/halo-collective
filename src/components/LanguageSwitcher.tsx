@@ -46,7 +46,7 @@ export function LanguageSwitcher() {
           <span className="text-base leading-none">
             {LOCALE_FLAGS[currentLocale]}
           </span>
-          <span className="font-mono text-xs uppercase tracking-wider">
+          <span className="font-sans text-xs uppercase tracking-wider">
             {currentLocale}
           </span>
         </Button>

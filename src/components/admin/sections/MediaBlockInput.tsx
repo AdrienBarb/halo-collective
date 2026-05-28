@@ -89,7 +89,7 @@ export default function MediaBlockInput({
                 aria-checked={active}
                 onClick={() => setKind(opt.kind)}
                 className={[
-                  "min-h-11 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] transition-colors",
+                  "min-h-11 px-3 py-1.5 font-sans text-[10px] font-medium uppercase tracking-[0.18em] transition-colors",
                   active
                     ? "bg-ink text-cream"
                     : "text-ink-3 hover:bg-cream-3 hover:text-ink",
@@ -192,7 +192,7 @@ export default function MediaBlockInput({
                   aria-checked={active}
                   onClick={() => setVideoMode(mode)}
                   className={[
-                    "min-h-9 px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] transition-colors",
+                    "min-h-9 px-3 py-1 font-sans text-[10px] font-medium uppercase tracking-[0.18em] transition-colors",
                     active
                       ? "bg-ink text-cream"
                       : "text-ink-3 hover:bg-cream-3 hover:text-ink",

@@ -82,14 +82,14 @@ export default function CompactImageField({
               unoptimized
             />
           ) : (
-            <span className="pointer-events-none absolute inset-0 flex items-center justify-center font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-ink-3">
+            <span className="pointer-events-none absolute inset-0 flex items-center justify-center font-sans text-[9px] font-medium uppercase tracking-[0.18em] text-ink-3">
               {aspect === "square" ? "No image" : "No image"}
             </span>
           )}
           {value ? (
             <span
               aria-hidden
-              className="pointer-events-none absolute inset-0 flex items-center justify-center bg-ink/55 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-cream opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+              className="pointer-events-none absolute inset-0 flex items-center justify-center bg-ink/55 font-sans text-[9px] font-medium uppercase tracking-[0.18em] text-cream opacity-0 transition-opacity duration-150 group-hover:opacity-100"
             >
               Replace
             </span>
@@ -110,7 +110,7 @@ export default function CompactImageField({
               type="button"
               onClick={() => inputRef.current?.click()}
               disabled={isUploading}
-              className="rounded-xs border border-line bg-cream px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink transition-colors hover:border-ink/40 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-xs border border-line bg-cream px-3 py-1.5 font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-ink transition-colors hover:border-ink/40 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {value ? "Replace" : "Upload"}
             </button>
@@ -119,7 +119,7 @@ export default function CompactImageField({
                 type="button"
                 onClick={onClear}
                 disabled={isUploading}
-                className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3 underline-offset-4 transition-colors hover:text-ink hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+                className="font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-ink-3 underline-offset-4 transition-colors hover:text-ink hover:underline disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Remove
               </button>

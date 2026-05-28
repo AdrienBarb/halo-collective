@@ -26,7 +26,7 @@ export default function ChipMultiSelect({
 
   return (
     <div className="space-y-3">
-      <h3 className="font-serif text-[16px] font-semibold tracking-[-0.005em] text-ink">
+      <h3 className="font-display text-[16px] font-semibold tracking-[-0.005em] text-ink">
         {label}
       </h3>
       <div className="flex flex-wrap gap-2">
@@ -39,7 +39,7 @@ export default function ChipMultiSelect({
               aria-pressed={selected}
               onClick={() => toggle(option.value)}
               className={cn(
-                "cursor-pointer rounded-full border px-3.5 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] transition",
+                "cursor-pointer rounded-full border px-3.5 py-1.5 font-sans text-[11px] font-medium uppercase tracking-[0.12em] transition",
                 selected
                   ? "border-accent-warm bg-accent-warm/15 text-ink"
                   : "border-line bg-cream text-ink-2 hover:bg-cream-3",

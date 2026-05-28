@@ -53,11 +53,11 @@ export default function SectionCard({
       className="scroll-mt-8 rounded-sm border border-line bg-cream-2"
     >
       <header className="grid grid-cols-[auto_1fr] gap-x-5 gap-y-3 border-b border-line px-6 py-5 md:gap-x-7">
-        <div className="font-mono text-[26px] font-semibold leading-none tracking-tight text-accent-gold">
+        <div className="font-sans text-[26px] font-semibold leading-none tracking-tight text-accent-gold">
           {number}
         </div>
         <div className="min-w-0">
-          <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+          <div className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
             {name}
           </div>
           <p className="mt-1 text-[15px] leading-snug text-ink-2">
@@ -69,7 +69,7 @@ export default function SectionCard({
         <div className="space-y-4 border-b border-line px-6 py-5">
           {onEyebrowChange ? (
             <div>
-              <label className="block font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+              <label className="block font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                 Custom title
               </label>
               {/*
@@ -87,13 +87,13 @@ export default function SectionCard({
                 }}
                 placeholder={eyebrowPlaceholder}
                 maxLength={120}
-                className="mt-2 w-full border-0 bg-transparent p-0 font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink placeholder:text-ink-3 focus:outline-none focus:ring-0"
+                className="mt-2 w-full border-0 bg-transparent p-0 font-sans text-[12px] font-medium uppercase tracking-[0.22em] text-ink placeholder:text-ink-3 focus:outline-none focus:ring-0"
               />
             </div>
           ) : null}
           {onTitleChange ? (
             <div>
-              <label className="block font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+              <label className="block font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                 Custom subtitle
               </label>
               {/*
@@ -110,7 +110,7 @@ export default function SectionCard({
                 }}
                 placeholder={titlePlaceholder}
                 maxLength={120}
-                className="mt-2 w-full border-0 bg-transparent p-0 font-serif text-[20px] leading-[1.2] text-ink placeholder:text-ink-3 focus:outline-none focus:ring-0"
+                className="mt-2 w-full border-0 bg-transparent p-0 font-display text-[20px] leading-[1.2] text-ink placeholder:text-ink-3 focus:outline-none focus:ring-0"
               />
             </div>
           ) : null}

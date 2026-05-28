@@ -42,7 +42,7 @@ export default function QuoteBlock({ block }: QuoteBlockProps) {
                     paddingBottom: 10,
                     borderBottom: `1px solid ${palette.borderSoft}`,
                     color: palette.textMuted,
-                    fontFamily: fonts.mono,
+                    fontFamily: fonts.sans,
                     fontSize: 10,
                     fontWeight: 600,
                     letterSpacing: "0.22em",
@@ -56,10 +56,11 @@ export default function QuoteBlock({ block }: QuoteBlockProps) {
                 style={{
                   margin: 0,
                   color: palette.panelDark,
-                  fontFamily: fonts.serif,
-                  fontSize: 17,
+                  fontFamily: fonts.display,
+                  fontSize: 20,
                   fontStyle: "italic",
-                  lineHeight: 1.55,
+                  fontWeight: 400,
+                  lineHeight: 1.4,
                 }}
               >
                 {`"${block.text}"`}

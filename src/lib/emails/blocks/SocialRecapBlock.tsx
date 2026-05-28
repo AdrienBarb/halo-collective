@@ -13,7 +13,7 @@ export default function SocialRecapBlock({ block }: SocialRecapBlockProps) {
         style={{
           margin: "0 0 10px",
           color: palette.textMuted,
-          fontFamily: fonts.mono,
+          fontFamily: fonts.sans,
           fontSize: 10,
           letterSpacing: "0.18em",
           textTransform: "uppercase",
@@ -51,7 +51,7 @@ export default function SocialRecapBlock({ block }: SocialRecapBlockProps) {
             style={{
               margin: post.caption ? "4px 0 0" : 0,
               color: palette.accent,
-              fontFamily: fonts.mono,
+              fontFamily: fonts.sans,
               fontSize: 10,
               letterSpacing: "0.12em",
               textTransform: "uppercase",

@@ -23,7 +23,7 @@ export default function TextUpdateBlock({
         style={{
           margin: "0 0 10px",
           color: palette.textMuted,
-          fontFamily: fonts.mono,
+          fontFamily: fonts.sans,
           fontSize: 10,
           letterSpacing: "0.18em",
           textTransform: "uppercase",

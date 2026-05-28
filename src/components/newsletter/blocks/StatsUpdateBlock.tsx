@@ -11,18 +11,18 @@ export default function StatsUpdateBlock({ block }: StatsUpdateBlockProps) {
 
   return (
     <div className="space-y-3">
-      <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+      <div className="font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-ink-3">
         Ranking & stats
       </div>
       {hasRanking ? (
         <div className="flex items-baseline gap-3 rounded bg-cream-2 px-4 py-3">
           {block.rankingCurrent ? (
-            <span className="font-mono text-2xl font-bold text-ink">
+            <span className="font-display text-[28px] font-extrabold italic leading-none tracking-[-0.005em] text-ink">
               {block.rankingCurrent}
             </span>
           ) : null}
           {block.rankingChange ? (
-            <span className="font-mono text-[11px] uppercase tracking-wide text-ink-3">
+            <span className="font-sans text-[11px] font-medium uppercase tracking-wide text-ink-3">
               {block.rankingChange}
             </span>
           ) : null}

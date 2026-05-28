@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter_Tight, JetBrains_Mono } from "next/font/google";
+import { Barlow_Condensed, Inter, JetBrains_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { Toaster } from "react-hot-toast";
@@ -14,23 +14,23 @@ import "./globals.css";
 import { genPageMetadata } from "@/lib/seo/genPageMetadata";
 import { siteMetadata } from "@/data/siteMetadata";
 
-// Editorial display + headlines + italic pull-quotes + the wordmark "HALO"
-// Variable font so we can use opsz (optical size) — see colors_and_type.css
-const fraunces = Fraunces({
-  variable: "--font-serif",
+// Display / headings: player names, section titles, stats, CTAs, wordmark
+// Condensed grotesque, uppercase, sport/premium energy.
+const barlowCondensed = Barlow_Condensed({
+  variable: "--font-display",
   subsets: ["latin"],
   style: ["normal", "italic"],
-  axes: ["opsz"],
+  weight: ["300", "400", "600", "700", "800"],
 });
 
-// Body copy (paragraphs, athlete names on cards)
-const interTight = Inter_Tight({
+// Body / UI: bios, labels, badges, dates, descriptions
+const inter = Inter({
   variable: "--font-sans",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
-// Eyebrows, meta, dates, ranks, button text — wide-tracked uppercase
+// Retained for monospaced contexts (OTP code in transactional emails)
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
@@ -54,7 +54,7 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       <body
-        className={`${fraunces.variable} ${interTight.variable} ${jetbrainsMono.variable} antialiased`}
+        className={`${barlowCondensed.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
           <NuqsAdapter>

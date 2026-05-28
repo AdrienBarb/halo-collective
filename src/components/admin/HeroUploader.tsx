@@ -92,10 +92,10 @@ export default function HeroUploader({
         ) : (
           <span className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 text-cream">
             <CameraIcon />
-            <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em]">
+            <span className="font-sans text-[11px] font-medium uppercase tracking-[0.22em]">
               {emptyTitle}
             </span>
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-cream/70">
+            <span className="font-sans text-[10px] uppercase tracking-[0.18em] text-cream/70">
               {emptyHelp}
             </span>
           </span>
@@ -115,7 +115,7 @@ export default function HeroUploader({
               .join(" ")}
           >
             <CameraIcon />
-            <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-cream">
+            <span className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-cream">
               {isDragging ? "Drop to upload" : "Replace"}
             </span>
           </span>

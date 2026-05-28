@@ -25,7 +25,7 @@ export default async function EditAthletePage({
         <div>
           <Link
             href="/admin/athletes"
-            className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3 hover:text-ink"
+            className="font-sans text-[11px] uppercase tracking-[0.18em] text-ink-3 hover:text-ink"
           >
             ← Athletes
           </Link>
@@ -37,7 +37,7 @@ export default async function EditAthletePage({
       </div>
 
       <section>
-        <h2 className="mb-4 font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink">
+        <h2 className="mb-4 font-sans text-[12px] font-medium uppercase tracking-[0.22em] text-ink">
           Profile
         </h2>
         <AthleteForm mode="edit" initialData={athlete} initialSponsors={sponsors} />

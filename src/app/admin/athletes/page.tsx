@@ -51,7 +51,7 @@ export default async function AdminAthletesPage() {
                   <TableCell className="font-medium">
                     {athlete.firstName} {athlete.lastName}
                   </TableCell>
-                  <TableCell className="font-mono text-[12px] text-ink-2">
+                  <TableCell className="font-sans text-[12px] text-ink-2">
                     {athlete.slug}
                   </TableCell>
                   <TableCell>{athlete.countryName}</TableCell>

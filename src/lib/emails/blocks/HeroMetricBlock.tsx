@@ -19,9 +19,11 @@ export default function HeroMetricBlock({ metric }: HeroMetricBlockProps) {
         style={{
           margin: 0,
           color: palette.surface,
-          fontFamily: fonts.mono,
-          fontSize: 16,
-          fontWeight: 700,
+          fontFamily: fonts.display,
+          fontSize: 20,
+          fontStyle: "italic",
+          fontWeight: 800,
+          letterSpacing: "-0.005em",
         }}
       >
         {metric.value}
@@ -30,7 +32,7 @@ export default function HeroMetricBlock({ metric }: HeroMetricBlockProps) {
         style={{
           margin: "4px 0 0",
           color: palette.panelMuted,
-          fontFamily: fonts.mono,
+          fontFamily: fonts.sans,
           fontSize: 9,
           letterSpacing: "0.15em",
           textTransform: "uppercase",

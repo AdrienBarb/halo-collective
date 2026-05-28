@@ -41,11 +41,11 @@ export function MediaLinkGroupHeader({ count }: { count?: number }) {
 
   return (
     <div className="flex items-baseline justify-between gap-3">
-      <div className="font-serif text-[16px] font-medium leading-tight text-ink">
+      <div className="font-display text-[16px] font-medium leading-tight text-ink">
         {labels.mediaRecap.header}
       </div>
       {countLabel ? (
-        <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+        <div className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
           {countLabel}
         </div>
       ) : null}

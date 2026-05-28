@@ -23,7 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 
 const buttonClass =
-  "w-full cursor-pointer rounded-md bg-accent-warm py-3 font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink transition hover:bg-accent-gold disabled:cursor-not-allowed disabled:opacity-60";
+  "w-full cursor-pointer rounded-md bg-accent-warm py-3 font-sans text-[12px] font-medium uppercase tracking-[0.22em] text-ink transition hover:bg-accent-gold disabled:cursor-not-allowed disabled:opacity-60";
 
 export default function ResetPasswordClient() {
   const router = useRouter();
@@ -69,13 +69,13 @@ export default function ResetPasswordClient() {
   if (!token) {
     return (
       <div className="space-y-4 text-center">
-        <p className="font-serif text-[18px] text-ink">{t("invalidTitle")}</p>
+        <p className="font-display text-[18px] text-ink">{t("invalidTitle")}</p>
         <p className="text-[14px] leading-relaxed text-ink-3">
           {t("invalidBody")}
         </p>
         <Link
           href="/forgot-password"
-          className="inline-block pt-2 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-ink underline-offset-2 hover:underline"
+          className="inline-block pt-2 font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-ink underline-offset-2 hover:underline"
         >
           {t("requestNewLink")}
         </Link>
@@ -97,7 +97,7 @@ export default function ResetPasswordClient() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
+              <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-ink-3">
                 {t("newPassword")}
               </FormLabel>
               <FormControl>
@@ -119,7 +119,7 @@ export default function ResetPasswordClient() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
+              <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-ink-3">
                 {t("confirmPassword")}
               </FormLabel>
               <FormControl>

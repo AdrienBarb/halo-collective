@@ -10,7 +10,7 @@ export default function ThrowbackBlock({ block }: ThrowbackBlockProps) {
   const paragraphs = splitParagraphs(block.body);
   return (
     <div className="space-y-4">
-      <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+      <div className="font-sans text-[10px] uppercase tracking-[0.18em] text-ink-3">
         Throwback
       </div>
       {block.media ? <MediaBlock media={block.media} /> : null}

@@ -85,7 +85,7 @@ export default function LogoUploader({
             unoptimized
           />
         ) : (
-          <span className="pointer-events-none absolute inset-0 flex items-center justify-center font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-ink-3">
+          <span className="pointer-events-none absolute inset-0 flex items-center justify-center font-sans text-[9px] font-medium uppercase tracking-[0.16em] text-ink-3">
             Upload<br />logo
           </span>
         )}
@@ -93,7 +93,7 @@ export default function LogoUploader({
         {value ? (
           <span
             aria-hidden
-            className="pointer-events-none absolute inset-0 flex items-center justify-center bg-ink/55 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-cream opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+            className="pointer-events-none absolute inset-0 flex items-center justify-center bg-ink/55 font-sans text-[9px] font-medium uppercase tracking-[0.16em] text-cream opacity-0 transition-opacity duration-150 group-hover:opacity-100"
           >
             Replace
           </span>

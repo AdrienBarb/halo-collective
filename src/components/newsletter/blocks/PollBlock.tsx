@@ -71,7 +71,7 @@ export default function PollBlock({
 
   return (
     <div className="space-y-4">
-      <p className="font-serif text-[18px] font-medium leading-snug tracking-[-0.01em] text-ink">
+      <p className="font-display text-[18px] font-medium leading-snug tracking-[-0.01em] text-ink">
         {block.question}
       </p>
       {isLoading && !data ? (
@@ -114,7 +114,7 @@ export default function PollBlock({
                         ) : null}
                         <span>{opt.label}</span>
                       </span>
-                      <span className="font-mono text-[11px] font-semibold text-ink-2">
+                      <span className="font-sans text-[11px] font-semibold text-ink-2">
                         {pct}%
                       </span>
                     </div>
@@ -159,7 +159,7 @@ export default function PollBlock({
                 if (selectedIndex !== null) vote(selectedIndex);
               }}
               disabled={isClosed || anyPending || selectedIndex === null}
-              className="block w-full cursor-pointer rounded-xl bg-action px-4 py-3.5 font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-cream transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
+              className="block w-full cursor-pointer rounded-xl bg-action px-4 py-3.5 font-display text-[13px] font-bold uppercase tracking-[0.12em] text-cream transition-opacity disabled:cursor-not-allowed disabled:opacity-60"
             >
               {anyPending
                 ? labels.engagementInteractive.submitting
@@ -167,7 +167,7 @@ export default function PollBlock({
             </button>
           ) : null}
 
-          <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+          <div className="flex items-center justify-between font-sans text-[10px] uppercase tracking-[0.18em] text-ink-3">
             <span>
               {labels.engagementInteractive.votesCountTemplate.replace(
                 "{count}",

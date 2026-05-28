@@ -100,7 +100,7 @@ export default function AthleteProfile({
         {isSubscribed && editions.length === 0 ? (
           <section className="px-6 py-12 md:py-16">
             <div className="rounded-2xl border border-dashed border-line bg-cream-2 px-6 py-14 text-center">
-              <p className="font-serif text-[22px] leading-tight text-ink">
+              <p className="font-display text-[22px] leading-tight text-ink">
                 {t("noEditionsTitle")}
               </p>
               <p className="mt-2 text-[14px] text-ink-3">
@@ -176,7 +176,7 @@ function SocialLinksStrip({
       aria-label={t("follow", { fullName })}
       className="border-t border-line px-6 py-10 md:py-12"
     >
-      <div className="text-center font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-ink-3">
+      <div className="text-center font-sans text-[10px] font-medium uppercase tracking-[0.28em] text-ink-3">
         {t("follow", { fullName })}
       </div>
       <ul className="mt-5 flex flex-wrap items-center justify-center gap-3">
@@ -232,17 +232,17 @@ function ProfileIdentity({
             unoptimized
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center font-serif text-[56px] font-semibold tracking-[-0.02em] text-cream md:text-[72px]">
+          <div className="flex h-full w-full items-center justify-center font-display text-[56px] font-extrabold italic uppercase tracking-[-0.01em] text-cream md:text-[72px]">
             {initials}
           </div>
         )}
       </div>
 
-      <h1 className="mt-5 text-center font-serif text-[36px] font-semibold leading-[1.05] tracking-[-0.02em] text-ink md:text-[48px]">
+      <h1 className="mt-5 text-center font-display text-[36px] font-extrabold italic uppercase leading-[1.02] tracking-[-0.01em] text-ink md:text-[48px]">
         {fullName}
       </h1>
 
-      <div className="mt-2 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-ink-3">
+      <div className="mt-2 font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-ink-3">
         <span aria-hidden className="mr-1.5">
           {flagEmoji}
         </span>
@@ -292,7 +292,7 @@ function SponsorsStrip({ sponsors }: { sponsors: Sponsor[] }) {
       aria-label={t("partners")}
       className="border-b border-line px-6 py-5 md:py-8"
     >
-      <div className="text-center font-mono text-[10px] font-medium uppercase tracking-[0.28em] text-ink-3">
+      <div className="text-center font-sans text-[10px] font-medium uppercase tracking-[0.28em] text-ink-3">
         {t("partners")}
       </div>
       <ul className="mt-3 flex flex-nowrap items-center justify-center gap-2 md:mt-4 md:gap-2.5">
@@ -342,10 +342,10 @@ function Stat({
     <div
       className={`flex flex-col items-center px-2 py-5 ${dividerClass}`}
     >
-      <span className="font-serif text-[28px] font-semibold leading-none tracking-[-0.01em] text-ink md:text-[34px]">
+      <span className="font-display text-[28px] font-extrabold italic leading-none tracking-[-0.005em] text-ink md:text-[34px]">
         {value}
       </span>
-      <span className="mt-2 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-ink-3">
+      <span className="mt-2 font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-ink-3">
         {label}
       </span>
     </div>

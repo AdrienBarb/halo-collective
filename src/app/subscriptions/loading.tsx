@@ -5,7 +5,7 @@ export default async function SubscriptionsLoading() {
   return (
     <div className="mx-auto max-w-[1100px] space-y-6 px-5 py-10">
       <div>
-        <h1 className="font-serif text-[28px] font-semibold tracking-[-0.01em] text-ink">
+        <h1 className="font-display text-[28px] font-semibold tracking-[-0.01em] text-ink">
           {t("title")}
         </h1>
         <p className="mt-1 text-[13px] text-ink-3">{t("subhead")}</p>

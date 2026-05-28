@@ -39,7 +39,7 @@ export default function BlockPicker<K extends string>({
         value={selected}
         onChange={(e) => setSelected(e.target.value as K)}
         aria-label={selectLabel}
-        className="min-h-11 rounded-xs border border-line bg-cream px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink"
+        className="min-h-11 rounded-xs border border-line bg-cream px-3 py-1.5 font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-ink"
       >
         {options.map((opt) => (
           <option key={opt.kind} value={opt.kind}>
@@ -50,7 +50,7 @@ export default function BlockPicker<K extends string>({
       <button
         type="button"
         onClick={() => onAdd(selected)}
-        className="min-h-11 rounded-xs border border-line bg-ink px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-cream transition-colors hover:bg-ink-2"
+        className="min-h-11 rounded-xs border border-line bg-ink px-3 py-1.5 font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-cream transition-colors hover:bg-ink-2"
       >
         + {label}
       </button>

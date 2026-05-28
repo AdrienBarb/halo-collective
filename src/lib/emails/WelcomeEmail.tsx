@@ -112,9 +112,10 @@ const FOOTER_LABEL: CSSProperties = {
 const BODY_PARAGRAPH: CSSProperties = {
   margin: 0,
   marginBottom: 18,
-  fontFamily: fonts.serif,
-  fontSize: 18,
-  lineHeight: 1.75,
+  fontFamily: fonts.sans,
+  fontSize: 16,
+  fontWeight: 400,
+  lineHeight: 1.7,
   color: palette.textBody,
   whiteSpace: "pre-line",
 };
@@ -307,7 +308,7 @@ function RecentEditionsSection({
                       style={{
                         margin: 0,
                         color: palette.textMuted,
-                        fontFamily: fonts.mono,
+                        fontFamily: fonts.sans,
                         fontSize: 10,
                         letterSpacing: "0.14em",
                         textTransform: "uppercase",
@@ -319,9 +320,12 @@ function RecentEditionsSection({
                       style={{
                         margin: "4px 0 0",
                         color: palette.textPrimary,
-                        fontFamily: fonts.serif,
-                        fontSize: 16,
-                        lineHeight: 1.35,
+                        fontFamily: fonts.display,
+                        fontSize: 18,
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        letterSpacing: "-0.005em",
+                        lineHeight: 1.2,
                       }}
                     >
                       {edition.title}
@@ -339,7 +343,7 @@ function RecentEditionsSection({
                       style={{
                         margin: 0,
                         color: palette.accent,
-                        fontFamily: fonts.mono,
+                        fontFamily: fonts.sans,
                         fontSize: 14,
                         fontWeight: 700,
                       }}

@@ -48,7 +48,7 @@ export default function YouTubeEmbed({ videoId, label }: YouTubeEmbedProps) {
       >
         <Play className="h-7 w-7 translate-x-[2px] fill-current" aria-hidden="true" />
       </span>
-      <span className="absolute bottom-3 right-3 z-10 rounded bg-ink/80 px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wide text-cream">
+      <span className="absolute bottom-3 right-3 z-10 rounded bg-ink/80 px-2 py-1 font-sans text-[10px] font-bold uppercase tracking-wide text-cream">
         YouTube
       </span>
     </button>

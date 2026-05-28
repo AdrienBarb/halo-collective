@@ -531,7 +531,7 @@ export default function NewsletterForm({
           <div className="space-y-8 pb-32">
             {!isEdit ? (
               <section className="rounded-sm border border-line bg-cream-2 px-6 py-5">
-                <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                <div className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                   Athlete
                 </div>
                 <p className="mt-1 text-[13px] leading-snug text-ink-2">
@@ -565,7 +565,7 @@ export default function NewsletterForm({
                 className="flex w-full items-center justify-between gap-4 px-6 py-4 text-left"
               >
                 <div className="min-w-0">
-                  <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                  <div className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                     Prefill from source
                   </div>
                   <p className="mt-1 text-[13px] leading-snug text-ink-2">
@@ -573,7 +573,7 @@ export default function NewsletterForm({
                     transcript). Media URLs are skipped — re-upload after.
                   </p>
                 </div>
-                <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-ink-3">
+                <span className="font-sans text-[11px] uppercase tracking-[0.22em] text-ink-3">
                   {importOpen ? "Hide" : "Open"}
                 </span>
               </button>
@@ -586,7 +586,7 @@ export default function NewsletterForm({
                       if (importError) setImportError(null);
                     }}
                     placeholder="Paste anything — past newsletter HTML, a written brief, a voice transcript, post-match notes…"
-                    className="h-48 w-full resize-y rounded-sm border border-line bg-cream px-3 py-2 font-mono text-[12px] leading-relaxed text-ink-1 placeholder:text-ink-3 focus:outline-none focus:ring-1 focus:ring-accent-gold"
+                    className="h-48 w-full resize-y rounded-sm border border-line bg-cream px-3 py-2 font-sans text-[12px] leading-relaxed text-ink-1 placeholder:text-ink-3 focus:outline-none focus:ring-1 focus:ring-accent-gold"
                   />
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <Button
@@ -609,9 +609,9 @@ export default function NewsletterForm({
                   {importError ? (
                     <div
                       role="alert"
-                      className="rounded-sm border border-red-300 bg-red-50 px-3 py-2 font-mono text-[11px] leading-relaxed text-red-700"
+                      className="rounded-sm border border-red-300 bg-red-50 px-3 py-2 font-sans text-[11px] leading-relaxed text-red-700"
                     >
-                      <div className="font-semibold uppercase tracking-[0.18em]">
+                      <div className="font-medium uppercase tracking-[0.18em]">
                         Could not prefill
                       </div>
                       <div className="mt-1 whitespace-pre-wrap break-words">
@@ -629,11 +629,11 @@ export default function NewsletterForm({
               className="scroll-mt-8 rounded-sm border border-line bg-cream-2"
             >
               <header className="grid grid-cols-[auto_1fr] gap-x-5 gap-y-3 border-b border-line px-6 py-5 md:gap-x-7">
-                <div className="font-mono text-[26px] font-semibold leading-none tracking-tight text-accent-gold">
+                <div className="font-sans text-[26px] font-semibold leading-none tracking-tight text-accent-gold">
                   00
                 </div>
                 <div className="min-w-0">
-                  <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                  <div className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                     Edition
                   </div>
                   <p className="mt-1 text-[15px] leading-snug text-ink-2">
@@ -649,7 +649,7 @@ export default function NewsletterForm({
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex items-center justify-between gap-4">
-                        <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                        <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                           Edition mode
                         </FormLabel>
                         <FormControl>
@@ -668,7 +668,7 @@ export default function NewsletterForm({
                                   aria-checked={active}
                                   onClick={() => field.onChange(opt)}
                                   className={[
-                                    "min-h-11 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] transition-colors",
+                                    "min-h-11 px-4 py-2 font-sans text-[10px] font-medium uppercase tracking-[0.18em] transition-colors",
                                     active
                                       ? "bg-ink text-cream"
                                       : "text-ink-3 hover:bg-cream-3 hover:text-ink",
@@ -697,7 +697,7 @@ export default function NewsletterForm({
                   name="heroImageUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                      <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                         Cover image
                       </FormLabel>
                       <FormControl>
@@ -718,7 +718,7 @@ export default function NewsletterForm({
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                      <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                         Title
                       </FormLabel>
                       <FormControl>
@@ -771,7 +771,7 @@ export default function NewsletterForm({
                     }
                     return (
                       <FormItem>
-                        <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                        <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                           Email subject
                         </FormLabel>
                         <FormControl>
@@ -786,7 +786,7 @@ export default function NewsletterForm({
                           />
                         </FormControl>
                         <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+                          <span className="font-sans text-[10px] uppercase tracking-[0.18em] text-ink-3">
                             Insert:
                           </span>
                           {EMAIL_SUBJECT_MERGE_TAGS.map((tag) => (
@@ -821,11 +821,11 @@ export default function NewsletterForm({
               className="scroll-mt-8 rounded-sm border border-line bg-cream-2"
             >
               <header className="grid grid-cols-[auto_1fr] gap-x-5 gap-y-3 border-b border-line px-6 py-5 md:gap-x-7">
-                <div className="font-mono text-[26px] font-semibold leading-none tracking-tight text-accent-gold">
+                <div className="font-sans text-[26px] font-semibold leading-none tracking-tight text-accent-gold">
                   ◇
                 </div>
                 <div className="min-w-0">
-                  <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                  <div className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                     Tournament
                   </div>
                   <p className="mt-1 text-[15px] leading-snug text-ink-2">
@@ -861,7 +861,7 @@ export default function NewsletterForm({
                   name="tournamentName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                      <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                         Tournament
                       </FormLabel>
                       <FormControl>
@@ -886,7 +886,7 @@ export default function NewsletterForm({
                     name="tournamentCategory"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                        <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                           Category
                         </FormLabel>
                         <FormControl>
@@ -905,7 +905,7 @@ export default function NewsletterForm({
                     name="tournamentLocation"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                        <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                           Location
                         </FormLabel>
                         <FormControl>
@@ -924,7 +924,7 @@ export default function NewsletterForm({
                     name="tournamentSurface"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                        <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                           Surface
                         </FormLabel>
                         <FormControl>
@@ -944,7 +944,7 @@ export default function NewsletterForm({
                       name="tournamentStartDate"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                          <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                             Starts
                           </FormLabel>
                           <FormControl>
@@ -974,7 +974,7 @@ export default function NewsletterForm({
                       name="tournamentEndDate"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                          <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                             Ends
                           </FormLabel>
                           <FormControl>
@@ -1008,7 +1008,7 @@ export default function NewsletterForm({
                     name="worldRankSnapshot"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                        <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                           World rank at this edition
                         </FormLabel>
                         <FormControl>
@@ -1038,7 +1038,7 @@ export default function NewsletterForm({
                     name="countryRankSnapshot"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                        <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                           Country rank at this edition
                         </FormLabel>
                         <FormControl>
@@ -1147,7 +1147,7 @@ export default function NewsletterForm({
           )}
         >
           <div className="flex items-center justify-between gap-4">
-            <p className="hidden font-mono text-[10px] uppercase tracking-[0.22em] text-ink-3 md:block">
+            <p className="hidden font-sans text-[10px] uppercase tracking-[0.22em] text-ink-3 md:block">
               {isEdit ? "Editing draft" : "New edition"} · {editionMode} ·{" "}
               {SECTION_ORDER.length} sections
             </p>

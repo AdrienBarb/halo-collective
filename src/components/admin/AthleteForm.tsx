@@ -303,7 +303,7 @@ export default function AthleteForm({
                 name="firstName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                    <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                       First name
                     </FormLabel>
                     <FormControl>
@@ -318,7 +318,7 @@ export default function AthleteForm({
                 name="lastName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                    <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                       Last name
                     </FormLabel>
                     <FormControl>
@@ -335,7 +335,7 @@ export default function AthleteForm({
               name="slug"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                  <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                     URL slug
                   </FormLabel>
                   <FormControl>
@@ -349,7 +349,7 @@ export default function AthleteForm({
                     />
                   </FormControl>
                   <p className="text-[11px] text-ink-3">
-                    Lives at <span className="font-mono">/{field.value || "your-slug"}</span>. Auto-generated from the name until you edit it.
+                    Lives at <span className="font-sans">/{field.value || "your-slug"}</span>. Auto-generated from the name until you edit it.
                   </p>
                   <FormMessage />
                 </FormItem>
@@ -362,7 +362,7 @@ export default function AthleteForm({
                 name="sport"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                    <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                       Sport
                     </FormLabel>
                     <Select
@@ -387,7 +387,7 @@ export default function AthleteForm({
                 name="tour"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                    <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                       Tour
                     </FormLabel>
                     <FormControl>
@@ -406,7 +406,7 @@ export default function AthleteForm({
                 name="countryCode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                    <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                       Country
                     </FormLabel>
                     <Select
@@ -445,7 +445,7 @@ export default function AthleteForm({
               name="bio"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                  <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                     Bio
                   </FormLabel>
                   <FormControl>
@@ -465,7 +465,7 @@ export default function AthleteForm({
                 name="worldRank"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                    <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                       World rank
                     </FormLabel>
                     <FormControl>
@@ -495,7 +495,7 @@ export default function AthleteForm({
                 name="countryRank"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                    <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                       Country rank
                     </FormLabel>
                     <FormControl>
@@ -525,7 +525,7 @@ export default function AthleteForm({
                 name="titlesCount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                    <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                       Career titles
                     </FormLabel>
                     <FormControl>
@@ -580,7 +580,7 @@ export default function AthleteForm({
                 }
                 return (
                   <FormItem>
-                    <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                    <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                       Welcome email message
                     </FormLabel>
                     <FormControl>
@@ -595,7 +595,7 @@ export default function AthleteForm({
                       />
                     </FormControl>
                     <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+                      <span className="font-sans text-[10px] uppercase tracking-[0.18em] text-ink-3">
                         Insert:
                       </span>
                       {WELCOME_EMAIL_MERGE_TAGS.map((tag) => (
@@ -674,7 +674,7 @@ export default function AthleteForm({
                   name={`socialLinks.${social.key}` as const}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-3">
+                      <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-ink-3">
                         {social.label}
                       </FormLabel>
                       <FormControl>
@@ -701,7 +701,7 @@ export default function AthleteForm({
           )}
         >
           <div className="flex items-center justify-between gap-4">
-            <p className="hidden font-mono text-[10px] uppercase tracking-[0.22em] text-ink-3 md:block">
+            <p className="hidden font-sans text-[10px] uppercase tracking-[0.22em] text-ink-3 md:block">
               {isEdit ? "Editing athlete" : "New athlete"} ·{" "}
               {sponsorCount} {sponsorCount === 1 ? "sponsor" : "sponsors"}
             </p>

@@ -30,7 +30,7 @@ export default async function EditNewsletterPage({
     <div className="space-y-8">
       <Link
         href="/admin/newsletters"
-        className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3 transition-colors hover:text-ink"
+        className="font-sans text-[11px] uppercase tracking-[0.18em] text-ink-3 transition-colors hover:text-ink"
       >
         ← Newsletters
       </Link>
@@ -39,10 +39,10 @@ export default async function EditNewsletterPage({
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <NewsletterStatusPill status={newsletter.status} />
-            <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-accent-gold">
+            <span className="font-sans text-[11px] font-medium uppercase tracking-[0.22em] text-accent-gold">
               {eyebrow}
             </span>
-            <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3">
+            <span className="font-sans text-[11px] uppercase tracking-[0.18em] text-ink-3">
               {newsletter.athlete.firstName} {newsletter.athlete.lastName}
             </span>
           </div>
@@ -53,7 +53,7 @@ export default async function EditNewsletterPage({
                 href={`/${newsletter.athlete.slug}/${newsletter.slug}`}
                 target="_blank"
                 rel="noreferrer"
-                className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-action transition-colors hover:text-ink"
+                className="font-sans text-[11px] font-medium uppercase tracking-[0.2em] text-action transition-colors hover:text-ink"
               >
                 View live ↗
               </Link>

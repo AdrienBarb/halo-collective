@@ -130,7 +130,7 @@ export default function WeekRecapSection({ blocks }: WeekRecapSectionProps) {
           return (
             <div key={gi} className="space-y-1">
               {showMatchFormatHeaders && (
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                <p className="font-sans text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                   {MATCH_FORMAT_LABELS[head.format]}
                 </p>
               )}

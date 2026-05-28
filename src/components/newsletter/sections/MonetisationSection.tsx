@@ -61,7 +61,7 @@ export default function MonetisationSection({ blocks }: MonetisationSectionProps
             href={anchor.cta.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="block w-full rounded-xl bg-action px-4 py-3.5 text-center font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-cream transition-opacity hover:opacity-90"
+            className="block w-full rounded-xl bg-action px-4 py-3.5 text-center font-display text-[13px] font-bold uppercase tracking-[0.12em] text-cream transition-opacity hover:opacity-90"
           >
             {anchor.cta.label} →
           </a>

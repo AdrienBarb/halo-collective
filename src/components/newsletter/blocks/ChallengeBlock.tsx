@@ -58,7 +58,7 @@ export default function ChallengeBlock({
 
   return (
     <div className="space-y-4">
-      <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-action">
+      <div className="font-sans text-[10px] uppercase tracking-[0.18em] text-action">
         {labels.engagementEyebrows.challenge}
       </div>
       <h4 className="text-base font-bold text-ink">{block.title}</h4>
@@ -86,7 +86,7 @@ export default function ChallengeBlock({
               ? labels.engagementInteractive.youDidIt
               : labels.engagementInteractive.iDidIt}
           </button>
-          <span className="font-mono text-xs uppercase tracking-wide text-ink-3">
+          <span className="font-sans text-xs uppercase tracking-wide text-ink-3">
             {labels.engagementInteractive.reactionCountTemplate.replace(
               "{count}",
               count.toString(),

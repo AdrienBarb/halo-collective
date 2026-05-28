@@ -16,10 +16,10 @@ export default async function ResetPasswordPage() {
       <div className="mx-auto flex min-h-[calc(100vh-80px)] max-w-lg flex-col justify-center px-6 py-12">
         <div className="overflow-hidden rounded-2xl border border-line bg-cream-2">
           <div className="bg-ink px-6 py-6 text-center md:px-10 md:py-8">
-            <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-accent-gold">
+            <div className="font-sans text-[11px] font-medium uppercase tracking-[0.22em] text-accent-gold">
               {t("eyebrow")}
             </div>
-            <h1 className="mt-2 font-serif text-[28px] font-semibold leading-tight tracking-[-0.015em] text-cream md:text-[32px]">
+            <h1 className="mt-2 font-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-cream md:text-[32px]">
               {t("title")}
             </h1>
           </div>

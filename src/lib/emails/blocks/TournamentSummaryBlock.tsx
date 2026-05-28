@@ -65,7 +65,7 @@ export default function TournamentSummaryBlock({
                   style={{
                     margin: "4px 0 0",
                     color: palette.textMuted,
-                    fontFamily: fonts.mono,
+                    fontFamily: fonts.sans,
                     fontSize: 10,
                     letterSpacing: "0.12em",
                     textTransform: "uppercase",

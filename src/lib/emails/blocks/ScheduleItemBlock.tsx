@@ -29,7 +29,7 @@ export default function ScheduleItemBlock({ item, isLast }: ScheduleItemBlockPro
                 style={{
                   margin: 0,
                   color: palette.accent,
-                  fontFamily: fonts.mono,
+                  fontFamily: fonts.sans,
                   fontSize: 10,
                   fontWeight: 700,
                   letterSpacing: "0.06em",

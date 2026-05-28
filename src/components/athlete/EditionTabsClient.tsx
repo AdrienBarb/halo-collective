@@ -108,10 +108,10 @@ export default function EditionTabsClient({
     <section className="border-b border-line px-6 py-5">
       <div className="mb-3 flex items-baseline justify-between">
         <div className="flex items-baseline gap-3">
-          <h3 className="font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink">
+          <h3 className="font-sans text-[12px] font-medium uppercase tracking-[0.22em] text-ink">
             {t("title")}
           </h3>
-          <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3">
+          <span className="font-sans text-[11px] uppercase tracking-[0.18em] text-ink-3">
             {editions.length.toString().padStart(2, "0")}
           </span>
         </div>
@@ -170,7 +170,7 @@ export default function EditionTabsClient({
                 aria-hidden
                 className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.40)_0%,rgba(0,0,0,0.15)_45%,rgba(0,0,0,0.65)_100%)]"
               />
-              <div className="absolute left-4 top-4 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-white">
+              <div className="absolute left-4 top-4 font-sans text-[10px] font-medium uppercase tracking-[0.16em] text-white">
                 {meta}
               </div>
               {isActive ? (
@@ -180,7 +180,7 @@ export default function EditionTabsClient({
                 />
               ) : null}
               <div className="absolute bottom-4 left-4 right-4">
-                <h4 className="font-serif text-[18px] font-semibold leading-[1.15] tracking-[-0.015em] text-white md:text-[20px]">
+                <h4 className="font-display text-[18px] font-semibold leading-[1.15] tracking-[-0.015em] text-white md:text-[20px]">
                   {edition.title}
                 </h4>
               </div>

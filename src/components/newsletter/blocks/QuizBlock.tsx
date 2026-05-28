@@ -70,10 +70,10 @@ export default function QuizBlock({
 
   return (
     <div className="space-y-4">
-      <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-action">
+      <div className="font-sans text-[10px] uppercase tracking-[0.18em] text-action">
         {labels.engagementEyebrows.quiz}
       </div>
-      <p className="font-serif text-lg italic leading-snug text-ink">
+      <p className="font-display text-lg italic leading-snug text-ink">
         {block.question}
       </p>
       {isLoading && !data ? (
@@ -112,7 +112,7 @@ export default function QuizBlock({
                     />
                     <div className="relative flex items-center justify-between gap-3">
                       <span className="text-sm text-ink">{opt.label}</span>
-                      <span className="font-mono text-xs text-ink-2">{pct}%</span>
+                      <span className="font-sans text-xs text-ink-2">{pct}%</span>
                     </div>
                   </li>
                 );
@@ -134,7 +134,7 @@ export default function QuizBlock({
           </ul>
           {hasAnswered && correctIndex !== null ? (
             <div
-              className={`font-mono text-[10px] uppercase tracking-wide ${
+              className={`font-sans text-[10px] uppercase tracking-wide ${
                 userCorrect ? "text-emerald-700" : "text-red-700"
               }`}
             >

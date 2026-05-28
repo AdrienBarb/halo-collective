@@ -51,7 +51,7 @@ export default async function AdminNewslettersPage() {
             <TableBody>
               {newsletters.map((n) => (
                 <TableRow key={n.id}>
-                  <TableCell className="font-mono text-[12px]">
+                  <TableCell className="font-sans text-[12px]">
                     {n.editionNumber.toString().padStart(2, "0")}
                   </TableCell>
                   <TableCell className="font-medium">{n.title}</TableCell>

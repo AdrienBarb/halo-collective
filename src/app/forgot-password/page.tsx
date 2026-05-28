@@ -22,7 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 
 const buttonClass =
-  "w-full cursor-pointer rounded-md bg-accent-warm py-3 font-mono text-[12px] font-semibold uppercase tracking-[0.22em] text-ink transition hover:bg-accent-gold disabled:cursor-not-allowed disabled:opacity-60";
+  "w-full cursor-pointer rounded-md bg-accent-warm py-3 font-sans text-[12px] font-medium uppercase tracking-[0.22em] text-ink transition hover:bg-accent-gold disabled:cursor-not-allowed disabled:opacity-60";
 
 export default function ForgotPasswordPage() {
   const t = useTranslations("Auth.ForgotPassword");
@@ -68,10 +68,10 @@ export default function ForgotPasswordPage() {
       <div className="mx-auto flex min-h-[calc(100vh-80px)] max-w-lg flex-col justify-center px-6 py-12">
         <div className="overflow-hidden rounded-2xl border border-line bg-cream-2">
           <div className="bg-ink px-6 py-6 text-center md:px-10 md:py-8">
-            <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-accent-gold">
+            <div className="font-sans text-[11px] font-medium uppercase tracking-[0.22em] text-accent-gold">
               {t("eyebrow")}
             </div>
-            <h1 className="mt-2 font-serif text-[28px] font-semibold leading-tight tracking-[-0.015em] text-cream md:text-[32px]">
+            <h1 className="mt-2 font-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-cream md:text-[32px]">
               {t("title")}
             </h1>
           </div>
@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
           <div className="px-6 py-8 md:px-10 md:py-10">
             {sent ? (
               <div className="space-y-4 text-center">
-                <p className="font-serif text-[18px] text-ink">
+                <p className="font-display text-[18px] text-ink">
                   {t("checkInboxTitle")}
                 </p>
                 <p className="text-[14px] leading-relaxed text-ink-3">
@@ -88,7 +88,7 @@ export default function ForgotPasswordPage() {
                 {isLandingHidden() ? null : (
                   <Link
                     href="/"
-                    className="inline-block pt-2 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-ink underline-offset-2 hover:underline"
+                    className="inline-block pt-2 font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-ink underline-offset-2 hover:underline"
                   >
                     {t("backToHalo")}
                   </Link>
@@ -110,7 +110,7 @@ export default function ForgotPasswordPage() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
+                        <FormLabel className="font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-ink-3">
                           {t("email")}
                         </FormLabel>
                         <FormControl>

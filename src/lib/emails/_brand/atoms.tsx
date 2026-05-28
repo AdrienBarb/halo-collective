@@ -20,10 +20,10 @@ export function EmailParagraphs({
           style={{
             margin: i === 0 ? `${firstMarginTop}px 0 0` : `${gap}px 0 0`,
             color: palette.textBody,
-            fontFamily: fonts.serif,
+            fontFamily: fonts.sans,
             fontSize: 15,
-            fontStyle: "italic",
-            lineHeight: 1.75,
+            fontWeight: 400,
+            lineHeight: 1.7,
           }}
         >
           {p}
@@ -49,10 +49,10 @@ export function EmailCtaButton({
         boxSizing: "border-box",
         backgroundColor: palette.panelDark,
         color: palette.surface,
-        fontFamily: fonts.mono,
-        fontSize: 12,
+        fontFamily: fonts.display,
+        fontSize: 14,
         fontWeight: 700,
-        letterSpacing: "0.18em",
+        letterSpacing: "0.12em",
         textTransform: "uppercase",
         textDecoration: "none",
         padding: "14px 20px",
@@ -71,11 +71,12 @@ export function EmailHeading({ children }: { children: ReactNode }) {
       style={{
         margin: 0,
         color: palette.panelDark,
-        fontFamily: fonts.serif,
-        fontSize: 30,
-        fontWeight: 600,
-        lineHeight: 1.15,
-        letterSpacing: "-0.015em",
+        fontFamily: fonts.display,
+        fontSize: 32,
+        fontWeight: 700,
+        lineHeight: 1.1,
+        letterSpacing: "-0.005em",
+        textTransform: "uppercase",
       }}
     >
       {children}
@@ -88,10 +89,10 @@ export function EmailLead({ children }: { children: ReactNode }) {
     <Text
       style={{
         margin: "16px 0 0",
-        color: palette.textBody,
-        fontFamily: fonts.serif,
+        color: palette.textPrimary,
+        fontFamily: fonts.sans,
         fontSize: 17,
-        fontStyle: "italic",
+        fontWeight: 500,
         lineHeight: 1.5,
       }}
     >
@@ -106,7 +107,9 @@ export function EmailBody({ children }: { children: ReactNode }) {
       style={{
         margin: "16px 0 0",
         color: palette.textBody,
+        fontFamily: fonts.sans,
         fontSize: 15,
+        fontWeight: 400,
         lineHeight: 1.65,
       }}
     >
@@ -130,10 +133,10 @@ export function EmailButton({
         marginTop: 24,
         backgroundColor: palette.accent,
         color: palette.panelDark,
-        fontFamily: fonts.mono,
-        fontSize: 12,
-        fontWeight: 600,
-        letterSpacing: "0.22em",
+        fontFamily: fonts.display,
+        fontSize: 14,
+        fontWeight: 700,
+        letterSpacing: "0.12em",
         textTransform: "uppercase",
         textDecoration: "none",
         padding: "14px 28px",

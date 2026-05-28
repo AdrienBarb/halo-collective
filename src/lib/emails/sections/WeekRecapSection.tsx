@@ -62,7 +62,7 @@ function MatchFormatHeader({ format }: { format: "singles" | "doubles" }) {
       style={{
         margin: "0 0 4px",
         color: palette.textMuted,
-        fontFamily: fonts.mono,
+        fontFamily: fonts.sans,
         fontSize: 10,
         letterSpacing: "0.18em",
         textTransform: "uppercase",

@@ -149,13 +149,13 @@ export default function SectionRenderer({
           aria-hidden
           className="absolute inset-x-0 top-0 h-[3px] bg-accent-gold"
         />
-        <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-accent-warm md:text-[13px] md:tracking-[0.28em]">
+        <div className="font-sans text-[11px] font-medium uppercase tracking-[0.2em] text-accent-warm md:text-[13px] md:tracking-[0.28em]">
           <span>{number}</span>
           <span aria-hidden className="mx-1.5 md:mx-2">·</span>
           <span>{eyebrow}</span>
         </div>
         {title ? (
-          <h2 className="font-serif text-[24px] font-medium leading-[1.1] tracking-[-0.02em] text-cream md:text-[36px]">
+          <h2 className="font-display text-[24px] font-bold uppercase leading-[1.1] tracking-[-0.005em] text-cream md:text-[36px]">
             {title}
           </h2>
         ) : null}

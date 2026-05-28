@@ -57,7 +57,7 @@
   --color-ring: #1a1612;
 
   /* ---------- Type families ---------- */
-  --font-serif: var(--font-serif), Georgia, "Times New Roman", serif;
+  --font-display: var(--font-display), "Helvetica Neue Condensed", "Arial Narrow", Helvetica, Arial, sans-serif;
   --font-sans: var(--font-sans), "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: var(--font-mono), "SF Mono", ui-monospace, monospace;
 
@@ -113,60 +113,64 @@ body {
    Editorial typography utilities
    ========================= */
 
-/* Display serif uppercase — landing hero "THE INSIDE STORY..." */
+/* Display uppercase — landing hero "THE INSIDE STORY..." */
 .h-display {
-  font-family: var(--font-serif);
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: 32px;
   line-height: 1.1;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.01em;
   text-transform: uppercase;
   color: var(--color-ink);
 }
 
 /* H1 — athlete name on story page */
 .h1 {
-  font-family: var(--font-serif);
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: 26px;
   line-height: 1.05;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
   color: var(--color-ink);
 }
 
 /* H2 — section/module title (sits on navy banner) */
 .h2 {
-  font-family: var(--font-serif);
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: 20px;
   line-height: 1.15;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
   color: var(--color-cream);
 }
 
 /* H3 — card heading */
 .h3 {
-  font-family: var(--font-serif);
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: 15px;
   line-height: 1.1;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
+  text-transform: uppercase;
   color: var(--color-ink);
 }
 
-/* Italic serif — pull quote / hero subtitle (journal voice) */
+/* Display italic — pull quote / hero subtitle */
 .quote {
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   font-weight: 400;
   font-style: italic;
   font-size: 17px;
   line-height: 1.5;
-  letter-spacing: -0.005em;
+  letter-spacing: 0;
   color: var(--color-ink-2);
 }
 
 .quote-sm {
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
+  font-weight: 400;
   font-style: italic;
   font-size: 15px;
   line-height: 1.4;
@@ -176,6 +180,7 @@ body {
 /* Body paragraph */
 .p-body {
   font-family: var(--font-sans);
+  font-weight: 400;
   font-size: 14px;
   line-height: 1.55;
   color: var(--color-ink-2);
@@ -183,23 +188,24 @@ body {
 
 .p-body-sm {
   font-family: var(--font-sans);
+  font-weight: 400;
   font-size: 12px;
   line-height: 1.5;
   color: var(--color-ink-2);
 }
 
-/* Mono labels — the visual signature: wide-tracked uppercase */
+/* Sans labels — the visual signature: wide-tracked uppercase */
 .eyebrow {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--color-accent-gold);
 }
 
 .meta {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 9px;
   font-weight: 500;
   letter-spacing: 0.18em;
@@ -208,32 +214,9 @@ body {
 }
 
 .tiny {
-  font-family: var(--font-mono);
-  font-size: 8px;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--color-ink-3);
-}
-
-/* Wordmark composite: italic Fraunces "HALO" + mono small-caps "COLLECTIVE" */
-.wordmark {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 5px;
-}
-.wordmark .halo {
-  font-family: var(--font-serif);
-  font-style: italic;
+  font-family: var(--font-sans);
+  font-size: 9px;
   font-weight: 500;
-  font-size: 18px;
-  letter-spacing: -0.02em;
-  color: var(--color-ink);
-}
-.wordmark .collective {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  font-size: 10px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--color-ink-3);
@@ -243,14 +226,14 @@ body {
    Buttons (brand variants)
    ========================= */
 
-/* Dark CTA — ink/cream, uppercase mono */
+/* Dark CTA — ink/cream, uppercase display */
 .btn-primary-cta {
   background: var(--color-ink);
   color: var(--color-cream);
-  font-family: var(--font-mono);
-  font-weight: 600;
-  font-size: 11px;
-  letter-spacing: 0.15em;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   padding: 14px 20px;
   border-radius: var(--radius-md);
@@ -266,9 +249,9 @@ body {
 .btn-action {
   background: var(--color-action);
   color: #ffffff;
-  font-family: var(--font-mono);
-  font-weight: 900;
-  font-size: 11px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 13px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   padding: 10px 20px;
@@ -311,9 +294,9 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 999px;
   color: #ffffff;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   padding: 6px 12px;

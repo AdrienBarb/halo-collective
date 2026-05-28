@@ -97,7 +97,7 @@ export function EmailLayout({
                           style={{
                             margin: 0,
                             color: palette.textOnDark,
-                            fontFamily: fonts.mono,
+                            fontFamily: fonts.sans,
                             fontSize: 11,
                             fontWeight: 600,
                             letterSpacing: "0.22em",
@@ -118,7 +118,7 @@ export function EmailLayout({
                           className="force-dark-fg"
                           style={{
                             color: palette.textOnDark,
-                            fontFamily: fonts.mono,
+                            fontFamily: fonts.sans,
                             fontSize: 10,
                             fontWeight: 700,
                             letterSpacing: "0.18em",
@@ -165,7 +165,7 @@ export function EmailLayout({
               style={{
                 margin: footerNote ? "12px 0 0" : 0,
                 color: palette.textMuted,
-                fontFamily: fonts.mono,
+                fontFamily: fonts.sans,
                 fontSize: 10,
                 fontWeight: 600,
                 letterSpacing: "0.18em",

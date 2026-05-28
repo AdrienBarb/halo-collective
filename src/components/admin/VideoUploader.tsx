@@ -67,7 +67,7 @@ export default function VideoUploader({
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={isUploading}
-          className="inline-flex items-center gap-2 rounded-md border border-line bg-cream px-3 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-ink hover:bg-cream-2 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-md border border-line bg-cream px-3 py-2 font-sans text-[11px] font-medium uppercase tracking-[0.18em] text-ink hover:bg-cream-2 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isUploading
             ? "Uploading…"
@@ -80,7 +80,7 @@ export default function VideoUploader({
             type="button"
             onClick={onClear}
             disabled={isUploading}
-            className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-3 hover:text-ink disabled:opacity-60"
+            className="font-sans text-[11px] uppercase tracking-[0.18em] text-ink-3 hover:text-ink disabled:opacity-60"
           >
             Remove
           </button>

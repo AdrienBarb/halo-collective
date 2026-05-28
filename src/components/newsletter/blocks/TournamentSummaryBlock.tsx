@@ -32,7 +32,7 @@ export default function TournamentSummaryBlock({
       <div className="min-w-0 flex-1">
         <div className="text-base font-bold text-ink">{summary.name}</div>
         {meta.length > 0 ? (
-          <div className="mt-1 font-mono text-[10px] uppercase tracking-wide text-ink-3">
+          <div className="mt-1 font-sans text-[10px] uppercase tracking-wide text-ink-3">
             {meta.join(" · ")}
           </div>
         ) : null}

@@ -12,7 +12,7 @@ export default function PhaseTimelineBlock({ block }: PhaseTimelineBlockProps) {
           key={i}
           className="flex gap-5 border-b border-line py-4 last:border-b-0"
         >
-          <div className="w-20 shrink-0 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-action">
+          <div className="w-20 shrink-0 font-sans text-[11px] font-bold uppercase tracking-[0.14em] text-action">
             {phase.label}
           </div>
           <div className="min-w-0 flex-1">

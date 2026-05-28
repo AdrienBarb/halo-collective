@@ -61,20 +61,20 @@ export default function QABlock({
 
   return (
     <div className="space-y-4">
-      <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-action">
+      <div className="font-sans text-[10px] uppercase tracking-[0.18em] text-action">
         {labels.engagementEyebrows.qa}
       </div>
       {block.intro ? (
         <p className="text-sm text-ink-2">{block.intro}</p>
       ) : null}
-      <p className="font-serif text-lg italic leading-snug text-ink">
+      <p className="font-display text-lg italic leading-snug text-ink">
         {block.prompt}
       </p>
       {isLoading && !data ? (
         <div className="h-24 animate-pulse rounded bg-line/30" aria-hidden />
       ) : submitted ? (
         <div className="space-y-2 rounded border border-line bg-cream-2 px-4 py-3">
-          <div className="font-mono text-[10px] uppercase tracking-wide text-emerald-700">
+          <div className="font-sans text-[10px] uppercase tracking-wide text-emerald-700">
             {labels.engagementInteractive.yourAnswerRecorded}
           </div>
           <p className="text-sm text-ink">{submitted}</p>
@@ -107,7 +107,7 @@ export default function QABlock({
           </Button>
         </form>
       )}
-      <p className="font-mono text-[10px] uppercase tracking-wide text-ink-3">
+      <p className="font-sans text-[10px] uppercase tracking-wide text-ink-3">
         {block.reassurance ?? labels.reassuranceText}
       </p>
     </div>

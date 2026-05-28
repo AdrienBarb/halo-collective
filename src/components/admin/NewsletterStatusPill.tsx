@@ -27,7 +27,7 @@ export default function NewsletterStatusPill({
     <span
       className={[
         "inline-flex items-center gap-2 rounded-pill border px-3 py-1.5",
-        "font-mono text-[10px] font-semibold uppercase tracking-[0.22em]",
+        "font-sans text-[10px] font-medium uppercase tracking-[0.22em]",
         TONE[status],
       ].join(" ")}
     >

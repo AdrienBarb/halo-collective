@@ -36,11 +36,20 @@ export const palette = {
   bye: "#999999",
 } as const;
 
-// Email-safe font stacks. Web fonts don't reliably load in
-// Outlook/Gmail clients, so we use system-resident families only.
+// Email-safe font stacks. Web fonts don't reliably load in Outlook/Gmail
+// clients, so we use system-resident families only. The stacks below
+// approximate the web brand (Barlow Condensed + Inter) using the closest
+// system equivalents — recipients with the brand fonts installed locally
+// will see them; everyone else falls back gracefully.
+//
+//  display → Barlow Condensed approximation (Arial Narrow on Windows/Office,
+//            Helvetica Neue Condensed on Apple)
+//  sans    → Inter, leading with the user's local install before OS sans
+//  serif   → deprecated; remaining references are migrating to display/sans
+//  mono    → OTP code display only
 export const fonts = {
-  display: '"Arial Black", "Arial Bold", Helvetica, Arial, sans-serif',
+  display: '"Barlow Condensed", "Helvetica Neue Condensed", "Arial Narrow", Oswald, Impact, Helvetica, Arial, sans-serif',
   serif: 'Georgia, "Times New Roman", Times, serif',
-  sans: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+  sans: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
   mono: '"SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
 } as const;

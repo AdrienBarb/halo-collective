@@ -7,7 +7,7 @@ interface SocialRecapBlockProps {
 export default function SocialRecapBlock({ block }: SocialRecapBlockProps) {
   return (
     <div className="space-y-3">
-      <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+      <div className="font-sans text-[10px] uppercase tracking-[0.18em] text-ink-3">
         Social recap
       </div>
       <ul className="space-y-2">
@@ -22,7 +22,7 @@ export default function SocialRecapBlock({ block }: SocialRecapBlockProps) {
               {post.caption ? (
                 <span className="block text-sm text-ink">{post.caption}</span>
               ) : null}
-              <span className="mt-1 block truncate font-mono text-[10px] uppercase tracking-wide text-action">
+              <span className="mt-1 block truncate font-sans text-[10px] uppercase tracking-wide text-action">
                 {post.url} →
               </span>
             </a>

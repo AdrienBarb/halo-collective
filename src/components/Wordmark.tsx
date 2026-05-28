@@ -11,18 +11,18 @@ export default function Wordmark({
   size = "default",
   className = "",
 }: WordmarkProps) {
-  const haloSize = size === "large" ? "text-[22px]" : "text-[18px]";
-  const collectiveSize = size === "large" ? "text-[11px]" : "text-[10px]";
+  const haloSize = size === "large" ? "text-[24px]" : "text-[20px]";
+  const collectiveSize = size === "large" ? "text-[13px]" : "text-[12px]";
 
   const content = (
     <>
       <span
-        className={`font-serif italic font-semibold ${haloSize} tracking-[-0.02em] text-ink`}
+        className={`font-display font-bold uppercase ${haloSize} tracking-[-0.005em] text-ink`}
       >
         HALO
       </span>
       <span
-        className={`font-mono font-semibold ${collectiveSize} tracking-[0.22em] uppercase text-ink-3`}
+        className={`font-display font-normal uppercase ${collectiveSize} tracking-[0.12em] text-ink-3`}
       >
         COLLECTIVE
       </span>

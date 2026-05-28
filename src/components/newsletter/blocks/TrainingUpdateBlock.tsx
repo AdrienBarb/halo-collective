@@ -10,7 +10,7 @@ export default function TrainingUpdateBlock({ block }: TrainingUpdateBlockProps)
   const paragraphs = splitParagraphs(block.body);
   return (
     <div className="space-y-4">
-      <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-3">
+      <div className="font-sans text-[10px] uppercase tracking-[0.18em] text-ink-3">
         Training
       </div>
       {block.media ? <MediaBlock media={block.media} /> : null}

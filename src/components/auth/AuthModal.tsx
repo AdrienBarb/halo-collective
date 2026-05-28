@@ -41,10 +41,10 @@ export default function AuthModal({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md border-line bg-cream-2">
         <DialogHeader>
-          <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-accent-gold">
+          <div className="font-sans text-[11px] font-medium uppercase tracking-[0.22em] text-accent-gold">
             {mode === "signup" ? t("eyebrowSignUp") : t("eyebrowSignIn")}
           </div>
-          <DialogTitle className="font-serif text-[24px] font-semibold tracking-[-0.015em] text-ink">
+          <DialogTitle className="font-display text-[24px] font-semibold tracking-[-0.015em] text-ink">
             {mode === "signup" ? t("titleSignUp") : t("titleSignIn")}
           </DialogTitle>
         </DialogHeader>

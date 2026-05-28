@@ -62,7 +62,7 @@ export default function PrizeDrawBlock({
 
   return (
     <div className="space-y-4">
-      <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-action">
+      <div className="font-sans text-[10px] uppercase tracking-[0.18em] text-action">
         {labels.engagementEyebrows.prize_draw}
       </div>
       {block.prizeMedia ? <MediaBlock media={block.prizeMedia} /> : null}
@@ -77,11 +77,11 @@ export default function PrizeDrawBlock({
       {isLoading && !data ? (
         <div className="h-20 animate-pulse rounded bg-line/30" aria-hidden />
       ) : isClosed ? (
-        <div className="rounded border border-line bg-cream-2 px-4 py-3 font-mono text-[10px] uppercase tracking-wide text-ink-3">
+        <div className="rounded border border-line bg-cream-2 px-4 py-3 font-sans text-[10px] uppercase tracking-wide text-ink-3">
           {labels.engagementInteractive.drawClosed}
         </div>
       ) : isEntered ? (
-        <div className="rounded border border-emerald-300 bg-emerald-50 px-4 py-3 font-mono text-[11px] uppercase tracking-wide text-emerald-800">
+        <div className="rounded border border-emerald-300 bg-emerald-50 px-4 py-3 font-sans text-[11px] uppercase tracking-wide text-emerald-800">
           {labels.engagementInteractive.inDraw}
         </div>
       ) : (
