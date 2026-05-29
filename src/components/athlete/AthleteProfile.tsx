@@ -38,25 +38,47 @@ export default function AthleteProfile({
   previewMode = false,
 }: AthleteProfileProps) {
   const fullName = `${athlete.firstName} ${athlete.lastName}`;
-  const flag = flagFor(athlete.countryCode);
-  const t = useTranslations("Athlete.Profile");
 
-  // Anonymous visitors get a single-purpose gate: only the subscribe card,
-  // inside the standard cream layout (navbar + footer stay).
+  // Anonymous visitors get the full profile rendered as a blurred,
+  // non-interactive backdrop with the subscribe gate pinned on top. The gate
+  // stays vertically centered as the visitor scrolls the blurred page.
   // Subscription requires a user account, so !isSignedIn implies !isSubscribed.
   if (!isSignedIn && !previewMode) {
     return (
-      <div className="bg-cream">
-        <div className="mx-auto max-w-[820px] border-x border-line bg-cream-2">
-          <SubscribeButton
-            athleteSlug={athlete.slug}
-            athleteFirstName={athlete.firstName}
-            athleteLastName={athlete.lastName}
-            athleteAvatarUrl={athlete.avatarUrl}
-            isSignedIn={isSignedIn}
-            isSubscribed={isSubscribed}
-            ipCountryCode={ipCountryCode}
-          />
+      <div className="fixed inset-0 z-40 overflow-y-auto bg-cream">
+        <div className="relative mx-auto flex min-h-full max-w-[820px] items-center justify-center overflow-hidden border-x border-line bg-cream-2 px-4 py-8">
+          {/* Blurred, non-interactive newsletter backdrop — clipped to this
+              column so the blur never bleeds past the border lines.
+              previewMode keeps the engagement blocks from firing authenticated
+              fetches (anonymous visitors would 401 → sign-out → redirect). */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 select-none overflow-hidden blur-[3px]"
+          >
+            <ProfileBody
+              athlete={athlete}
+              editions={editions}
+              selectedSlug={selectedSlug}
+              isSubscribed={false}
+              previewMode
+              forceEditionsVisible
+            />
+          </div>
+
+          <div aria-hidden className="absolute inset-0 bg-cream/30" />
+
+          <div className="relative w-full max-w-[600px]">
+            <SubscribeButton
+              athleteSlug={athlete.slug}
+              athleteFirstName={athlete.firstName}
+              athleteLastName={athlete.lastName}
+              athleteAvatarUrl={athlete.avatarUrl}
+              isSignedIn={isSignedIn}
+              isSubscribed={isSubscribed}
+              ipCountryCode={ipCountryCode}
+              compact
+            />
+          </div>
         </div>
       </div>
     );
@@ -65,50 +87,14 @@ export default function AthleteProfile({
   return (
     <div className="bg-cream">
       <div className="mx-auto max-w-[820px] border-x border-line bg-cream-2">
-        <EditionsCover
+        <ProfileBody
+          athlete={athlete}
           editions={editions}
-          initialSelectedSlug={selectedSlug}
-          athleteCoverImageUrl={athlete.coverImageUrl ?? null}
-          flag={flag}
-          memberBadgeLabel={t("memberBadge")}
+          selectedSlug={selectedSlug}
+          isSubscribed={isSubscribed}
+          previewMode={previewMode}
+          forceEditionsVisible={false}
         />
-
-        <ProfileIdentity
-          fullName={fullName}
-          firstName={athlete.firstName}
-          lastName={athlete.lastName}
-          avatarUrl={athlete.avatarUrl}
-          countryName={athlete.countryName}
-          flagEmoji={flag.emoji}
-        />
-
-        {athlete.bio ? <ProfileBio bio={athlete.bio} /> : null}
-
-        <StatsRow athlete={athlete} />
-
-        <SponsorsStrip sponsors={athlete.sponsors} />
-
-        {isSubscribed && editions.length > 0 ? (
-          <EditionsView
-            athleteSlug={athlete.slug}
-            editions={editions}
-            initialSelectedSlug={selectedSlug}
-            previewMode={previewMode}
-          />
-        ) : null}
-
-        {isSubscribed && editions.length === 0 ? (
-          <section className="px-6 py-12 md:py-16">
-            <div className="rounded-2xl border border-dashed border-line bg-cream-2 px-6 py-14 text-center">
-              <p className="font-display text-[22px] leading-tight text-ink">
-                {t("noEditionsTitle")}
-              </p>
-              <p className="mt-2 text-[14px] text-ink-3">
-                {t("noEditionsBody")}
-              </p>
-            </div>
-          </section>
-        ) : null}
 
         <SubscribeButton
           athleteSlug={athlete.slug}
@@ -124,6 +110,79 @@ export default function AthleteProfile({
         />
       </div>
     </div>
+  );
+}
+
+interface ProfileBodyProps {
+  athlete: AthleteWithSponsors;
+  editions: EditionWithSections[];
+  selectedSlug: string | null;
+  isSubscribed: boolean;
+  previewMode: boolean;
+  forceEditionsVisible: boolean;
+}
+
+function ProfileBody({
+  athlete,
+  editions,
+  selectedSlug,
+  isSubscribed,
+  previewMode,
+  forceEditionsVisible,
+}: ProfileBodyProps) {
+  const fullName = `${athlete.firstName} ${athlete.lastName}`;
+  const flag = flagFor(athlete.countryCode);
+  const t = useTranslations("Athlete.Profile");
+  const showEditions =
+    (forceEditionsVisible || isSubscribed) && editions.length > 0;
+
+  return (
+    <>
+      <EditionsCover
+        editions={editions}
+        initialSelectedSlug={selectedSlug}
+        athleteCoverImageUrl={athlete.coverImageUrl ?? null}
+        flag={flag}
+        memberBadgeLabel={t("memberBadge")}
+      />
+
+      <ProfileIdentity
+        fullName={fullName}
+        firstName={athlete.firstName}
+        lastName={athlete.lastName}
+        avatarUrl={athlete.avatarUrl}
+        countryName={athlete.countryName}
+        flagEmoji={flag.emoji}
+      />
+
+      {athlete.bio ? <ProfileBio bio={athlete.bio} /> : null}
+
+      <StatsRow athlete={athlete} />
+
+      <SponsorsStrip sponsors={athlete.sponsors} />
+
+      {showEditions ? (
+        <EditionsView
+          athleteSlug={athlete.slug}
+          editions={editions}
+          initialSelectedSlug={selectedSlug}
+          previewMode={previewMode}
+        />
+      ) : null}
+
+      {isSubscribed && editions.length === 0 ? (
+        <section className="px-6 py-12 md:py-16">
+          <div className="rounded-2xl border border-dashed border-line bg-cream-2 px-6 py-14 text-center">
+            <p className="font-display text-[22px] leading-tight text-ink">
+              {t("noEditionsTitle")}
+            </p>
+            <p className="mt-2 text-[14px] text-ink-3">
+              {t("noEditionsBody")}
+            </p>
+          </div>
+        </section>
+      ) : null}
+    </>
   );
 }
 

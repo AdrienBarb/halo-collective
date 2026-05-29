@@ -24,6 +24,7 @@ interface SubscribeButtonProps {
   isSignedIn: boolean;
   isSubscribed: boolean;
   ipCountryCode: string | null;
+  compact?: boolean;
 }
 
 export default function SubscribeButton({
@@ -34,6 +35,7 @@ export default function SubscribeButton({
   isSignedIn,
   isSubscribed,
   ipCountryCode,
+  compact = false,
 }: SubscribeButtonProps) {
   const router = useRouter();
   const t = useTranslations("Athlete.Subscribe");
@@ -90,11 +92,19 @@ export default function SubscribeButton({
   const submitting = subscribe.isPending;
 
   return (
-    <section className="px-6 pt-10 pb-12 md:pt-12">
+    <section className={compact ? "" : "px-6 pt-10 pb-12 md:pt-12"}>
       <div className="overflow-hidden rounded-2xl border border-line bg-cream-2">
-        <div className="bg-ink px-6 py-8 text-center md:px-10 md:py-10">
+        <div
+          className={`bg-ink text-center ${
+            compact ? "px-6 py-6 md:px-8 md:py-7" : "px-6 py-8 md:px-10 md:py-10"
+          }`}
+        >
           {athleteAvatarUrl !== undefined ? (
-            <div className="relative mx-auto mb-5 h-20 w-20 overflow-hidden rounded-full border-2 border-cream/20 bg-[linear-gradient(135deg,#5a6478_0%,#2c3340_100%)] md:h-24 md:w-24">
+            <div
+              className={`relative mx-auto overflow-hidden rounded-full border-2 border-cream/20 bg-[linear-gradient(135deg,#5a6478_0%,#2c3340_100%)] ${
+                compact ? "mb-3 h-16 w-16" : "mb-5 h-20 w-20 md:h-24 md:w-24"
+              }`}
+            >
               {athleteAvatarUrl ? (
                 <Image
                   src={athleteAvatarUrl}
@@ -114,17 +124,25 @@ export default function SubscribeButton({
           <div className="font-sans text-[11px] font-medium uppercase tracking-[0.22em] text-accent-gold">
             {t("eyebrow")}
           </div>
-          <h2 className="mt-2 font-display text-[28px] font-bold uppercase leading-tight tracking-[-0.005em] text-cream md:text-[34px]">
+          <h2
+            className={`mt-2 font-display font-bold uppercase leading-tight tracking-[-0.005em] text-cream ${
+              compact ? "text-[24px] md:text-[28px]" : "text-[28px] md:text-[34px]"
+            }`}
+          >
             {t("title", { athleteFirstName })}
           </h2>
         </div>
 
-        <div className="px-6 py-8 md:px-10 md:py-10">
-          <div className="space-y-3">
+        <div
+          className={
+            compact ? "px-6 py-6 md:px-8 md:py-7" : "px-6 py-8 md:px-10 md:py-10"
+          }
+        >
+          <div className={compact ? "space-y-2.5" : "space-y-3"}>
             <label
-              className={`flex cursor-pointer gap-4 rounded-xl border-2 bg-cream-2 p-5 transition ${
-                newsletterConsent ? "border-loss" : "border-line"
-              }`}
+              className={`flex cursor-pointer gap-4 rounded-xl border-2 bg-cream-2 transition ${
+                compact ? "p-4" : "p-5"
+              } ${newsletterConsent ? "border-loss" : "border-line"}`}
             >
               <input
                 type="checkbox"
@@ -146,9 +164,9 @@ export default function SubscribeButton({
             </label>
 
             <label
-              className={`flex cursor-pointer gap-4 rounded-xl border-2 bg-cream-2 p-5 transition ${
-                partnerOffersConsent ? "border-loss" : "border-line"
-              }`}
+              className={`flex cursor-pointer gap-4 rounded-xl border-2 bg-cream-2 transition ${
+                compact ? "p-4" : "p-5"
+              } ${partnerOffersConsent ? "border-loss" : "border-line"}`}
             >
               <input
                 type="checkbox"
@@ -177,12 +195,18 @@ export default function SubscribeButton({
             type="button"
             onClick={onSubscribeClick}
             disabled={submitting}
-            className="mt-4 w-full cursor-pointer rounded-md bg-accent-warm py-4 font-display text-[14px] font-bold uppercase tracking-[0.12em] text-ink transition hover:bg-accent-gold disabled:cursor-not-allowed disabled:opacity-60"
+            className={`mt-4 w-full cursor-pointer rounded-md bg-accent-warm font-display text-[14px] font-bold uppercase tracking-[0.12em] text-ink transition hover:bg-accent-gold disabled:cursor-not-allowed disabled:opacity-60 ${
+              compact ? "py-3.5" : "py-4"
+            }`}
           >
             {submitting ? t("subscribing") : t("subscribeCta")}
           </button>
 
-          <p className="mt-6 text-center text-[12px] leading-relaxed text-ink-3">
+          <p
+            className={`text-center text-[12px] leading-relaxed text-ink-3 ${
+              compact ? "mt-4" : "mt-6"
+            }`}
+          >
             {t("finePrint")}
           </p>
         </div>
